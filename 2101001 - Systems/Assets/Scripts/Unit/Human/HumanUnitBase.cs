@@ -256,6 +256,7 @@ public class HumanUnitBase : MonoBehaviour
         public List<Vector3> position; // 자신의 기관계의 위치를 나타냅니다. 기준은 유닛이 바라보는 방향이 (0,0,-1)일때입니다.
         public List<float> radius; // 반지름, scale값의 절반
 
+        // 이 바이오 시스템이 가지고 있는 케미컬 양
         public List<GameManager.chemical> chemicals; // 원리와 화학은 이쪽에서 다뤄질 것 같습니다.
         public List<GameManager.chemical> chemicalsRatioForSurvival; // 원리와 화학은 이쪽에서 다뤄질 것 같습니다.
         public List<GameManager.chemical> chemicalsRatioForOperate; // 원리와 화학은 이쪽에서 다뤄질 것 같습니다.
