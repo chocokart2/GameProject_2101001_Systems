@@ -3,7 +3,15 @@ guid: 6c02f9e5db81efc42804c1565d8599e3
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - MaterialNull: {fileID: 2100000, guid: ce8a1e71c3d0013439941d2b662ce1d4, type: 2}
+  - MachineMaterialNull: {fileID: 2100000, guid: 7836839d0ebcc4548af6b32724c7d258,
+      type: 2}
+  - MaterialPositiveX: {instanceID: 0}
+  - MaterialPositiveY: {instanceID: 0}
+  - MaterialNegativeX: {instanceID: 0}
+  - MaterialNegativeY: {instanceID: 0}
+  - myUnitAI: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

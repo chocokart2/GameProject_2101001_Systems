@@ -12,6 +12,9 @@ TagManager:
   - StartDarkFog
   - Visible
   - 3D
+  - tee
+  - Unit
+  - Light
   layers:
   - Default
   - TransparentFX
@@ -25,7 +28,7 @@ TagManager:
   - Visible
   - 3D
   - Unit
-  - 
+  - FieldMouseInput
   - 
   - 
   - 

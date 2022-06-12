@@ -1,0 +1,49 @@
+fileFormatVersion: 2
+guid: 8533ef87a3660a747a829b97e4f501c0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - KnifeBlade: {fileID: 7349551938747291488, guid: 006c1c3042e59f94ab0eb5e618ab3d54,
+      type: 3}
+  - KnifeHand: {instanceID: 0}
+  - PistolBullet: {fileID: 381776451933462528, guid: 2c1f9b6c3f44fac4cbb5020e0171d102,
+      type: 3}
+  - UnitSightPrefab: {fileID: 2582533030928220571, guid: 1899de7d30b91954e92701aea8ee1f44,
+      type: 3}
+  - EnergyStorage: {fileID: 434823172946834840, guid: 5ca17aee82e13364b844619c800d86f0,
+      type: 3}
+  - EnergyTransmission: {fileID: 7710862785368572221, guid: f7713930f7c3f554496ef201a191b144,
+      type: 3}
+  - EnergyFarm: {fileID: 7227679414761953378, guid: 6c71e6f0bef06ee44812af3b16b305d5,
+      type: 3}
+  - PlacementFixture: {fileID: 6933711212470791875, guid: d1d7cc2452b712e4398f40d156a3bd4d,
+      type: 3}
+  - PlacementDrone: {fileID: 5770033144022579235, guid: 4f6958295fb3bd842925480603bf6846,
+      type: 3}
+  - PlacementRcCar: {instanceID: 0}
+  - SensorString: {fileID: 8306087332928653514, guid: b1e1045a220df0b448fb3f47f149df81,
+      type: 3}
+  - SensorCamera: {instanceID: 0}
+  - NetworkCircuit: {instanceID: 0}
+  - NetworkAntenna: {fileID: 5274552058813666489, guid: 691b77da977476844a8b033d6770694b,
+      type: 3}
+  - NetworkRouter: {instanceID: 0}
+  - AttackBomb: {instanceID: 0}
+  - AttackTurret: {fileID: 3719170197599077008, guid: 0f50ae24bf2ef604392a1a485877b01a,
+      type: 3}
+  - DisturberWall: {instanceID: 0}
+  - DisturberCamo_hologram: {instanceID: 0}
+  - DisturberLight: {fileID: 6250590557529770511, guid: 803c5ac4e23a88246b6440da13efa88b,
+      type: 3}
+  - ProductMine: {instanceID: 0}
+  - ProductMove: {instanceID: 0}
+  - ProductCraft: {instanceID: 0}
+  - ProductSave: {instanceID: 0}
+  - MachineSettingGUI: {fileID: 3539557358890066545, guid: 2c76a38fdc107864686954a9ab400d9d,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

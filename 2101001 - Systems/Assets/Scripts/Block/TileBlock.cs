@@ -23,7 +23,10 @@ public class TileBlock : MonoBehaviour
     }
 
     /// <summary>
-    ///
+    /// 만약에 자신이 Sight에 부딛힘 + 눈에 들어오는 조건도 만족함
+    /// ㄴ부딛힌 Sight의 parent로 들어감.
+    /// (+ㄴㄴ 이값이 TeamSight로 들어가게 되고)
+    /// (+ㄴㄴㄴ 들어온 데이터를 기반으로 타일을 랜더링하게 됩니다.)
     /// </summary>
 
     // Update is called once per frame

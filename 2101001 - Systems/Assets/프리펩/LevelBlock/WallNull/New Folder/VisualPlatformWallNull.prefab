@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 595668274790599513}
   m_Layer: 9
   m_Name: VisualPlatformWallNull
-  m_TagString: Untagged
+  m_TagString: Visible
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

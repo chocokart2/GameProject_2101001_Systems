@@ -14,14 +14,8 @@ public class DarkFog : MonoBehaviour
     void Start()
     {
         myTransform = GetComponent<Transform>();
-        playerMemoryMap = GameObject.Find("Player").GetComponent<UnitMemory>().memoryMap;
+        playerMemoryMap = GameObject.Find("HumanPlayer").GetComponent<UnitMemory>().memoryMap;
         SaveMapData(100);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void OnTriggerEnter(Collider other)

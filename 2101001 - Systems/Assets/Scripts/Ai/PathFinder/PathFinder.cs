@@ -33,18 +33,18 @@ public class PathFinder : MonoBehaviour
 
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        //openNodeDic = new Dictionary<Vector3, myNode>();
-        //closedNodeDic = new Dictionary<Vector3, myNode>();
-    }
+//    // Start is called before the first frame update
+//    void Start()
+//    {
+//        //openNodeDic = new Dictionary<Vector3, myNode>();
+//        //closedNodeDic = new Dictionary<Vector3, myNode>();
+//    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+//    // Update is called once per frame
+//    void Update()
+//    {
+//        
+//    }
 
     public void PathFinderFunction(float _x, float _z, Vector3 unitPosition, ref List<Vector3> directionList, ref bool isAbleToReach) //_x와 _z는 목표점의 transform.position의 값들입니다.
     {

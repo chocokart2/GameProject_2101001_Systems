@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnergyTransmission : MonoBehaviour
 {
     public List<EnergyNetElement> EnergyNet;
-    public GameObject EnergyTransmissionRange;
+    public GameObject EnergyTransmissionRangeGO;
     GameObject EnergyTransmissionRangeInstantiate;
     Transform myTransform;
 
@@ -22,13 +22,14 @@ public class EnergyTransmission : MonoBehaviour
     void Start()
     {
         myTransform = GetComponent<Transform>();
-        EnergyTransmissionRangeInstantiate = Instantiate(EnergyTransmissionRange, myTransform.position, Quaternion.identity);
-        EnergyTransmissionRangeInstantiate.GetComponent<EnergyTransmissionRange>().machineTransform = myTransform;
+        EnergyTransmissionRangeInstantiate = Instantiate(EnergyTransmissionRangeGO, myTransform.position, Quaternion.identity);
+        EnergyTransmissionRangeInstantiate.GetComponent<EnergyTransmissionRange>().thatEnergyTransmission = gameObject; // 오류 가능성
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //EnergyTransmissionRangeInstantiate.GetComponent<EnergyTransmissionRange>().myTransform.position = myTransform.position;
+        EnergyTransmissionRangeInstantiate.GetComponent<EnergyTransmissionRange>().thatEnergyTransmission = gameObject;
     }
 }

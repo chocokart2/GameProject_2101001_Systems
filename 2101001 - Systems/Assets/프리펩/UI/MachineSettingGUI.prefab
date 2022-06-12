@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3539557358890066545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3539557358890066544}
+  - component: {fileID: 3539557358890066549}
+  - component: {fileID: -2734545298417713352}
+  m_Layer: 0
+  m_Name: MachineSettingGUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3539557358890066544
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3539557358890066545}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 19.25, z: 15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3539557358890066549
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3539557358890066545}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &-2734545298417713352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3539557358890066545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f79834d45bac5540ae248e704b03c1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MainSceneButton: {fileID: 1433053165685117343, guid: f60b36d513b468449af41287a64ed278,
+    type: 3}
+  TextBox: {fileID: 0}
+  MachineSettingBackground: {fileID: 1048690406082620082, guid: eb34cce32a32579489ca292536f7c8d4,
+    type: 3}
+  MachineSettingTitle: {fileID: 4787887879752987180, guid: f2779df2aa74df140b750810b5e95a8e,
+    type: 3}
+  MachineSettingDeco: {fileID: 855333573885214335, guid: e2770926059f8364ebf5a86225d5e97c,
+    type: 3}
+  MachineSettingButton: {fileID: 3650964924368357615, guid: 18c2528e5796fbd43aada6eaa9168fb8,
+    type: 3}
+  MachineSettingSubGuiBackground: {fileID: 8710088737221831671, guid: 3e97bc64e4c08814db6ecde5821df517,
+    type: 3}
+  MachineSettingUpButton: {fileID: 0}
+  MachineSettingDownButton: {fileID: 0}
+  EnergyPriorityButton: {fileID: 0}
+  NetworkConnectorSelfIcon: {fileID: 0}
+  NetworkConnectorDisconnectedIcon: {fileID: 0}
+  NetworkConnectorPartiallyConnectedIcon: {fileID: 0}
+  NetworkConnectorConnectedIcon: {fileID: 8385667599173379519, guid: 0d0b138ff6abb9648a85c379546db55d,
+    type: 3}
+  NetworkConnectorMenu: {fileID: 0}
+  MachineSettingTitleText: {fileID: 0}
+  TargetMachine: {fileID: 0}

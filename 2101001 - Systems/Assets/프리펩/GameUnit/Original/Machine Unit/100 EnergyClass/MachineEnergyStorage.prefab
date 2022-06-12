@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxEnergy: 100
-  Energy: 0
+  energy: 0
   energyPriority: 200
 --- !u!1001 &4657773795758450453
 PrefabInstance:
@@ -90,6 +90,16 @@ PrefabInstance:
     - target: {fileID: 8798859314729726561, guid: 1d567fdbf6ea1af4086220028445fa23,
         type: 3}
       propertyPath: MachineUnitCode
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798859314729726561, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: regularMachineClassID
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798859314729726561, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: officialMachineClassID
       value: 101
       objectReference: {fileID: 0}
     m_RemovedComponents: []

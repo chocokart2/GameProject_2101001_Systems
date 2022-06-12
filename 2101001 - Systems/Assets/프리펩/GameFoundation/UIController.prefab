@@ -49,3 +49,7 @@ MonoBehaviour:
   tileLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  FieldMouseInputLayerMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  DebugGameObject: {fileID: 0}

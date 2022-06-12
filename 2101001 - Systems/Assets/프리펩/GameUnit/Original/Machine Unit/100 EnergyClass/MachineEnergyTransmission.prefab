@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22e43a1a6e36bc44592c466ee8891fd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnergyTransmissionRange: {fileID: 8864169416028134230, guid: 93c858d5cd6c6fc45a2fc2bb96a6e254,
+  EnergyTransmissionRangeGO: {fileID: 8864169416028134230, guid: 93c858d5cd6c6fc45a2fc2bb96a6e254,
     type: 3}
 --- !u!1001 &3290175367665996720
 PrefabInstance:
@@ -89,6 +89,11 @@ PrefabInstance:
     - target: {fileID: 8798859314729726561, guid: 1d567fdbf6ea1af4086220028445fa23,
         type: 3}
       propertyPath: MachineUnitCode
+      value: 102
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798859314729726561, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: officialMachineClassID
       value: 102
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -7,13 +7,19 @@ using UnityEngine;
 
 public class UnitMovable : MonoBehaviour
 {
+
+    string CurrentStatus;
+
+
     
+
+
     public List<Vector3> directionList;
     float cumulativeTime; // 누적 시간
     float moveSpeed;
     bool isNeedNewVector;
     bool isUnitMovingNow;
-    bool isNewListComes;
+    //bool isNewListComes;
     GameManager thatGameManager;
     Transform myTransform;
     PathFinder myPathfinder;
@@ -21,6 +27,9 @@ public class UnitMovable : MonoBehaviour
     Vector3 futurePosition;
     Vector3 destinationPosition;
     Vector3 currentVector;
+
+    // 수동 컨트롤을 위한 컴포넌트입니다.
+    Vector3 CalledDirection;
 
     //Vector3 DEBUG_oldVector;
 
@@ -31,6 +40,8 @@ public class UnitMovable : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        CurrentStatus = "Stop";
+
         deltaMove = 0.0f;
         cumulativeTime = 0.0f;
         directionList = new List<Vector3>(); // 초반에 아무것도 없음
@@ -40,11 +51,11 @@ public class UnitMovable : MonoBehaviour
         myPathfinder = GetComponent<PathFinder>();
         //moveSpeed = 3.0f;
         moveSpeed = 4.0f; // 움직임 리스트
-        moveSpeed = 1.0f; // 움직임 리스트
+        //moveSpeed = 1.0f; // 움직임 리스트
         isNeedNewVector = false;
         //isNewList = false;
         isUnitMovingNow = false;
-        isNewListComes = false;
+        //isNewListComes = false;
         //DEBUG_oldVector = new Vector3(0, 0, 0);
     }
 
@@ -157,6 +168,22 @@ public class UnitMovable : MonoBehaviour
     }
 
 
+    // check
+
+    void Check()
+    {
+
+    }
+
+    void Work()
+    {
+
+    }
+
+
+
+
+
     public void MoveCommand(float destinationPositionX, float destinationPositionZ)
     {
         Mathf.Round(destinationPositionX);
@@ -196,11 +223,21 @@ public class UnitMovable : MonoBehaviour
         // 이 컴포넌트가 놀고 있으면 바로 새 백터를 끼웁니다.
         // 그렇지 않다면, 업데이트 함수에 현재 쓰고 있는 벡터를 다 쓸 때까지 기다리도록 합니다.
     }
+    public void Move(Vector3 vector, float efficiency)
+    {
+        myTransform.transform.position += vector.normalized * Time.deltaTime * moveSpeed * efficiency;
+        //
+
+    }
 
     void RePathFinding()
     {
 
     }
+
+    
+
+
 }
 
 

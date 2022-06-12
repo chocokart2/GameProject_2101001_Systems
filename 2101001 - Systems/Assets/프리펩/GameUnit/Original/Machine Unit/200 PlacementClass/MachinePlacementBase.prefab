@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 1046888903806349221}
   - component: {fileID: 3471925728598838649}
   - component: {fileID: 3440914932637931132}
-  m_Layer: 0
-  m_Name: Cube
+  m_Layer: 11
+  m_Name: PlacementColliderBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88,11 +88,24 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2539882782979346114}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &9096810972366801646
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545847781777753372}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Center: {x: 0, y: -0.4, z: 0}
 --- !u!114 &5560093494166906660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,6 +118,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2683c81104b317341992ea119fcd8f42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emptyObject: {fileID: 8107366115615122423, guid: 999b98a0d636482479c5fd20115e1225,
+    type: 3}
+  IsMachineConnected: 0
+  IsNetworkConnected: 0
 --- !u!1001 &4699590202360387473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -112,6 +129,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1440580059434390439, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: isRenderingChangable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3444715577661051597, guid: 1d567fdbf6ea1af4086220028445fa23,
         type: 3}
       propertyPath: m_RootOrder
@@ -166,6 +188,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3965945788844970065, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3965945788844970065, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3965945788844970065, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 4017444718975058857, guid: 1d567fdbf6ea1af4086220028445fa23,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4153324094409400109, guid: 1d567fdbf6ea1af4086220028445fa23,
         type: 3}

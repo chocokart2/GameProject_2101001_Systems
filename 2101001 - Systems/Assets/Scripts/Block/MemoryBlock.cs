@@ -33,7 +33,7 @@ public class MemoryBlock : MonoBehaviour
 
         //myTransform.translate()
 
-        playerMemoryMap = GameObject.Find("Player").GetComponent<UnitMemory>().memoryMap;
+        playerMemoryMap = GameObject.Find("HumanPlayer").GetComponent<UnitMemory>().memoryMap;
 
         if (isStartWithFogBlock)
         {
@@ -100,6 +100,8 @@ public class MemoryBlock : MonoBehaviour
 
         }
     }
+
+
 
     void OnTriggerExit(Collider other)
     {

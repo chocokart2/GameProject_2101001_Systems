@@ -52,6 +52,14 @@ public class PlayerController : MonoBehaviour
         // 3레이저는 바닥에 닿으면 체크합니다.
         // 4 2,3줄은 태그를 이용해서 벽과 바닥을 구분하도록 합니다.
         // 바닥에 닿은 레이저는 그 바닥이 벽 아래 바닥인지, 그냥 바닥인지 체크합니다.
+
+        // UIController가 등장한 버전
+        // (0. UI컨트롤러가 자신이 선택한 게임오브젝트에게 컨트롤 메시지를 던집니다.)
+        // 1. UI컨트롤러로부터 컨트롤 메시지를 받습니다
+        // 2. 컨트롤 메시지를 받으면 움직입니다.
+
+
+        /*
         if (Input.GetMouseButtonDown(1)) // 마우스 클릭을 받았습니다!
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -68,7 +76,7 @@ public class PlayerController : MonoBehaviour
                 UnityEngine.Debug.Log("DEBUG_Update_마우스 클릭 좌표 : " + x + " and " + z);
                 MoveToTile(x, z);
             }
-        }
+        }*/
     }
 
     void MoveToTile(float _x, float _z)
@@ -79,7 +87,7 @@ public class PlayerController : MonoBehaviour
         //transform.position = new Vector3(_x, 1, _z);
 
         // 0.2 버전 : 경로를 만들고 가능한 경로가 있으면 한칸씩 움직입니다.
-        myUnitMovable.MoveCommand(_x, _z);
+        //myUnitMovable.MoveCommand(_x, _z);
 
         //PathFinder(_x, _z);
         //bool isPathFinderMakeit = false;
