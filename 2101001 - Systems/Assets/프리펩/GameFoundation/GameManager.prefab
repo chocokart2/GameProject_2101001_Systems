@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6704812024731203047}
   - component: {fileID: 2235429176708526653}
   - component: {fileID: 5977269259205586430}
+  - component: {fileID: -7397609774329034343}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -29,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -45,10 +47,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80976a43c9de0984abb86d8ba2d45d51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FixturePosition: []
+  currentFieldData:
+    playerTeamName: 
+    currentPlayLocation: []
+    teamsAndSquads: []
+    unitDatas: []
+    humanUnitDatas: []
+    machineUnitDatas: []
+    unitBaseComponentData: []
+    organListComponentData: []
+    unitItemPackComponentData: []
+    tileDatas: []
+    missionDatas: []
+    GameCurrentLocation: 
+  baseUnitList: []
+  humanUnitList: []
+  machineUnitList: []
+  playerTeam: 
   HumanPrefabDefaultSkin: {fileID: 3516928186645611712, guid: 40322c3fbafda8947a8a556c941aea0d,
     type: 3}
   HumanPrefabKartSkin: {fileID: 402454375768657497, guid: 0cad6d07d48e90a40ba3226589c9ac2b,
     type: 3}
+  EnergyStorage: {fileID: 0}
+  EnergyTransmission: {fileID: 0}
+  EnergyFarm: {fileID: 0}
+  PlacementFixture: {fileID: 0}
+  PlacementDrone: {fileID: 0}
+  PlacementRcCar: {fileID: 0}
+  SensorString: {fileID: 0}
+  SensorCamera: {fileID: 0}
+  NetworkSircuit: {fileID: 0}
+  NetworkAntenna: {fileID: 0}
+  AttackBomb: {fileID: 0}
+  Attackturret: {fileID: 0}
+  DisturberWall: {fileID: 0}
+  DisturberCamo_hologram: {fileID: 0}
+  DisturberLight: {fileID: 0}
+  ProductMine: {fileID: 0}
+  ProductMove: {fileID: 0}
+  ProductCraft: {fileID: 0}
+  ProductSave: {fileID: 0}
 --- !u!114 &2235429176708526653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,3 +112,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9ed1e2243840144bb9d36bd609414b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ErrorLog: []
+--- !u!114 &-7397609774329034343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6704812024731203046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd53cf35570ed5746a6a38438068ca4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  tileLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  FieldMouseInputLayerMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  DebugGameObject: {fileID: 0}
+  openedGuiName: 
+  isGuiOpenedAtField: 0

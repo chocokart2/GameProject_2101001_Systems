@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -52,4 +53,7 @@ MonoBehaviour:
   FieldMouseInputLayerMask:
     serializedVersion: 2
     m_Bits: 4096
-  DebugGameObject: {fileID: 0}
+  DebugGameObject: {fileID: 5959670853136304392, guid: 91aabf764fc1319468ae7d5693ae75dc,
+    type: 3}
+  openedGuiName: 
+  isGuiOpenedAtField: 0

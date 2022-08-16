@@ -22,6 +22,35 @@ public class UIController : MonoBehaviour
 
     public bool isGuiOpenedAtField; // GUI가 켜져 있는 동안에는 다른 작동이 허용되지 않습니다.
 
+    #region 키 바인딩
+
+    // 플레이어 움직임
+    KeyCode MoveNorth = KeyCode.W;
+    KeyCode MoveSouth = KeyCode.S;
+    KeyCode MoveEast = KeyCode.D;
+    KeyCode MoveWest = KeyCode.A;
+
+    // 아이템 선택하기
+    KeyCode ItemSelect1 = KeyCode.Alpha1;
+    KeyCode ItemSelect2 = KeyCode.Alpha2;
+    KeyCode ItemSelect3 = KeyCode.Alpha3;
+
+    // 아이템 사용하기
+    KeyCode ItemSkill1 = KeyCode.E;
+    KeyCode ItemSkill2 = KeyCode.F;
+    KeyCode ItemReload = KeyCode.R;
+
+    // 유닛 선택하기
+    KeyCode UnitSelect = KeyCode.LeftShift;
+
+    // 유닛 명령하기
+    KeyCode UnitCommand = KeyCode.Q;
+
+    // 봇 유닛 메뉴
+    KeyCode BotMenu = KeyCode.Tab;
+
+    #endregion
+
 
     Camera FieldCamera;
     Camera UICamera;
