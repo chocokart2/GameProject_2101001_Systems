@@ -20,8 +20,9 @@ public class GameManager : MonoBehaviour
 {
     #region 어디에 쓰이는 클래슨고?
     // 게임의 전반적인 통제자
-    // UI 통제 기능
-    // 플레이어 데이터 통제
+    // UiManager UI 통제 기능 (타 컴포넌트)
+    // FieldManager 플레이어 데이터 통제
+    // 게임이 끝났는지 판정하는 GoalManager
 
     // UI 통제 기능
     // 키보드 입력 / 마우스 입력을 받아들여 그에 맞는 함수를 실행시켜준다.
@@ -29,7 +30,7 @@ public class GameManager : MonoBehaviour
     //
     // 플레이어 데이터 통제
     // 플레이어 데이터 [파일로부터 읽어오기] / [업데이트] / [파일로 저장]
-    //
+    // 각 팀의 상황들, 정보를 전부 저장한다.
 
 
     #endregion
@@ -94,6 +95,10 @@ public class GameManager : MonoBehaviour
 
 
     #region 길찾기 알고리즘 보조역할
+
+
+
+
     Dictionary<Vector3, int> RealTileMap;
     void TileMapSetup() { RealTileMap = new Dictionary<Vector3, int>(); }
 
@@ -719,6 +724,8 @@ public class GameManager : MonoBehaviour
 
     #region Field Manager
     // 필드 매니저의 역할.
+    // "불러오기, 수정, 저장"
+
     // 전체 필드에 존재하는 유닛들을 저장하고, 필드에 존재하는 것들을 끌어들입니다. 반대로 전투가 끝나면 유닛과 타일들을 저장합니다.
     // 1. 야전에 유닛들과 타일을 불러오거나, 끝나면 Json 파일로 저장하는 역할을 맡습니다.
     // (-) 유닛 연구 상태, 어떤 유닛을 생산했는지에 대한 정보는 저장하지 않습니다. 다른 매니저에게 이 일을 맡기십시오.
@@ -728,142 +735,6 @@ public class GameManager : MonoBehaviour
     // Assets/GameFile/Field에서 파일이 있는지 체크합니다.
     // 유닛 정보 / 팀 정보 / 스쿼드 정보를 긁어오거나 데모 데이터를 필드에 저장합니다.
 
-    #region TestCode
-    bool TestMode; // true이면 프로그램이 실행할 때마다 테스트를 진행합니다.
-
-
-    //1. 폴더에 있는 JSON 파일을 가져오거나, 중간에 삽입되어 얻은 값들로, 유닛을 생성합니다.
-
-    // 1.1. 파일을 가져와 변수에 저장하는 것
-    // 조건. JsonString을 변수로 저장했을때, 변수에 미할당 기본값이 남아있는지 체크 할 것.
-    bool testLoading(FieldData field)
-    {
-        return false;
-    }
-    // 1.2. 변수의 값으로 유닛을 생성하는 것.
-    // 조건. 유닛을 생성하고 이벤트를 호출하고 그 유닛이 응답해주는 함수를 호출하였을때, 누락된 유닛이 있는지 체크할 것. 유닛의 목록과 응답한 유닛의 목록을 비교하라.
-
-    // 1.2.1. 유닛의 컴포넌트와 세부 사항.
-    // 조건. 컴포넌트에 값이 들어갔느냐 기본값이 아니라 할당된 값 여부를 판단.
-
-    // 2. 게임매니저가 필드에 존재하는 유닛들에게 정보를 긁어와 Json 파일로 만드는 것
-
-    // 
-
-
-
-
-    #endregion
-    #region Delegate
-    public delegate void VoidToVoid();
-
-    #endregion
-    #region Event
-
-    #endregion
-    #region Field - Field Manager
-
-
-
-    #region 호출 순서가 중요한 필드
-
-    // 필드는 호출 순서대로 넣습니다.
-
-
-
-    // 로딩시 넣는 임시 데이터
-
-
-
-
-    // 
-    public delegate void UnitInfoDataHandler(ref FieldData myData);
-    public event UnitInfoDataHandler BeconEventForUnit = delegate (ref FieldData myData) { };
-    //public event UnitInfoDataHandler BeconEventForUnit = delegate (ref List<UnitInfoData> myData) { };
-
-    // 팀/스쿼드/유닛
-
-    public FieldData currentFieldData; // 현재의 필드 데이터입니다. 데이터 로딩으로 먼저 채워진 후, 비콘으로 데이터가 추가로 채워지고 난 뒤, 게임 도중에 다시 수정 될 수 있습니다.
-    //public List<Team> teamList;
-    //public List<Squad> squadList;
-    //public List<UnitInfo> unitInfoList;// 지워질 데이터,
-    public List<BaseUnitData> baseUnitList;
-    public List<HumanUnitInfoData> humanUnitList;
-    public List<MachineUnitInfoData> machineUnitList;
-    // 주석한 부분 인스턴스 아이디를 키값으로 하고, 데이터 상으로 존재하는 유닛 정보를 벨류값으로 하는 딕셔너리 아이디어였습니다.
-    //public Dictionary<int, int> InstanceIdToUnitId; // gameObject.GetInstanceID()값을 세계 내부의 고정값인 UnitInfoID값으로 바꿔줍니다.
-    //public Dictionary<int, BaseUnitData> UnitDictionary; // 필드에 존재하는 유닛들
-    public Dictionary<int, SquadData> SquadDictionary;
-    public Dictionary<int, Team> TeamDictionary;
-
-    // 플레이어가 조종할 팀 설정
-    public string playerTeam;
-
-    #endregion
-    #region 유닛 필드
-
-
-
-    //public List<Team> teams;
-    Team Alpha;
-    Team Beta;
-    Team Neutral;
-
-    int LastSpawnedUnitId;
-
-
-
-    #endregion
-
-
-    #region Prefabs
-    #region UnitPrefabs
-    #region Human Prefabs And Skin
-    public GameObject HumanPrefabDefaultSkin;
-    public GameObject HumanPrefabKartSkin;
-
-    // charactor 따라서 prefab를 다른걸로 설정하여 instantiate의 첫번째 매개변수를 결정합니다.
-    #endregion
-    #region Machine Prefabs
-    public GameObject EnergyStorage; // 101
-    public GameObject EnergyTransmission; // 102
-    public GameObject EnergyFarm; // 103
-    public GameObject PlacementFixture; // 201
-    public GameObject PlacementDrone; // 202
-    // spider had been terminated
-    public GameObject PlacementRcCar; // 204
-    public GameObject SensorString; // 301
-    public GameObject SensorCamera; // 302
-    public GameObject NetworkSircuit; // 501
-    public GameObject NetworkAntenna; // 502
-    public GameObject AttackBomb; // 701
-    public GameObject Attackturret; // 702
-    public GameObject DisturberWall; // 801
-    public GameObject DisturberCamo_hologram; // 802
-    public GameObject DisturberLight; // 803
-    public GameObject ProductMine; // 901
-    public GameObject ProductMove; // 902
-    public GameObject ProductCraft; // 903
-    public GameObject ProductSave; // 904
-    #endregion
-    #endregion
-    #region TilePrefabs
-    #region Floor
-
-    #endregion
-    #region Wall
-
-    #endregion
-
-
-    #endregion
-
-    #endregion
-
-
-
-
-    #endregion
     #region Class - Field Manager
 
     #region Base - Class-Field Manager
@@ -876,6 +747,16 @@ public class GameManager : MonoBehaviour
     //
     //    public List<TeamData> teamDatas;
     //}
+
+    [System.Serializable]
+    public class FieldManager
+    {
+        public FieldData fieldData
+        {
+            get; set;
+        }
+    }
+
     [System.Serializable]
     public class FieldData // <!> 아직 완벽하지 않은 데이터입니다! 야전에 추가할 정보가 있으면 더 추가해주세요.
     {
@@ -890,8 +771,8 @@ public class GameManager : MonoBehaviour
                                              // 해당 지역의 타일 배치가 실행되고, 거기에 존재하는 유닛도 배치됩니다.
                                              // <!> 스쿼드도 지역 이름따라 배치될 수있지만, 같은 장소에 다른 미션들을 받은경우가 있으면 어떻게 할지 로직이 필요합니다.
                                              // 만약 동시에 두개 이상의 공간을 보여주려면 여러 지역 이름을 나열합니다.
-        // 현재 플레이어의 목표는 스쿼드의 미션을 확인하세요. 현재 위치에 존재하는 스쿼드의 미션이 곧 현재의 목표입니다.
-        //
+                                             // 현재 플레이어의 목표는 스쿼드의 미션을 확인하세요. 현재 위치에 존재하는 스쿼드의 미션이 곧 현재의 목표입니다.
+                                             //
 
         // 여러 야전의 전반적인 데이터가 저장되는 곳입니다.
         public TeamData[] teamsAndSquads; // 분대에 대한 정보, 유닛이 존재하는 지역을 담습니다
@@ -937,9 +818,9 @@ public class GameManager : MonoBehaviour
         {
             if (unitDatas == null) return null;
 
-            for(int index = 0; index < unitDatas.Length; index++)
+            for (int index = 0; index < unitDatas.Length; index++)
             {
-                if(unitDatas[index].ID == id)
+                if (unitDatas[index].ID == id)
                 {
                     return unitDatas[index];
                 }
@@ -984,7 +865,7 @@ public class GameManager : MonoBehaviour
         // 데이터는 ID에 맞게 불러옵니다. 자신의 ID가 저장되어 있으면 불러오고 그렇지 못하면 디폴트 데이터를 불러옵니다.
         public BaseUnitData()
         {
-            
+
         }
         public BaseUnitData(string gameObjectName)
         {
@@ -1161,6 +1042,25 @@ public class GameManager : MonoBehaviour
     #endregion
     #region Tile - Class-Field Manager
     [System.Serializable]
+    public class BlockData
+    {
+        #region 어디에 쓰이는 클래슨고?
+        // 필드를 로딩하거나 저장할때, 블럭들이 어디에 어떤 블럭이 있었는지를 저장하는 용도의 클래스입니다.
+        // 또는 유니티를 이용해 자기만의 맵을 만들었을때도 저장하는 용도입니다.
+
+        #region 필드 설명
+        // BlockID
+        // 어떤 블럭인가
+        // 블럭의 형태뿐 만 아니라 어떤 텍스쳐의 블럭을 사용하였는가도 저장하는 용도입니다.
+        #endregion
+        #endregion
+        public int blockID;
+        public Vector3 blockPosition;
+    }
+
+
+    [System.Serializable]
+    [Obsolete("이 데이터는 구식입니다. BlockData 형식을 이용하세요.")]
     public class BaseTileData
     {
         public int TileID;
@@ -1181,6 +1081,146 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #endregion
+
+
+
+    #region TestCode
+    bool TestMode; // true이면 프로그램이 실행할 때마다 테스트를 진행합니다.
+
+
+    //1. 폴더에 있는 JSON 파일을 가져오거나, 중간에 삽입되어 얻은 값들로, 유닛을 생성합니다.
+
+    // 1.1. 파일을 가져와 변수에 저장하는 것
+    // 조건. JsonString을 변수로 저장했을때, 변수에 미할당 기본값이 남아있는지 체크 할 것.
+    bool testLoading(FieldData field)
+    {
+        return false;
+    }
+    // 1.2. 변수의 값으로 유닛을 생성하는 것.
+    // 조건. 유닛을 생성하고 이벤트를 호출하고 그 유닛이 응답해주는 함수를 호출하였을때, 누락된 유닛이 있는지 체크할 것. 유닛의 목록과 응답한 유닛의 목록을 비교하라.
+
+    // 1.2.1. 유닛의 컴포넌트와 세부 사항.
+    // 조건. 컴포넌트에 값이 들어갔느냐 기본값이 아니라 할당된 값 여부를 판단.
+
+    // 2. 게임매니저가 필드에 존재하는 유닛들에게 정보를 긁어와 Json 파일로 만드는 것
+
+    // 
+
+
+
+
+    #endregion
+    #region Delegate
+    public delegate void VoidToVoid();
+
+    #endregion
+    #region Event
+
+    #endregion
+    #region Field - Field Manager
+
+
+
+    #region 호출 순서가 중요한 필드
+
+    // 필드는 호출 순서대로 넣습니다.
+
+
+
+    // 로딩시 넣는 임시 데이터
+
+
+
+
+    // 
+    public delegate void UnitInfoDataHandler(ref FieldData myData);
+    public event UnitInfoDataHandler BeconEventForUnit = delegate (ref FieldData myData) { };
+    //public event UnitInfoDataHandler BeconEventForUnit = delegate (ref List<UnitInfoData> myData) { };
+
+    // 팀/스쿼드/유닛
+
+    public FieldData currentFieldData; // 현재의 필드 데이터입니다. 데이터 로딩으로 먼저 채워진 후, 비콘으로 데이터가 추가로 채워지고 난 뒤, 게임 도중에 다시 수정 될 수 있습니다.
+    //public List<Team> teamList;
+    //public List<Squad> squadList;
+    //public List<UnitInfo> unitInfoList;// 지워질 데이터,
+    public List<BaseUnitData> baseUnitList;
+    public List<HumanUnitInfoData> humanUnitList;
+    public List<MachineUnitInfoData> machineUnitList;
+    // 주석한 부분 인스턴스 아이디를 키값으로 하고, 데이터 상으로 존재하는 유닛 정보를 벨류값으로 하는 딕셔너리 아이디어였습니다.
+    //public Dictionary<int, int> InstanceIdToUnitId; // gameObject.GetInstanceID()값을 세계 내부의 고정값인 UnitInfoID값으로 바꿔줍니다.
+    //public Dictionary<int, BaseUnitData> UnitDictionary; // 필드에 존재하는 유닛들
+    public Dictionary<int, SquadData> SquadDictionary;
+    public Dictionary<int, Team> TeamDictionary;
+
+    // 플레이어가 조종할 팀 설정
+    public string playerTeam;
+
+    #endregion
+    #region 유닛 필드
+
+
+
+    //public List<Team> teams;
+    Team Alpha;
+    Team Beta;
+    Team Neutral;
+
+    int LastSpawnedUnitId;
+
+
+
+    #endregion
+
+
+    #region Prefabs
+    #region UnitPrefabs
+    #region Human Prefabs And Skin
+    public GameObject HumanPrefabDefaultSkin;
+    public GameObject HumanPrefabKartSkin;
+
+    // charactor 따라서 prefab를 다른걸로 설정하여 instantiate의 첫번째 매개변수를 결정합니다.
+    #endregion
+    #region Machine Prefabs
+    public GameObject EnergyStorage; // 101
+    public GameObject EnergyTransmission; // 102
+    public GameObject EnergyFarm; // 103
+    public GameObject PlacementFixture; // 201
+    public GameObject PlacementDrone; // 202
+    // spider had been terminated
+    public GameObject PlacementRcCar; // 204
+    public GameObject SensorString; // 301
+    public GameObject SensorCamera; // 302
+    public GameObject NetworkSircuit; // 501
+    public GameObject NetworkAntenna; // 502
+    public GameObject AttackBomb; // 701
+    public GameObject Attackturret; // 702
+    public GameObject DisturberWall; // 801
+    public GameObject DisturberCamo_hologram; // 802
+    public GameObject DisturberLight; // 803
+    public GameObject ProductMine; // 901
+    public GameObject ProductMove; // 902
+    public GameObject ProductCraft; // 903
+    public GameObject ProductSave; // 904
+    #endregion
+    #endregion
+    #region TilePrefabs
+    #region Floor
+
+    #endregion
+    #region Wall
+
+    #endregion
+
+
+    #endregion
+
+    #endregion
+
+
+
+
+    #endregion
+    
     #region Function - Field Manager
 
     #region generic Func
@@ -2026,7 +2066,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #endregion
-    #region Mission Manager
+    #region Goal Manager
     // 설명: 필드에 일어나는 전투와 전투 목적에 대해 관리하는 녀석입니다.
     // 전투 목표에 대해 체크합니다. (능동적으로 다른 변수를 감시하는 것이 아니라 함수로 호출되어 작동합니다.)
     // 전투 목표 달성 여부에 대해 체크합니다. (이 함수도 호출되어 작동됩니다.)
@@ -2040,7 +2080,47 @@ public class GameManager : MonoBehaviour
 
     #endregion
     #region Class
+    public class GoalManager
+    {
+        #region 이건 어디에 쓰이는 클래슨고?
+        // 싱글톤
+        // 1. 이 작전 필드에서 플레이어 입장에서 내려진 작전 목표에 대해서 저장하고
+        // 2. 플레이어가 작전에 성공했는지 Update 함수에서 자기 맴버 변수를 호출하여 항시 확인합니다.
+        // 3. 만약 작전에 대해서 성공했다면 이벤트를 호출합니다. (니들이 필요하면 알아서 쓰세요.)
+        #endregion
 
+        #region Field
+
+        #endregion
+        #region Class
+
+        #endregion
+        #region Function
+        public void CheckGoalStatus()
+        {
+            // 팀이 목표를 달성했는지 여부를 판단합니다.
+        }
+
+
+
+
+        #endregion
+
+    }
+
+
+    public class MissionGoal
+    {
+        // 플레이어가 가지고 있는 목표에 대해서 다룹니다.
+        // 1. 지역형
+        // 
+        // 
+        // 2. 캐릭터형
+        // 
+
+
+
+    }
 
 
 

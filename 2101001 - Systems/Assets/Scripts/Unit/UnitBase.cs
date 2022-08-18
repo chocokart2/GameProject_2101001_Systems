@@ -26,7 +26,9 @@ public class UnitBase : MonoBehaviour
     public Dictionary<string, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 Name이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
     public List<string> hierarchyGameObjectNameForRendering;
 
-    // 이 유닛이 각도에 따라 달라지는 모습이 담긴 필드입니다.
+    #region 다른 컴포넌트로 옮겨야 할 부분
+
+    #region 애니메이터로 옮겨야 할 부분 (먼 훗날에 할 것)
     public Material MaterialNull; // 기본형
     public Material MachineMaterialNull; // 머신 유닛 기본형
     public Material MaterialPositiveX; // 유닛이 바라보는 방향이 양의 X일때
@@ -34,6 +36,12 @@ public class UnitBase : MonoBehaviour
     public Material MaterialNegativeX; // 유닛이 바라보는 방향이 음의 X일때
     public Material MaterialNegativeY; // 유닛이 바라보는 방향이 음의 Y일때
     bool isMaterialSetted = false;
+    #endregion
+
+    // 이 유닛이 각도에 따라 달라지는 모습이 담긴 필드입니다.
+
+    #endregion
+
     // 자신과 자식 게임오브젝트의 이름을 작성합니다.
     // 이때, 자식 게임오브젝트중 UnitBase를 가지고 있는 게임오브젝트는 작성하지 않아도 됩니다.
     // 자식의 자식인경우, 폴더처럼 이름/자식/자식으로, 사이에 슬래쉬를 넣어주세요
