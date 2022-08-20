@@ -200,50 +200,73 @@ public class UnitBase : MonoBehaviour
     [System.Serializable]
     public class UnitBaseData // GameManager에서 사용하는 클래스입니다. 변할 수 있는 값들을 여기에 저장합니다.(이벤트는 기본적으로 설정됨.)
     {
-        public string unitType = "human"; // 소문자로 작성합니다. 두 단어 이상인 경우 두번째 단어부터 대문자를 쓰고 붙여씁니다.
-        public bool isUnitTypeSet = false;
-        public Vector3 direction;
-        public int instanceId; // 1) instantiate할때마다 생성됩니다. 2) GameManager에서 유닛을 찾는데 이용합니다.
-        public int gameManagerId;
-        public string teamID; // Unassigned값은
-
+        #region 생성자 목록
         public UnitBaseData()
         {
             unitType = "human";
-            isUnitTypeSet = false;
             direction = new Vector3(1, 0, 0);
             instanceId = -1;
-            teamID = "Player";
+            teamName = "Player";
         }
         public UnitBaseData(string _unitType)
         {
             this.unitType = _unitType;
-            this.isUnitTypeSet = true;
             this.direction = new Vector3(0, 1, 0);
             this.instanceId = -1;
-            teamID = "Player";
+            teamName = "Player";
         }
+        // 매개변수에 _instanceId를 사용하는 경우는 이미 존재하는 게임오브젝트를 데이터에 집어넣을 때 입니다.
         public UnitBaseData(string _unitType, int _instanceId)
         {
             this.unitType = _unitType;
-            this.isUnitTypeSet = true;
             this.direction = new Vector3(0, 1, 0);
             this.instanceId = _instanceId;
-            teamID = "Player";
+            teamName = "Player";
         }
         public UnitBaseData(string _unitType, int _instanceId, string _team) : this(_unitType, _instanceId)
         {
-            teamID = _team;
+            teamName = _team;
         }
         public UnitBaseData(GameManager.BaseUnitData unitData, string team)
         {
             unitType = unitData.unitType;
-            isUnitTypeSet = true;
             direction = unitData.direction;
             instanceId = -1;
             gameManagerId = unitData.ID;
-            teamID = team;
+            teamName = team;
         }
+        #endregion
+
+        public string unitType
+        {
+            get 
+            {
+                return unitType;
+            }
+            private set
+            {
+                if (unitType == null)
+                {
+                    unitType = value;
+                }
+            }
+        }
+        public string teamName { get; set; } // 자신을 포함하는 인스턴스가 누구인지를 가리킵니다.
+        //public bool isUnitTypeSet = false;
+        public Vector3 direction;
+        public int instanceId; // 1) instantiate할때마다 생성됩니다. 2) GameManager에서 유닛을 찾는데 이용합니다.
+        //public int gameManagerId; // 어레이에 없어짐으로서 더이상 사용하지 않음
+
+
+        #region 함수들
+
+        
+
+
+
+
+        #endregion
+
     }
 
 
@@ -437,7 +460,7 @@ public class UnitBase : MonoBehaviour
     {
         if(gameObject.name == "Player")
         {
-            unitBaseData.teamID = "Player";
+            unitBaseData.teamName = "Player";
         }
     }
 
@@ -474,27 +497,27 @@ public class UnitBase : MonoBehaviour
             if (targetObject.GetComponent<ChildObjectOfUnit>().isRenderingChangable == true)
             {
                 targetObject.GetComponent<Renderer>().enabled = isTeamLooking;
-                if (unitBaseData.teamID == gameManager.playerTeam)
+                if (unitBaseData.teamName == gameManager.playerTeam)
                 {
                     //targetObject.GetComponent<Renderer>().enabled = true;
                 }
             }
         }
     }
-    public void SightEnter(string teamID)
+    public void SightEnter(string teamName)
     {
         if (sightCount == null)
         {
             sightCount = new Dictionary<string, int>();
             sightCount.Add("Player", 1);
         }
-        if (sightCount.ContainsKey(teamID) == true)
+        if (sightCount.ContainsKey(teamName) == true)
         {
-            sightCount[teamID] += 1;
+            sightCount[teamName] += 1;
         }
         else
         {
-            sightCount.Add(teamID, 1);
+            sightCount.Add(teamName, 1);
         }
         if (lightCount == null)
         {
@@ -503,9 +526,9 @@ public class UnitBase : MonoBehaviour
         }
         checkRenderingCondition();
     }
-    public void SightExit(string teamID)
+    public void SightExit(string teamName)
     {
-        sightCount[teamID] -= 1;
+        sightCount[teamName] -= 1;
         checkRenderingCondition();
     }
     public void LightEnter(int lightNumber)

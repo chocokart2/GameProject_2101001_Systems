@@ -110,9 +110,9 @@ public class Beacon : MonoBehaviour
             // 자신의 팀에 자신의 유닛을 집어넣습니다.
 
             // 스쿼드를 이름따라 찾고 인덱스를 찾습니다.
-            for(int squadIndex = 0; targetField.teamsAndSquads[myTeamIndex].squads.Length > squadIndex; squadIndex++)
+            for(int squadIndex = 0; targetField.teamDatas[myTeamIndex].squads.Length > squadIndex; squadIndex++)
             {
-                if(targetField.teamsAndSquads[myTeamIndex].squads[squadIndex].name == UnitBaseSquad)
+                if(targetField.teamDatas[myTeamIndex].squads[squadIndex].name == UnitBaseSquad)
                 {
                     isSquadFound = true; mySquadIndex = squadIndex;
                     break;
@@ -180,14 +180,14 @@ public class Beacon : MonoBehaviour
         gameManager.AddComponentData(new UnitItemPack.UnitItemPackData(item1, item2, item3), ref targetField, ref fakeBaseUnitData);
         // Add this to there
         gameManager.AddElementInArray(ref targetField.unitDatas, fakeBaseUnitData);
-        gameManager.AddElementInArray(ref targetField.teamsAndSquads[myTeamIndex].squads[mySquadIndex].memberID, fakeBaseUnitData.ID);
+        gameManager.AddElementInArray(ref targetField.teamDatas[myTeamIndex].squads[mySquadIndex].memberID, fakeBaseUnitData.ID);
 
         // 3. HumanUnitInfoData
         GameManager.HumanUnitInfoData fakeHumanUnitInfoData = new GameManager.HumanUnitInfoData();
-        fakeHumanUnitInfoData.SquadID = targetField.teamsAndSquads[myTeamIndex].squads[mySquadIndex].SquadID;
+        fakeHumanUnitInfoData.SquadID = targetField.teamDatas[myTeamIndex].squads[mySquadIndex].SquadID;
         fakeHumanUnitInfoData.BaseUnitDataID = fakeBaseUnitData.ID;
         fakeHumanUnitInfoData.charactor = "kart";
-        fakeHumanUnitInfoData.TeamID = targetField.teamsAndSquads[myTeamIndex].ID;
+        fakeHumanUnitInfoData.TeamID = targetField.teamDatas[myTeamIndex].ID;
         gameManager.AddElementInArray(ref targetField.humanUnitDatas, fakeHumanUnitInfoData);
 
         Debug.Log("Debug_Becon.RegisterWithGameManagerCallBack: 자신의 주둔군 여부 : " + fakeBaseUnitData.isUnitStayedThatPlace);
