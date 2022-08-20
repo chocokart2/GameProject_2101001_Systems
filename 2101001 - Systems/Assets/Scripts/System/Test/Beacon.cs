@@ -82,18 +82,18 @@ public class Beacon : MonoBehaviour
         // 자신의 팀이 어디 있는지 찾는 배열입니다.
         bool isTeamFound = false; int myTeamIndex = 0; // 자신의 팀이 어느 인덱스에 존재하는지 알려줍니다.
         bool isSquadFound = false; int mySquadIndex = 0; // 자신의 스쿼드가 어느 인덱스에 존재하는지 알려줍니다.
-        for(int teamIndex = 0; targetField.teamsAndSquads.Length > teamIndex; teamIndex++) // 팀 배열의 머리부터 발끝까지 뒤집니다.
+        for(int teamIndex = 0; targetField.teamDatas.Length > teamIndex; teamIndex++) // 팀 배열의 머리부터 발끝까지 뒤집니다.
         {
             #region Error Hunter: Null cacher
-            if(targetField.teamsAndSquads[teamIndex] == null)
+            if(targetField.teamDatas[teamIndex] == null)
             {
-                Debug.Log("DEBUG_Beacon.RegisterWithGameManagerCallBack: targetField의 teamsAndSquad가 null입니다.");
+                Debug.Log("DEBUG_Beacon.RegisterWithGameManagerCallBack: targetField의 teamDatas가 null입니다.");
                 continue;
             }
 
             #endregion
 
-            if (targetField.teamsAndSquads[teamIndex].name == UnitBaseTeam) // 만약 이번 팀이 찾는 팀의 이름과 동일하다면
+            if (targetField.teamDatas[teamIndex].name == UnitBaseTeam) // 만약 이번 팀이 찾는 팀의 이름과 동일하다면
             {
                 //팀을 찾은거고,
                 isTeamFound = true;

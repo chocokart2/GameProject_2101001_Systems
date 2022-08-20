@@ -1673,7 +1673,7 @@ PrefabInstance:
     - target: {fileID: 2984364821172624298, guid: fb77ce2041596bb4087fab7f8b5aa967,
         type: 3}
       propertyPath: m_Name
-      value: MissionObject (3)
+      value: GoalObject
       objectReference: {fileID: 0}
     - target: {fileID: 5618784140063397665, guid: fb77ce2041596bb4087fab7f8b5aa967,
         type: 3}

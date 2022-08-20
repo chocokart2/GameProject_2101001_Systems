@@ -775,12 +775,12 @@ public class GameManager : MonoBehaviour
                                              //
 
         // 여러 야전의 전반적인 데이터가 저장되는 곳입니다.
-        public TeamData[] teamsAndSquads; // 분대에 대한 정보, 유닛이 존재하는 지역을 담습니다
+        public TeamData[] teamDatas; // 분대에 대한 정보, 유닛이 존재하는 지역을 담습니다
 
         // 유닛에 대한 정보입니다.
-        public BaseUnitData[] unitDatas;
-        public HumanUnitInfoData[] humanUnitDatas;
-        public MachineUnitInfoData[] machineUnitDatas;
+        //public BaseUnitData[] unitDatas;
+        //public HumanUnitInfoData[] humanUnitDatas;
+        //public MachineUnitInfoData[] machineUnitDatas;
         // 유닛 프리펩에 붙는 컴포넌트에 대한 정보입니다.
         // 휴먼 유닛
         public UnitBase.UnitBaseData[] unitBaseComponentData;
@@ -791,11 +791,15 @@ public class GameManager : MonoBehaviour
 
 
 
-        // 타일에 대한 정보라던가
-        public BaseTileData[] tileDatas;
 
-        // 미션에 대한 정보라던가
-        public MissionData[] missionDatas;
+
+        // 블럭에 대한 정보
+        public BlockData[] blockDatas;
+        
+        
+        
+        //public BaseTileData[] tileDatas;
+
         public string GameCurrentLocation; // 현재 플레이하고 있는 장소입니다.
 
 
@@ -832,11 +836,91 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
-    #region Unit - Class-Field Manager
 
-    #region 공통: 유닛
+
+    #region 1. TeamData : Squads(Unit) / Goal / BlockMemory
+    #region 1.0. Team Information
+
+
+    #region 레거시
+    public class Team
+    {
+        public string name;
+        public List<Squad> squads;
+        public Dictionary<Vector3, int> memoryMap; // 휘발성 메모리 맵입니다.
+    }
+    #endregion
+
+
+
+    #endregion
+    #region 1.1. Squads
+    #region 1.1.0. Squad Information
+
+
+    public class Squad
+    {
+        // 멤버에 대한 정보 저장.
+        // 분대의 위치 저장.
+        // 분대의 이름
+        // 분대 아이콘(?)
+
+        public int squadID; // 스쿼드의 아이디 // 이 세계에서 몇 번째로 생성된 스쿼드인지 기록합니다.
+        public string name; // 표시될 스쿼드의 이름 // 플레이어가 지정한 이름입니다.
+        public string nameOfLocation; // 위치한 지역의 이름
+        //public int squadID;
+        //public List<UnitInfo> member;
+
+        public List<int> memberID; //
+
+
+    }  
+
     [System.Serializable]
-    public class BaseUnitData
+    public class SquadData
+    {
+        // 스쿼드의 정보
+        public int SquadID; // 0부터 시작하여 생성된 순서대로 배정받습니다
+        public string name;
+        public string nameOfLocation;
+        public string nameOfPastLocation;
+        //public int[] memberID;
+        public string assingedMission; // 명령받은 미션입니다.
+        public bool isDummyData;
+
+
+
+        // 분대원의 정보
+        public UnitInSquadData[] units;
+
+
+
+    }
+    #endregion
+    #region 1.1.1. Units
+    public class UnitInSquadData
+    {
+        #region Help
+        // 스쿼드 내부에 있는 유닛에 대한 정보입니다.
+
+        // 멤버
+        // A. 컴포넌트
+        // UnitBase 컴포넌트 속 데이터
+        // HumanUnitBase 컴포넌트 속 데이터
+        // UnitItemPack 컴포넌트 속 데이터
+        // UnitRoleData 컴포넌트 속 데이터
+
+        #endregion
+        public UnitBase.UnitBaseData unitBaseData;
+        public HumanUnitBase.OrganListData organListData;
+        public UnitItemPack.UnitItemPackData unitItemPackData;
+
+
+    }
+
+
+    [System.Serializable]
+    public class BaseUnitData // 구식 클래스
     {
         // 기본 정보
         public int ID; // WorldManager에서 저장되는아이디입니다. 유닛을 구분하는 유니크한 식별번호입니다. // WorldManager.GetNewUnitID를 호출해야 합니다. // 0부터 시작하여 1씩 늘어납니다.
@@ -872,6 +956,82 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+    #endregion
+
+
+
+
+    #endregion
+    #region 1.2. Goal
+    [System.Serializable]
+    public class GoalData
+    {
+        public string missionLocation;
+        public string objective;
+        // 팀마다 목표가 다릅니다.
+    }
+    #endregion
+    #region 1.3. BlockMemory
+    [System.Serializable]
+    public class BlockMemoryData
+    {
+        public Vector3 position;
+        public int blockID; // 어떤 블럭인가?
+        public BlockStatusData[] blockStatusDatas;
+    }
+    #endregion
+    #endregion
+    #region 2. BlockData
+    [System.Serializable]
+    public class BlockData
+    {
+        #region 어디에 쓰이는 클래슨고?
+        // 필드를 로딩하거나 저장할때, 블럭들이 어디에 어떤 블럭이 있었는지를 저장하는 용도의 클래스입니다.
+        // 또는 유니티를 이용해 자기만의 맵을 만들었을때도 저장하는 용도입니다.
+
+        #region 필드 설명
+        // BlockID
+        // 어떤 블럭인가
+        // 블럭의 형태뿐 만 아니라 어떤 텍스쳐의 블럭을 사용하였는가도 저장하는 용도입니다.
+        #endregion
+        #endregion
+        public Vector3 position;
+        public int blockID; // 어떤 블럭인가?
+        public BlockStatusData[] blockStatusDatas;
+    }
+    [System.Serializable]
+    public class BlockStatusData
+    {
+        string name; // 수치의 이름
+        float value; // 얼만큼인지
+    }
+    #region 레거시
+
+
+
+    //[System.Serializable]
+    //[Obsolete("이 데이터는 구식입니다. BlockData 형식을 이용하세요.")]
+    //public class BaseTileData
+    //{
+    //    public int TileID;
+    //    public string PrefabName;
+
+    //    public Vector3 position;
+    //}
+    #endregion
+
+    #endregion
+    #region 3. TerritoryData
+
+
+
+    #endregion
+
+
+    #region Unit - Class-Field Manager
+
+    #region 공통: 유닛
 
     public class BaseUnitReal
     {
@@ -939,29 +1099,8 @@ public class GameManager : MonoBehaviour
     }
     /**/
 
-    public class Squad
-    {
-        // 멤버에 대한 정보 저장.
-        // 분대의 위치 저장.
-        // 분대의 이름
-        // 분대 아이콘(?)
-
-        public int squadID; // 스쿼드의 아이디 // 이 세계에서 몇 번째로 생성된 스쿼드인지 기록합니다.
-        public string name; // 표시될 스쿼드의 이름 // 플레이어가 지정한 이름입니다.
-        public string nameOfLocation; // 위치한 지역의 이름
-        //public int squadID;
-        //public List<UnitInfo> member;
-
-        public List<int> memberID; //
 
 
-    }
-    public class Team
-    {
-        public string name;
-        public List<Squad> squads;
-        public Dictionary<Vector3, int> memoryMap; // 휘발성 메모리 맵입니다.
-    }
 
 
     /*
@@ -990,24 +1129,16 @@ public class GameManager : MonoBehaviour
 
     }
     /**/
-    [System.Serializable]
-    public class SquadData
-    {
-        public int SquadID; // 0부터 시작하여 생성된 순서대로 배정받습니다
-        public string name;
-        public string nameOfLocation;
-        public string nameOfPastLocation;
-        public int[] memberID;
-        public string assingedMission; // 명령받은 미션입니다.
-        public bool isDummyData;
-        public bool isMachineSquad;
-    }
+
     [System.Serializable]
     public class TeamData
     {
         public string name;
         public int ID;
+
         public SquadData[] squads;
+        public GoalData goal;
+        //public BlockData
     }
     #endregion
     #region 머신: 머신유닛인포메이션
@@ -1040,45 +1171,13 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
-    #region Tile - Class-Field Manager
-    [System.Serializable]
-    public class BlockData
-    {
-        #region 어디에 쓰이는 클래슨고?
-        // 필드를 로딩하거나 저장할때, 블럭들이 어디에 어떤 블럭이 있었는지를 저장하는 용도의 클래스입니다.
-        // 또는 유니티를 이용해 자기만의 맵을 만들었을때도 저장하는 용도입니다.
-
-        #region 필드 설명
-        // BlockID
-        // 어떤 블럭인가
-        // 블럭의 형태뿐 만 아니라 어떤 텍스쳐의 블럭을 사용하였는가도 저장하는 용도입니다.
-        #endregion
-        #endregion
-        public int blockID;
-        public Vector3 blockPosition;
-    }
 
 
-    [System.Serializable]
-    [Obsolete("이 데이터는 구식입니다. BlockData 형식을 이용하세요.")]
-    public class BaseTileData
-    {
-        public int TileID;
-        public string PrefabName;
 
-        public Vector3 position;
-    }
+    #region TerritoryData - Class-FieldManager
+
     #endregion
-    #region Mission - Class-Field Manager
-
-    [System.Serializable]
-    public class MissionData
-    {
-        public string missionLocation;
-        public string objective;
-        // 팀마다 목표가 다릅니다.
-    }
-    #endregion
+    
 
     #endregion
 
@@ -1455,7 +1554,7 @@ public class GameManager : MonoBehaviour
 
         FieldData returnValue = new FieldData();
         returnValue.playerTeamName = "Player";
-        returnValue.teamsAndSquads = new TeamData[2];
+        returnValue.teamDatas = new TeamData[2];
         #region teamsAndSquads
 
 
