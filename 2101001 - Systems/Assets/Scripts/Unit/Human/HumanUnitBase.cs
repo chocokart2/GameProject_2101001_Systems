@@ -26,7 +26,7 @@ using UnityEngine;
 // 기관계 필드를 저장하는 클래스입니다.
 // 구체적으로 Data가 더 필요하다면 파생 클래스가 만들어 질 것입니다.
 
-public class HumanUnitBase : MonoBehaviour
+public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<HumanUnitBase.HumanUnitBaseData>
 {
     #region ReadOnlyStatic Field
     public static Dictionary<int, string> HumanOrganNameList;
@@ -107,6 +107,9 @@ public class HumanUnitBase : MonoBehaviour
     #endregion
 
 
+
+
+
     public List<BaseOrganSystem> OrganSystems;
     public void organSystemsSet()
     {
@@ -125,7 +128,7 @@ public class HumanUnitBase : MonoBehaviour
         OrganSystems.Add(new SynthesisSystem(gameManager, setDefaultData()));
         OrganSystems.Add(new IntegumentarySystem(gameManager, setDefaultData()));
     }
-    public void organSystemsSet(OrganListData organData)
+    public void organSystemsSet(HumanUnitBaseData organData)
     {
         if (organData.organSystemDatas.Length == 9 && organData.type == "human")
         {
@@ -142,6 +145,10 @@ public class HumanUnitBase : MonoBehaviour
             OrganSystems.Add(new IntegumentarySystem(gameManager, organData.organSystemDatas[8]));
         }
         else organSystemsSet();
+    }
+    public HumanUnitBaseData OrganSystemsGet()
+    {
+        
     }
     BaseOrganSystemData setDefaultData()
     {
@@ -183,6 +190,13 @@ public class HumanUnitBase : MonoBehaviour
 
 
     #endregion
+    #region IComponentDataIOAble 함수
+    public void SetData(HumanUnitBaseData input)
+    {
+        organSystemsSet(input); 
+    }
+    get
+    #endregion
     #region 외부와 약속된 함수
     public void SetComponentData(OrganListData organData)
     {
@@ -207,9 +221,9 @@ public class HumanUnitBase : MonoBehaviour
 
     //
 
-    #region [데이터 입출력용 클래스] OrganListData, BaseOrganSystemData
+    #region [데이터 입출력용 클래스] HumanUnitBaseData, BaseOrganSystemData
     [System.Serializable]
-    public class OrganListData
+    public class HumanUnitBaseData
     {
         public string type;
         public BaseOrganSystemData[] organSystemDatas;
@@ -384,6 +398,7 @@ public class HumanUnitBase : MonoBehaviour
         // 구성 물질들
         // 작동하는 부분(bool 형식)
     }
+    
     // 소화계
     public class DigestiveSystem : BaseOrganSystem
     {

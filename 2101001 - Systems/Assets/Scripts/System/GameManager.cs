@@ -869,15 +869,43 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class TeamData
     {
+        // 팀을 특정하기 위한 클래스입니다.
         public string name;
         public int ID;
 
+        // 팀 내부에 대한 정보입니다.
         public SquadData[] squads;
         public GoalData goal;
-        public BlockMemoryData[] blockMemoryDatas;
-        //public BlockData
-    }
+        public BlockMemoryData[] blockMemorys;
+        public RelationData[] relations;
 
+        //public BlockData
+
+        #region static method
+        public static int GetNewTeamID(FieldData fieldData)
+        {
+            #region 함수 설명
+            // 필드데이터의 팀 목록을 확인하고, 새로 만들려는 팀이 몇 번째인가를 리턴합니다.
+            #endregion
+            int returnValue = -1;
+            if (fieldData.teamDatas == null) // 필드데이터에 팀이 없으면 이 팀이 첫번째 팀입니다.
+            {
+                return 0;
+            }
+            for (int index = 0; index < fieldData.teamDatas.Length; index++)
+            {
+                if (fieldData.teamDatas[index] == null) continue;
+
+                if (fieldData.teamDatas[index].ID > returnValue) returnValue = fieldData.teamDatas[index].ID;
+            }
+            return returnValue + 1;
+        }
+
+        #endregion
+    }
+    #region MyRegion
+
+    #endregion
     #region 레거시
     public class Team
     {
@@ -922,7 +950,7 @@ public class GameManager : MonoBehaviour
         public string nameOfLocation;
         public string nameOfPastLocation;
         //public int[] memberID;
-        public string assingedMission; // 명령받은 미션입니다.
+        public string assingedMission;
         public bool isDummyData;
 
 
@@ -931,7 +959,28 @@ public class GameManager : MonoBehaviour
         public UnitInSquadData[] units;
 
 
+        #region static member method
+        public static int GetNewSquadID(FieldData fieldData)
+        {
+            #region 함수 설명
+            // 필드데이터를 뒤져 가장 큰 스쿼드 아이디값 + 1을 리턴합니다.
+            #endregion
+            int returnValue = -1;
+            if (fieldData.teamDatas == null) return 0; // 팀 데이터가 없으니 스쿼드도 존재하지 않습니다. 따라서 첫번째입니다.
+            for (int teamIndex = 0; teamIndex < fieldData.teamDatas.Length; teamIndex++) // 모든 팀을 뒤집니다.
+            {
+                if (fieldData.teamDatas[teamIndex] == null) continue;
+                if (fieldData.teamDatas[teamIndex].squads == null) continue;
+                for (int squadIndex = 0; squadIndex < fieldData.teamDatas[teamIndex].squads.Length; squadIndex++)
+                {
+                    // 선택한 대상이 여태껏 찾은 아이디값보다 더 크면 더 큰 값을 선택합니다.
+                    if (fieldData.teamDatas[teamIndex].squads[squadIndex].SquadID > returnValue) returnValue = fieldData.teamDatas[teamIndex].squads[squadIndex].SquadID;
+                }
+            }
+            return returnValue + 1;
+        }
 
+        #endregion
     }
     #endregion
     #region 1.1.1. Units
@@ -958,17 +1007,60 @@ public class GameManager : MonoBehaviour
 
 
         #endregion
+
+
+
+        #region 팩토리 메서드
+        public static UnitInSquadData MakeUnit(ref FieldData fieldData)
+        {
+            UnitInSquadData returnValue = new UnitInSquadData();
+
+            return returnValue;
+        }
+        #endregion
         #region 속성 및 변수
+        // 컴포넌트
+        // 유닛의 종류에 따라서 Null인 값이 존재할 수도 있습니다.
         public UnitBase.UnitBaseData unitBaseData;
         public HumanUnitBase.OrganListData organListData;
         public UnitItemPack.UnitItemPackData unitItemPackData;
 
-        public int memeberID;
+        // 이 유닛을 설명하는 데이터들
+        public int memberID;
         #endregion
         #region 메서드
 
         #endregion
+        #region Static 메서드
+        public static int GetNewUnitID(FieldData fieldData)
+        {
+            #region 함수 설명
+            // 모든 스쿼드 값 내부 유닛의 아이디값을 전부 뒤져 가장 큰 아이디값을 찾아 그 값의 +1한 값을 리턴합니다.
+            #endregion
+            int returnValue = -1;
 
+            if (fieldData.teamDatas == null) return 0;
+            for (int teamIndex = 0; teamIndex < fieldData.teamDatas.Length; teamIndex++)
+            {
+                if (fieldData.teamDatas[teamIndex] == null) continue;
+                if (fieldData.teamDatas[teamIndex].squads == null) continue;
+                for (int squadIndex = 0; squadIndex < fieldData.teamDatas[teamIndex].squads.Length; squadIndex++)
+                {
+                    if (fieldData.teamDatas[teamIndex].squads[squadIndex] == null) continue;
+                    if (fieldData.teamDatas[teamIndex].squads[squadIndex].units == null) continue;
+                    for (int unitIndex = 0; unitIndex < fieldData.teamDatas[teamIndex].squads[squadIndex].units.Length; unitIndex++)
+                    {
+                        if (fieldData.teamDatas[teamIndex].squads[squadIndex].units[unitIndex] == null) continue;
+                        if (returnValue < fieldData.teamDatas[teamIndex].squads[squadIndex].units[unitIndex].memberID)
+                            returnValue = fieldData.teamDatas[teamIndex].squads[squadIndex].units[unitIndex].memberID;
+                    }
+                }
+            }
+
+            return returnValue + 1;
+        }
+
+        #endregion
 
 
 
@@ -1024,13 +1116,47 @@ public class GameManager : MonoBehaviour
 
     #endregion
     #region 1.2. Goal
+    #region 1.2.0. Goal Infomation
     [System.Serializable]
     public class GoalData
     {
-        public string missionLocation;
+        #region help
+        // 이 팀이 가지고 있는 목표에 대해서 다룹니다.
+        
+
+        #endregion
+        #region 생성자
+
+        #endregion
+        #region 필드
+        // 작전 필드에 사용할 정보
         public string objective;
-        // 팀마다 목표가 다릅니다.
+
+        //
+        
+
+
+
+
+        // 월드 지도에 사용할 정보
+        public string missisonLocation;
+
+        // 공통 정보
+
+        #endregion
     }
+    #endregion
+    #region 1.2.1. Which things can be Goal
+    [System.Serializable]
+    public class GoalObjectiveGeneric<T>
+    {
+
+    }
+
+    #endregion
+
+
+
     #endregion
     #region 1.3. BlockMemory
     [System.Serializable]
@@ -1039,6 +1165,19 @@ public class GameManager : MonoBehaviour
         public Vector3 position;
         public int blockID; // 어떤 블럭인가?
         public BlockStatusData[] blockStatusDatas;
+    }
+    #endregion
+    #region 1.4. Relations
+    [System.Serializable]
+    public class RelationData
+    {
+        #region Help
+        // 다른 상대와 관계 상태를 저장하기 위한 정보입니다.
+
+        #endregion
+
+        public string target;
+        
     }
     #endregion
     #endregion
@@ -1099,6 +1238,17 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region Interface
+    public interface IComponentDataIOAble<T>
+    {
+        void SetData(T inputData);
+        T GetData();
+    }
+
+
+
+
+    #endregion
 
     #region Unit - Class-Field Manager
 
@@ -1617,6 +1767,7 @@ public class GameManager : MonoBehaviour
     FieldData DemoFieldLoader()
     {
         #region help
+        // 펙토리 메서드입니다.
         // fieldData에 임시 데이터를 집어넣습니다.
 
         // Team PlayerTeam
@@ -1631,19 +1782,29 @@ public class GameManager : MonoBehaviour
 
         FieldData returnValue = new FieldData();
         returnValue.playerTeamName = "Player";
-        returnValue.teamDatas = new TeamData[2];
+        returnValue.teamDatas = new TeamData[3]; // 플레이어 팀 / 적 팀 / 중립 팀
         #region teamDatas
 
 
-        // teamsAndSquads[0]
+        // 0번째 스쿼드
         TeamData playerTeam = new TeamData();
         playerTeam.name = "Player";
-        playerTeam.ID = GetNewTeamID(returnValue);
+        playerTeam.ID = TeamData.GetNewTeamID(returnValue);
         playerTeam.squads = new SquadData[2] { new SquadData(), new SquadData() };
+        #region Player
+
+        #endregion
+        #region BLocks
+
+        #endregion
+        #region Territory
+
+        #endregion
+
         #region Player Squad 1
 
 
-        playerTeam.squads[0].SquadID = GetNewSquadID(returnValue);
+        playerTeam.squads[0].SquadID = SquadData.GetNewSquadID(returnValue);
         playerTeam.squads[0].name = "PlayerStriker001";
         playerTeam.squads[0].nameOfLocation = "Demo";
         playerTeam.squads[0].nameOfPastLocation = "AlphaHeadquarter";
@@ -1999,60 +2160,66 @@ public class GameManager : MonoBehaviour
     }
     #endregion
     #region 데이터 로딩을 통한 유닛 인스턴스화에 도움을 주는 함수
-    public void SetGameObjectComponentDataByFieldData(ref GameObject instantiatedGameObject, FieldData fieldData, string componentType, int index)
+    public void SetGameObjectComponentData(ref GameObject instantiatedGameObject, FieldData fieldData, int teamIndex, int squadIndex, int unitIndex)
     {
-        // 함수 설명: 컴포넌트 타입에 따라 FieldData에 
-        switch (componentType)
+        #region 함수 설명
+        // 생성된 게임오브젝트에 fieldData에 저장된 컴포넌트의 데이터들을 집어넣어주는 함수.
+        // 입력 : 인스턴스된 게임오브젝트, 데이터가 저장된 필드데이터, 소속(팀, 스쿼드, 유닛)
+        // 출력 : 없음. 대신 ref로 언급한 게임오브젝트의 컴포넌트의 데이터가 채워질 것입니다.
+
+        // 만약 게임오브젝트에 컴포넌트가 있는데 fieldData에 해당하는 컴포넌트 값이 Null인경우, 무시합니다.
+        // 대신 log를 내뿜습니다.
+        // 같은 맥락으로, 게임오브젝트에 컴포넌트가 있는데 fieldData에 컴포넌트 데이터가 있는경우에도 무시합니다.
+        // 이 역시 log를 내뿜습니다.
+        #endregion
+
+
+        UnitInSquadData unit = fieldData.teamDatas[teamIndex].squads[squadIndex].units[unitIndex];
+
+        // UnitBase 컴포넌트 집어넣기.
+        UnitBase unitBase = instantiatedGameObject.GetComponent<UnitBase>();
+        if (unitBase == null && unit.unitBaseData != null)
         {
-            case "UnitBase":
-                UnitBase unitBase = instantiatedGameObject.GetComponent<UnitBase>();
-                if (unitBase != null)
-                {
-                    if (fieldData.unitBaseComponentData.Length > index && index > -1)
-                    {
-                        unitBase.unitBaseData = fieldData.unitBaseComponentData[index];
-                    }
-                }
-                else
-                {
-                    Debug.Log("DEBUG_GameManager.SetGameObjectComponentDataByFieldData: 이 게임오브젝트는 " + componentType + "이란 컴포넌트를 가지고 있지 않습니다.");
-                }
-                break;
-            case "HumanUnitBase":
-                HumanUnitBase humanUnitBase = instantiatedGameObject.GetComponent<HumanUnitBase>();
-                if (humanUnitBase != null)
-                {
-                    if (fieldData.organListComponentData.Length > index && index > -1)
-                    {
-                        humanUnitBase.organSystemsSet(fieldData.organListComponentData[index]);
-                    }
-                }
-                else
-                {
-                    Debug.Log("DEBUG_GameManager.SetGameObjectComponentDataByFieldData: 이 게임오브젝트는 " + componentType + "이란 컴포넌트를 가지고 있지 않습니다.");
-                }
-                break;
-            case "UnitItemPack":
-                UnitItemPack unitItemPack = instantiatedGameObject.GetComponent<UnitItemPack>();
-                if (unitItemPack != null)
-                {
-                    if (fieldData.organListComponentData.Length > index && index > -1)
-                    {
-                        unitItemPack.InventorySet(fieldData.unitItemPackComponentData[index]);
-                    }
-                }
-                else
-                {
-                    Debug.Log("DEBUG_GameManager.SetGameObjectComponentDataByFieldData: 이 게임오브젝트는 " + componentType + "이란 컴포넌트를 가지고 있지 않습니다.");
-                }
-                break;
-            default:
-                Debug.Log("DEBUG_GameManager.SetGameObjectComponentDataByFieldData: 이 함수는 " + componentType + "이라는 컴포넌트에 데이터를 넣도록 설정되지 않았습니다.");
-                break;
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: fieldData 속에 이 게임오브젝트를 위한 Unit Base 컴포넌트가 존재하지 않습니다.");
+        }
+        else if (unitBase != null && unit.unitBaseData == null)
+        {
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: 이 게임오브젝트는 Unit Base 라는 컴포넌트를 가지고 있지 않습니다. 위치 : " + instantiatedGameObject.transform.position);
+        }
+        else if (unitBase != null && unit.unitBaseData == null)
+        {
+            unitBase.unitBaseData = unit.unitBaseData;
         }
 
+        // HumanUnitBase 컴포넌트 집어넣기.
+        HumanUnitBase humanUnitBase = instantiatedGameObject.GetComponent<HumanUnitBase>();
+        if (humanUnitBase == null && unit.organListData != null)
+        {
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: fieldData 속에 이 게임오브젝트를 위한 Human Unit Base 컴포넌트가 존재하지 않습니다.");
+        }
+        else if (humanUnitBase != null && unit.organListData == null)
+        {
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: 이 게임오브젝트는 Human Unit Base 라는 컴포넌트를 가지고 있지 않습니다. 위치 : " + instantiatedGameObject.transform.position);
+        }
+        else if (humanUnitBase != null && unit.organListData == null)
+        {
+            humanUnitBase.organSystemsSet(unit.organListData);
+        }
 
-
+        // UnitItemPack 컴포넌트 집어넣기.
+        UnitItemPack unitItemPack = instantiatedGameObject.GetComponent<UnitItemPack>();
+        if (unitItemPack == null && unit.unitItemPackData != null)
+        {
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: fieldData 속에 이 게임오브젝트를 위한 Human Unit Base 컴포넌트가 존재하지 않습니다.");
+        }
+        else if (unitItemPack != null && unit.unitItemPackData == null)
+        {
+            Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: 이 게임오브젝트는 Human Unit Base 라는 컴포넌트를 가지고 있지 않습니다. 위치 : " + instantiatedGameObject.transform.position);
+        }
+        else if (unitItemPack != null && unit.unitItemPackData == null)
+        {
+            unitItemPack.InventorySet(unit.unitItemPackData);
+        }
     }
     #endregion
     #region 없던 유닛을 생성시키는 함수
@@ -2060,13 +2227,29 @@ public class GameManager : MonoBehaviour
     #region RegisterUnitHelper
     public void RegisterUnitHelper_NewUnitData(ref BaseUnitData baseUnitData, Vector3 position/*, params object[] componentDatas */)
     {
+
+        // 아이디값 설정
         // 아이디가 0이 아니라도 일단 아무거나면 됐죠 으이?
         // 여기 람다쓰지말고 for루프 사용하자
         int temp = baseUnitData.ID;
         //baseUnitData.ID = GetNewUnitID(currentFieldData);
-        if (Array.FindIndex(currentFieldData.unitDatas, thing => thing.ID == temp) == -1 || baseUnitData.ID == 0)
+        if (temp == -1) temp = UnitInSquadData.GetNewUnitID(currentFieldData);
+        else
         {
-            baseUnitData.ID = GetNewUnitID(currentFieldData); // 여기선 호출되지 않았더라
+            for (int tIndex = 0; tIndex < currentFieldData.teamDatas.Length; tIndex++)
+            {
+                bool isFound = false;
+                for (int sIndex = 0; sIndex < currentFieldData.teamDatas[tIndex].squads.Length; sIndex++)
+                {
+                    for (int uIndex = 0; uIndex < currentFieldData.teamDatas[tIndex].squads[sIndex].units.Length; uIndex++)
+                    {
+                        if (temp == currentFieldData.teamDatas[tIndex].squads[sIndex].units[uIndex].memberID)
+                        {
+                            baseUnitData.ID = UnitInSquadData.GetNewUnitID(currentFieldData);
+                        }
+                    }
+                }
+            }
         }
         // 게임오브젝트 이름은 패스
 
@@ -2163,58 +2346,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Function - Unit
-    //[Obsolete("FieldData에 UnitData가 존재하지 않습니다.")]
-    //public int GetNewUnitID(FieldData fieldData) 
-    //{
-    //    // field값 중에서 가장 높은 아이디를 가져옵니다.
-    //    // 가장 높은 아이디 값의 +1한 값을 리턴합니다.
 
-    //    int returnValue = -1;
-    //    if(fieldData.unitDatas == null)
-    //    {
-    //        Debug.Log("DEBUG_GameManager.GetNewUnitID: 새로운 유닛 아이디! 0");
-    //        return 0;
-    //    }
-    //    for(int index = 0; index < fieldData.unitDatas.Length; index++)
-    //    {
-    //        if (fieldData.unitDatas[index].ID > returnValue) returnValue = fieldData.unitDatas[index].ID;
-    //    }
-    //    Debug.Log("DEBUG_GameManager.GetNewUnitID: 새로운 유닛 아이디! " + (returnValue + 1));
-    //    return returnValue + 1;
-
-
-    //    // 만약 returnValue가 int의 최대값이면 두번째로 낮은 값을 불러올 것
-    //}
-    public int GetNewSquadID(FieldData fieldData)
-    {
-        int returnValue = -1;
-        if (fieldData.teamsAndSquads == null) return 0;
-        for (int teamIndex = 0; teamIndex < fieldData.teamsAndSquads.Length; teamIndex++)
-        {
-            if (fieldData.teamsAndSquads[teamIndex] == null) continue;
-            if (fieldData.teamsAndSquads[teamIndex].squads == null) continue;
-            for(int squadIndex = 0; squadIndex < fieldData.teamsAndSquads[teamIndex].squads.Length; squadIndex++)
-            {
-                if (fieldData.teamsAndSquads[teamIndex].squads[squadIndex].SquadID > returnValue) returnValue = fieldData.teamsAndSquads[teamIndex].squads[squadIndex].SquadID;
-            }
-        }
-        return returnValue + 1;
-    }
-    public int GetNewTeamID(FieldData fieldData)
-    {
-        int returnValue = -1;
-        if(fieldData.teamsAndSquads == null)
-        {
-            return 0;
-        }
-        for (int index = 0; index < fieldData.teamsAndSquads.Length; index++)
-        {
-            if (fieldData.teamsAndSquads[index] == null) continue;
-
-            if (fieldData.teamsAndSquads[index].ID > returnValue) returnValue = fieldData.teamsAndSquads[index].ID;
-        }
-        return returnValue + 1;
-    }
     #endregion
 
     #region File I/O

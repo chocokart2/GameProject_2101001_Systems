@@ -8,7 +8,7 @@ using UnityEngine;
 // 이 컴포넌트의 함수를 호출하면 해당하는 연결된 컴포넌트의 메서드를 부릅니다. 없으면 말고.
 // 이벤트는 사용하지 않습니다! 이벤트를 쓰면 다른 녀석들의 이벤트도 호출되기에 유일한 객체의 이벤트여야 합니다.
 
-public class UnitBase : MonoBehaviour
+public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
 {
     #region 필드
 
@@ -232,7 +232,7 @@ public class UnitBase : MonoBehaviour
             unitType = unitData.unitType;
             direction = unitData.direction;
             instanceId = -1;
-            gameManagerId = unitData.ID;
+            //gameManagerId = unitData.ID;
             teamName = team;
         }
         #endregion
@@ -275,7 +275,20 @@ public class UnitBase : MonoBehaviour
     // 어느 팀에 속해 있나? -> 팀에 속해있으면 UI에서 보여집니다.
     //public int id; // instantiate할때마다 생성됩니다.
 
-    #region 정보 삽입 메서드
+    #region IComponentDataIOAble 메서드
+    public void SetData(UnitBaseData inputData)
+    {
+        unitBaseData = inputData;
+    }
+    public UnitBaseData GetData()
+    {
+        return unitBaseData;
+    }
+
+
+
+
+
     public void UnitBaseDataNewSet(string _unitType, int _id)
     {
         unitBaseData = new UnitBaseData(_unitType, _id);
