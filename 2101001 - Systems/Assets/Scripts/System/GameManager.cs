@@ -218,12 +218,14 @@ public class GameManager : MonoBehaviour
         }
         public AttackClassData GetData()
         {
-            AttackClassData returnValue = new AttackClassData();
-            returnValue.chemicals = chemical.toChemicalDataArray(chemicals.ToArray());
-            //returnValue.chemicals.CopyTo(chemical.toChemicalDataArray(chemicals.ToArray()), 0);
+            AttackClassData returnValue = new()
+            {
+                chemicals = chemical.toChemicalDataArray(chemicals.ToArray()),
+                //returnValue.chemicals.CopyTo(chemical.toChemicalDataArray(chemicals.ToArray()), 0);
 
-            returnValue.mass = this.mass;
-            returnValue.volume = this.volume;
+                mass = this.mass,
+                volume = this.volume
+            };
             return returnValue;
         }
         public static AttackClass[] toAttackClassArray(AttackClassData[] data)
@@ -758,10 +760,23 @@ public class GameManager : MonoBehaviour
     
 
     [System.Serializable]
-    public class FieldData // <!> 아직 완벽하지 않은 데이터입니다! 야전에 추가할 정보가 있으면 더 추가해주세요.
+    public struct FieldData // <!> 아직 완벽하지 않은 데이터입니다! 야전에 추가할 정보가 있으면 더 추가해주세요.
     {
         #region 생성자
-
+        public FieldData()
+        {
+            currentPlayLocation = new string[2];
+            playerTeamName = "Player";
+            teamDatas = new TeamData[1]
+            {
+                new TeamData()
+                {
+                    name = "Neutral"
+                }
+            };
+            machineUnitDatas = new MachineUnitData[0];
+            blockDatas = new BlockData[0];
+        }
         #endregion
         #region 프로퍼티
 
@@ -779,10 +794,13 @@ public class GameManager : MonoBehaviour
         #endregion
         public string[] currentPlayLocation;
 
+        #region 유닛에 대한 필드
         // 팀에 대한 정보들
         public string playerTeamName; // 플레이어가 통제하는 팀의 이름입니다.
         public TeamData[] teamDatas; // 분대에 대한 정보, 유닛이 존재하는 지역을 담습니다
-                                     
+        // 머신 유닛에 대한 필드들
+        public MachineUnitData[] machineUnitDatas; // 이런 클래스 만들기
+        #endregion        
         // 블럭에 대한 정보
         public BlockData[] blockDatas;
 
@@ -795,10 +813,25 @@ public class GameManager : MonoBehaviour
         {
 
         }
-        public void AddUnitData(BaseUnitData baseUnitData, MachineUnitInfoData machineUnitInfoData, params object[] componentDatas)
+        public void AddUnitData(MachineUnitData machineUnitData, params object[] componentDatas) // 에러가 있습니다!
         {
+            AddElementInArray(ref machineUnitDatas, machineUnitData); // 이건 진짜로 내가 하고싶었던 것
+
+            // 에러 분석
+
+            PingPong(); // GameManager의 함수. 함수 호출 가능한지 여부를 확인하기 위해 존재한다.
+
+            // 이제 알거 같은 부분
+
+            GameManager gm = new GameManager();
+            gm.AddElementInArray(ref machineUnitDatas, machineUnitData);
+            // ㄴ 음... 뭔가 마음에 들지 않는다. 다른 방법이 없을까?
+            
+            gm.AddElementInArrayStatic(ref machineUnitDatas, machineUnitData)
 
         }
+
+
         #endregion
 
 
@@ -870,17 +903,16 @@ public class GameManager : MonoBehaviour
     public class TeamData
     {
         // 팀을 특정하기 위한 클래스입니다.
-        public string name;
-        public int ID;
+        public string name; // 유저에게 표시할 이름
+        public int ID; // 이름이 같더라도 컴퓨터가 팀을 특정할 수 있도록 합니다.
 
         // 팀 내부에 대한 정보입니다.
-        public SquadData[] squads;
-        public GoalData goal;
-        public BlockMemoryData[] blockMemorys;
-        public RelationData[] relations;
+        public SquadData[] squads; // 팀 내부에 어떤 분대가 있는가
+        public GoalData goal; // 이 팀의 승리 조건
+        public BlockMemoryData[] blockMemorys; // 이 팀이 기억하고 있는 지도
+        public RelationData[] relations; // 다른 팀과의 관계
 
-        //public BlockData
-
+        public string[] DataTag; // 추가적인 데이터입니다. 무슨 일이 생겨서 가라로 추가해야 하는 정보가 있을 때 사용합니다.
         #region static method
         public static int GetNewTeamID(FieldData fieldData)
         {
@@ -943,6 +975,19 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class SquadData
     {
+        #region 생성자
+        public SquadData()
+        {
+
+        }
+        public SquadData(int TeamID)
+        {
+            TeamID = this.TeamID;
+        }
+        #endregion
+
+        public int TeamID;
+
         // 스쿼드의 정보
         public int SquadID; // 0부터 시작하여 생성된 순서대로 배정받습니다
         public string name;
@@ -984,8 +1029,15 @@ public class GameManager : MonoBehaviour
     }
     #endregion
     #region 1.1.1. Units
+    /// <summary>
+    /// 팀의 Squad 내부에 존재하는 유닛에 대한 정보입니다.
+    /// ? : Machine 유닛은 통제 가능한 중립이므로, TeamData에 존재하지 않고, FieldData에 존재합니다.
+    /// </summary>
+    [System.Serializable]
     public class UnitInSquadData
     {
+
+
         #region Help
         // 스쿼드 내부에 있는 유닛에 대한 정보입니다.
 
@@ -1007,9 +1059,6 @@ public class GameManager : MonoBehaviour
 
 
         #endregion
-
-
-
         #region 팩토리 메서드
         public static UnitInSquadData MakeUnit(ref FieldData fieldData)
         {
@@ -1018,15 +1067,21 @@ public class GameManager : MonoBehaviour
             return returnValue;
         }
         #endregion
-        #region 속성 및 변수
-        // 컴포넌트
+        #region 필드
+
+
+
+        #region 필드 : 컴포넌트 정보
         // 유닛의 종류에 따라서 Null인 값이 존재할 수도 있습니다.
         public UnitBase.UnitBaseData unitBaseData;
-        public HumanUnitBase.OrganListData organListData;
+        public HumanUnitBase.HumanUnitBaseData organListData;
         public UnitItemPack.UnitItemPackData unitItemPackData;
-
+        public UnitRole.UnitRoleData unitRoleData;
+        #endregion
         // 이 유닛을 설명하는 데이터들
         public int memberID;
+        public int squadID; // 그냥 가리키기만 하면 됩니다.
+        public int teamID; // 그냥 가리키기만 하면 됩니다.
         #endregion
         #region 메서드
 
@@ -1073,7 +1128,9 @@ public class GameManager : MonoBehaviour
         // 기본 정보
         public int ID; // WorldManager에서 저장되는아이디입니다. 유닛을 구분하는 유니크한 식별번호입니다. // WorldManager.GetNewUnitID를 호출해야 합니다. // 0부터 시작하여 1씩 늘어납니다.
         public string unitType; // Human인지, Machine인지 구분합니다.
+        //-> 유닛 베이스에서 다룹니다.
         public string gameObjectName; // 게임오브젝트 이름입니다.
+        //-> 유닛 베이스에서 다룹니다.
         public bool isDummyData;
 
         // 위치
@@ -1175,9 +1232,15 @@ public class GameManager : MonoBehaviour
         // 다른 상대와 관계 상태를 저장하기 위한 정보입니다.
 
         #endregion
-
-        public string target;
-        
+        public int targetTeamID;
+        public float status;
+        public bool IsAllay { get { return status > 1; } }
+        public bool IsEnemy { get { return status < -1; } }
+        void foo()
+        {
+            MachineUnitData aaa = new();
+            aaa.machineTypeID = 1;
+        }
     }
     #endregion
     #endregion
@@ -1195,9 +1258,25 @@ public class GameManager : MonoBehaviour
         // 블럭의 형태뿐 만 아니라 어떤 텍스쳐의 블럭을 사용하였는가도 저장하는 용도입니다.
         #endregion
         #endregion
-        public Vector3 position;
+
+        #region 필드
+
+        public Vector3 position; // 거의 키 값 취급을 하는 변수입니다.
         public int blockID; // 어떤 블럭인가?
         public BlockStatusData[] blockStatusDatas;
+        #endregion
+        #region 메서드
+        // BlockData[]는 dictionary역할을 해 줄수 있는 녀석이여야 합니다.
+        // 키 값을 매개변수로
+
+        public static void Sort(ref BlockData[] target)
+        {
+            
+        }
+
+
+        #endregion
+        
     }
     [System.Serializable]
     public class BlockStatusData
@@ -1237,7 +1316,40 @@ public class GameManager : MonoBehaviour
         public Vector3[] edgePosition;
     }
     #endregion
+    #region 4. MachineData
+    [System.Serializable]
+    public class MachineUnitData
+    {
+        #region 클래스 설명
+        // 이 필드에 존재하는 머신들에 대해서 다룹니다.
+        // 
+        //
+        #endregion
+        #region 필드
+        public UnitBase.UnitBaseData unitBaseData;
+        public string prefabName;
 
+        /// <summary>
+        /// 이 머신이 어떤 종류의 머신인가요?
+        /// </summary>
+        public int machineTypeID;
+
+        #region 머신 유닛이 "가질 수 있는" 컴포넌트 필드의 데이터들
+
+        #endregion
+
+        #endregion
+
+
+
+
+
+
+
+    }
+
+
+    #endregion
     #region Interface
     public interface IComponentDataIOAble<T>
     {
@@ -1568,6 +1680,30 @@ public class GameManager : MonoBehaviour
         array[array.Length - 1] = element;
         return array.Length - 1;
     }
+    public static int AddElementInArrayStatic<T>(ref T[] array, T element)
+    {
+        // array에 null이 있는곳을 찾습니다.
+        // null이 있다면 그곳에 element을 집어넣습니다.
+        // null이 없다면 크기를 늘린 뒤 그곳에 element를 집어넣습니다.
+        // 넣는 것에 성공했다면 해당 인덱스를 리턴합니다.
+
+        if (array == null)
+        {
+            array = new T[] { element };
+            return 0;
+        }
+        for (int index = 0; index < array.Length; index++)
+        {
+            if (array[index] == null)
+            {
+                array[index] = element;
+                return index;
+            }
+        }
+        Array.Resize(ref array, array.Length + 1);
+        array[array.Length - 1] = element;
+        return array.Length - 1;
+    }
     #endregion
 
     #region FieldData 관련 함수
@@ -1609,7 +1745,7 @@ public class GameManager : MonoBehaviour
 
         Dictionary<Type, int> typeIntPairs = new Dictionary<Type, int>();
         typeIntPairs.Add(typeof(UnitBase.UnitBaseData), 100);
-        typeIntPairs.Add(typeof(HumanUnitBase.OrganListData), 201);
+        typeIntPairs.Add(typeof(HumanUnitBase.HumanUnitBaseData), 201);
         typeIntPairs.Add(typeof(UnitItemPack.UnitItemPackData), 202);
 
 
@@ -1777,24 +1913,195 @@ public class GameManager : MonoBehaviour
         // Team EnemyTeam
         // -자신의 스쿼드 1부대: 공격대
         // Team Neutral
-        // 이후 머신 클래스에 들어갈 것입니다.
+
+        // 어떻게 만들 것인가
+        // 팀을 만든다
+        // 스쿼드를 만든다
+        // 유닛을 만든다
+        // 스쿼드 내부에 유닛을 집어넣는다
+        // 팀 내부에 스쿼드를 집어넣는다.
+
         #endregion
 
-        FieldData returnValue = new FieldData();
-        returnValue.playerTeamName = "Player";
-        returnValue.teamDatas = new TeamData[3]; // 플레이어 팀 / 적 팀 / 중립 팀
+        string location = "Demo";
+        string PlayerTeam = "PlayerTeam";
+        string EnemyTeam = "EnemyTeam";
+
+
+
+        FieldData returnValue = new()
+        {
+            currentPlayLocation = new string[1] { location },
+
+            playerTeamName = PlayerTeam,
+            teamDatas = new TeamData[3]
+            {
+                new()
+                {
+                    name = PlayerTeam,
+                    ID = 0, // <!하드코딩!>
+                    //ID = dataBase.GetNewTeamID(); // 만들어야 할 것들 // 아무래도 여기서도 불가능 할 것 같다\.
+                    // 할당이 이미 끝난 상태에서 아이디값을 나눠주도록 하자.
+
+                    squads = new SquadData[2]
+                    {
+                        new()
+                        {
+                            SquadID = 0, // <!하드코딩!>
+                            name = "엔지니어 팀",
+
+                            nameOfLocation = location,
+                            nameOfPastLocation = "PlayerTeamHQ",
+                            assingedMission = "none",
+                            isDummyData = true,
+
+                            units = new UnitInSquadData[3] // 감시자 하나, 엔지니어 둘
+                            {
+                                new()
+                                {
+                                    unitBaseData = new("human")
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("Radios", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new("human")
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("BuildTool", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new("human")
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("BuildTool", "Pistol", "Knife")
+                                }
+                            }
+                        },
+                        new()
+                        {
+                            SquadID = 1,
+                            name = "공격팀",
+
+                            nameOfLocation = location,
+                            nameOfPastLocation = "PlayerTeamHQ",
+                            assingedMission = "none",
+                            isDummyData = true,
+
+                            units = new UnitInSquadData[4]
+                            {
+                                new(),
+                                new(),
+                                new(),
+                                new()
+                            }
+                        } // 공격대
+                    },
+                    goal = new()
+                }, // 플레이어 팀
+                new()
+                {
+                    name = "EnemyTeam",
+                    ID = 1,
+
+                    squads = new SquadData[1]
+                    {
+                        new()
+                        {
+                            SquadID = 2,
+                            name = "적 공격대",
+
+                            nameOfLocation = location,
+                            nameOfPastLocation = "EnemyTeamHQ",
+                            assingedMission = "none",
+                            isDummyData = true,
+
+                            units = new UnitInSquadData[4]
+                            {
+                                new()
+                                {
+                                    unitBaseData = new()
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = EnemyTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("Radios", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new()
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = EnemyTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new()
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = EnemyTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new()
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = EnemyTeam
+                                    },
+                                    organListData = new(),
+                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                }
+                            }
+                        } // 적 공격팀
+                    }
+                }, // 적 팀에 대한 정보
+                new()
+                {
+                    name = "Neutral",
+                    ID = 2
+                } // 중립 팀
+            },
+
+            machineUnitDatas = new MachineUnitData[0],
+
+            blockDatas = new BlockData[0]
+            {
+                // 9 x 13의 블럭 맵이 필요합니다.
+            },
+            
+        };
+        //returnValue.playerTeamName = "Player";
+        //returnValue.teamDatas = new TeamData[3]; // 플레이어 팀 / 적 팀 / 중립 팀
         #region teamDatas
 
 
         // 0번째 스쿼드
-        TeamData playerTeam = new TeamData();
-        playerTeam.name = "Player";
-        playerTeam.ID = TeamData.GetNewTeamID(returnValue);
-        playerTeam.squads = new SquadData[2] { new SquadData(), new SquadData() };
+        //TeamData playerTeam = new TeamData();
+        //playerTeam.name = "Player";
+        //playerTeam.ID = TeamData.GetNewTeamID(returnValue);
+        //playerTeam.squads = new SquadData[2] { new SquadData(), new SquadData() };
         #region Player
 
         #endregion
-        #region BLocks
+        #region Blocks
 
         #endregion
         #region Territory
@@ -1804,26 +2111,28 @@ public class GameManager : MonoBehaviour
         #region Player Squad 1
 
 
-        playerTeam.squads[0].SquadID = SquadData.GetNewSquadID(returnValue);
-        playerTeam.squads[0].name = "PlayerStriker001";
-        playerTeam.squads[0].nameOfLocation = "Demo";
-        playerTeam.squads[0].nameOfPastLocation = "AlphaHeadquarter";
+        //playerTeam.squads[0].SquadID = SquadData.GetNewSquadID(returnValue);
+        //playerTeam.squads[0].name = "PlayerStriker001";
+        //playerTeam.squads[0].nameOfLocation = location;
+        //playerTeam.squads[0].nameOfPastLocation = "AlphaHeadquarter";
         // 바깥에서 멤버 아이디 추가해 줄 것입니다.
         //playerTeam.squads[0].memberID = new int[4]; // 멤버도 추가할 것
 
         #region Squad Member 1 감시자 1
-        // BaseUnitData, 컴포넌트 정보(UnitBaseData, OrganData, ItemData), HumanUnitInfoData
+        //// BaseUnitData, 컴포넌트 정보(UnitBaseData, OrganData, ItemData), HumanUnitInfoData
 
-        // BaseUnitData 정보 채우기
-        UnitInSquadData PlayerStriker01Attacker = new UnitInSquadData();
-        // unitBaseData
-        PlayerStriker01Attacker.unitBaseData = new UnitBase.UnitBaseData("Human");
-        PlayerStriker01Attacker.unitBaseData.direction = new Vector3(0, 0, -1);
-        PlayerStriker01Attacker.unitBaseData.teamName = "Player";
-        // OrganData 추가하기
-        PlayerStriker01Attacker.organListData = new HumanUnitBase.OrganListData();
-        // ItemData 추가하기
-        PlayerStriker01Attacker.unitItemPackData = new UnitItemPack.UnitItemPackData("Radios", "Pistol", "Knife");
+        //// BaseUnitData 정보 채우기
+        //UnitInSquadData PlayerStriker01Attacker = new UnitInSquadData();
+        //// unitBaseData
+        //PlayerStriker01Attacker.unitBaseData = new UnitBase.UnitBaseData("Human");
+        //PlayerStriker01Attacker.unitBaseData.direction = new Vector3(0, 0, -1);
+        //PlayerStriker01Attacker.unitBaseData.teamName = "Player";
+        //// OrganData 추가하기
+        //PlayerStriker01Attacker.organListData = new HumanUnitBase.HumanUnitBaseData();
+        //// ItemData 추가하기
+        //PlayerStriker01Attacker.unitItemPackData = new UnitItemPack.UnitItemPackData("Radios", "Pistol", "Knife");
+        
+
 
         //PlayerStriker01Attacker.memeberID = GetNewUnitID(returnValue);
 
@@ -1926,7 +2235,7 @@ public class GameManager : MonoBehaviour
         #region Player Squad 2
 
         #endregion
-        returnValue.teamDatas[0] = playerTeam;
+        //returnValue.teamDatas[0] = playerTeam;
 
         #region Enemy Squad 1
 
@@ -1939,11 +2248,11 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
-        
-        returnValue.humanUnitDatas = new HumanUnitInfoData[3];
+        //returnValue.
+        //returnValue.humanUnitDatas = new HumanUnitInfoData[3];
 
         
-        returnValue.currentPlayLocation = new string[] { "Demo" };
+        returnValue.currentPlayLocation = new string[] { location };
 
         PlayerSetup("Player");
 
@@ -1971,79 +2280,145 @@ public class GameManager : MonoBehaviour
         // 1.3. 인스턴스 함수를 호출합니다.
         // 1.4. 컴포넌트 데이터를 집어넣습니다.
         // 2. 이제 데이터를 집어넣을 수 있도록 currentFielddata에 잠금을 끕니다
-        for (int unitIndex = 0; unitIndex < data.unitDatas.Length; unitIndex++) // 필드 데이터에 있는 모든 유닛Array의 원소들을 인스턴스화하도록 시도합니다.
+
+
+        for (int teamIndex = 0; teamIndex < data.teamDatas.Length; teamIndex++)
         {
-            int humanUnitDataIndex = 0;
-            #region 1.1. 인스턴스화 - 프리펩 결정
-            // 유닛 타입 체크
-            // 타입에 따라 해당하는 유닛 타입 배열에 자신과 아이디가 같은 녀석을 찾음
-            // 세부 프리펩을 찾는다.
-            GameObject prefab; // 프리펩입니다.
-            switch (data.unitDatas[unitIndex].unitType) // 유닛의 타입을 찾습니다. 머신 / 인간 / +모더들이 추가한 유닛의 타입
+            for (int squadIndex = 0; squadIndex < data.teamDatas[teamIndex].squads.Length; squadIndex++)
             {
-                case "human": // 인간 타입일때.
-                    // 인간 프리펩을 찾습니다
+                for(int unitIndex = 0; unitIndex < data.teamDatas[teamIndex].squads[squadIndex].units.Length; unitIndex++)
+                {
+                    // 매개변수로 들어간 유닛을 하나하나 골라서 인스턴스화합니다.
+                    UnitInSquadData unit = data.teamDatas[teamIndex].squads[squadIndex].units[unitIndex];
+                    if (unit == null) continue;
+                    #region 1.1. 인스턴스화 - 프리펩 결정
+                    // 유닛 타입 체크
+                    // 타입에 따라 해당하는 유닛 타입 배열에 자신과 아이디가 같은 녀석을 찾음
+                    // 세부 프리펩을 찾는다.
+                    GameObject prefab;
 
-                    int humanIndex = 0;
-                    // 휴먼 데이터가 몇번째 인덱스가 존재하는지 찾는 루프문입니다. (나중에 인덱스 어레이를 집어넣도록 하자.)
-                    for (; humanIndex < data.humanUnitDatas.Length; humanIndex++)
+                    // 일단 스위치 문으로 구현한 다음에
+                    // 클래스와 상속을 이용한 다형성을 사용해서 다시 구현해보자.
+                    switch (unit.unitBaseData.prefabName)
                     {
-                        if (data.humanUnitDatas[humanIndex] == null) continue;
-
-                        if (data.humanUnitDatas[humanIndex].BaseUnitDataID == data.unitDatas[unitIndex].ID)
-                        {
-                            humanUnitDataIndex = humanIndex;
-                            break; // 휴먼 유닛 인덱스를 찾았습니다.
-                        }
-                    }
-                    // 유닛 데이터의 캐릭터 이름으로 프리펩을 찾습니다.
-                    switch (data.humanUnitDatas[humanUnitDataIndex].charactor)
-                    {
-                        case "kart":
-                            prefab = HumanPrefabKartSkin;
-                            break;
-                        default:
+                        // 인간 타입
+                        case "HumanUnitDefault":        
                             prefab = HumanPrefabDefaultSkin;
                             break;
+                        case "HumanUnitKart":
+                            prefab = HumanPrefabKartSkin;
+                            break;
+                        // 머신 타입
+                        // 머신 유닛의 프리펩은 머신 종류에 따라 나뉩니다. ex)103
+                        default:
+                            // 어떤 프리펩인지 모르므로 일단 기본 프리펩을 던져줍시다.
+
+
+                            switch (unit.unitBaseData.unitType)
+                            {
+                                case "human":
+                                    prefab = HumanPrefabDefaultSkin;
+                                    break;
+                                default:
+                                    Debug.Log("DEBUG_GameManager.UnitInstantiate: 이 유닛의 타입(" + unit.unitBaseData.unitType + ")을 통해 프리펩을 결정할 수 없습니다.");
+                                    continue;
+                                    break;
+                            }
+
+
+                            break;
                     }
-                    break;
-                case "machine": // 머신 타입일때.
-                    // 유닛의 프리펩은 머신 종류에 따라 나뉩니다. ex)103
-                    prefab = HumanPrefabDefaultSkin;
-                    break;
-                default:
-                    Debug.Log("DEBUG_GameManager.UnitInstantiate: 이 유닛의 타입(" + data.unitDatas[unitIndex].unitType + ")을 통해 프리펩을 결정할 수 없습니다.");
-                    prefab = HumanPrefabDefaultSkin;
-                    break;
+
+
+                    #endregion
+                    #region 1.2. 인스턴스화 - 위치 결정
+
+                    #endregion
+                    #region 1.3. 인스턴스화 - 함수 호출/
+                    GameObject InstantiatedObject = Instantiate(prefab);
+                    #endregion
+                    #region 2. 인스턴스화 한 대상들 컴포넌트 데이터 집어넣기
+
+                    #endregion
+                }
             }
-
-
-
-
-
-
-            #endregion
-            #region 1.2. 인스턴스화 - 위치 결정
-            Vector3 position; // 유닛이 존재할 위치입니다.
-            // 1. 데이터에 주둔군인지 여부를 결정합니다.
-            // 1.a. 주둔군인경우 저장된 위치를 값으로 합니다.
-            // 1.b. 주둔군이 아닌경우 스쿼드 / 혹은 유닛의 과거 위치를 찾아 과거 지역의 이름을 가지고있는 첫번째 비콘이 존재하는 위치에 넣습니다. // 이미 유닛이 배치되어있으면 그 비콘의 지역 이름이 같은 다음 비콘의 위치에 넣습니다.
-            // 1.a.1. 
-            // 
-            if (data.unitDatas[unitIndex].isUnitStayedThatPlace) // 유닛이 주둔군인지 여부를 판별합니다.
-            {
-                position = data.unitDatas[unitIndex].position;
-            }
-            else
-            {
-                // 
-                position = new Vector3(0, 1, 0);
-            }
-
-            #endregion
-            // 1.3. 인스턴스 함수 호출
-            GameObject instantiatedObject = Instantiate(prefab, position, Quaternion.identity);
         }
+        
+
+
+        //for (int unitIndex = 0; unitIndex < data.unitDatas.Length; unitIndex++) // 필드 데이터에 있는 모든 유닛Array의 원소들을 인스턴스화하도록 시도합니다.
+        //{
+        //    int humanUnitDataIndex = 0;
+        //    #region 1.1. 인스턴스화 - 프리펩 결정
+        //    // 유닛 타입 체크
+        //    // 타입에 따라 해당하는 유닛 타입 배열에 자신과 아이디가 같은 녀석을 찾음
+        //    // 세부 프리펩을 찾는다.
+        //    GameObject prefab; // 프리펩입니다.
+        //    switch (data.unitDatas[unitIndex].unitType) // 유닛의 타입을 찾습니다. 머신 / 인간 / +모더들이 추가한 유닛의 타입
+        //    {
+        //        case "human": // 인간 타입일때.
+        //            // 인간 프리펩을 찾습니다
+
+        //            int humanIndex = 0;
+        //            // 휴먼 데이터가 몇번째 인덱스가 존재하는지 찾는 루프문입니다. (나중에 인덱스 어레이를 집어넣도록 하자.)
+        //            for (; humanIndex < data.humanUnitDatas.Length; humanIndex++)
+        //            {
+        //                if (data.humanUnitDatas[humanIndex] == null) continue;
+
+        //                if (data.humanUnitDatas[humanIndex].BaseUnitDataID == data.unitDatas[unitIndex].ID)
+        //                {
+        //                    humanUnitDataIndex = humanIndex;
+        //                    break; // 휴먼 유닛 인덱스를 찾았습니다.
+        //                }
+        //            }
+        //            // 유닛 데이터의 캐릭터 이름으로 프리펩을 찾습니다.
+        //            switch (data.humanUnitDatas[humanUnitDataIndex].charactor)
+        //            {
+        //                case "kart":
+        //                    prefab = HumanPrefabKartSkin;
+        //                    break;
+        //                default:
+        //                    prefab = HumanPrefabDefaultSkin;
+        //                    break;
+        //            }
+        //            break;
+        //        case "machine": // 머신 타입일때.
+        //            // 유닛의 프리펩은 머신 종류에 따라 나뉩니다. ex)103
+        //            prefab = HumanPrefabDefaultSkin;
+        //            break;
+        //        default:
+        //            Debug.Log("DEBUG_GameManager.UnitInstantiate: 이 유닛의 타입(" + data.unitDatas[unitIndex].unitType + ")을 통해 프리펩을 결정할 수 없습니다.");
+        //            prefab = HumanPrefabDefaultSkin;
+        //            break;
+        //    }
+
+
+
+
+
+
+        //    #endregion
+        //    #region 1.2. 인스턴스화 - 위치 결정
+        //    Vector3 position; // 유닛이 존재할 위치입니다.
+        //    // 1. 데이터에 주둔군인지 여부를 결정합니다.
+        //    // 1.a. 주둔군인경우 저장된 위치를 값으로 합니다.
+        //    // 1.b. 주둔군이 아닌경우 스쿼드 / 혹은 유닛의 과거 위치를 찾아 과거 지역의 이름을 가지고있는 첫번째 비콘이 존재하는 위치에 넣습니다. // 이미 유닛이 배치되어있으면 그 비콘의 지역 이름이 같은 다음 비콘의 위치에 넣습니다.
+        //    // 1.a.1. 
+        //    // 
+        //    if (data.unitDatas[unitIndex].isUnitStayedThatPlace) // 유닛이 주둔군인지 여부를 판별합니다.
+        //    {
+        //        position = data.unitDatas[unitIndex].position;
+        //    }
+        //    else
+        //    {
+        //        // 
+        //        position = new Vector3(0, 1, 0);
+        //    }
+
+        //    #endregion
+        //    // 1.3. 인스턴스 함수 호출
+        //    GameObject instantiatedObject = Instantiate(prefab, position, Quaternion.identity);
+        //}
 
 
 
@@ -2142,6 +2517,25 @@ public class GameManager : MonoBehaviour
         */
         #endregion
     }
+    #region UnitInstantiate Helper Classes
+    private class UnitInstantiaterBase
+    {
+        public virtual void MakeUnit()
+        {
+
+        }
+    }
+    private class HumanInstantiater : UnitInstantiaterBase
+    {
+        public override void MakeUnit()
+        {
+            base.MakeUnit();
+            
+        }
+    }
+
+
+    #endregion
     void PlayerSetup()
     {
         playerTeam = "Player";
@@ -2225,73 +2619,84 @@ public class GameManager : MonoBehaviour
     #region 없던 유닛을 생성시키는 함수
     // 중간에 유닛이 생성하기를원하는 경우 이 함수를 호출해둬야 합니다.
     #region RegisterUnitHelper
-    public void RegisterUnitHelper_NewUnitData(ref BaseUnitData baseUnitData, Vector3 position/*, params object[] componentDatas */)
-    {
+    //public void RegisterUnitHelper_NewUnitData(ref BaseUnitData baseUnitData, Vector3 position/*, params object[] componentDatas */)
+    //{
 
-        // 아이디값 설정
-        // 아이디가 0이 아니라도 일단 아무거나면 됐죠 으이?
-        // 여기 람다쓰지말고 for루프 사용하자
-        int temp = baseUnitData.ID;
-        //baseUnitData.ID = GetNewUnitID(currentFieldData);
-        if (temp == -1) temp = UnitInSquadData.GetNewUnitID(currentFieldData);
-        else
-        {
-            for (int tIndex = 0; tIndex < currentFieldData.teamDatas.Length; tIndex++)
-            {
-                bool isFound = false;
-                for (int sIndex = 0; sIndex < currentFieldData.teamDatas[tIndex].squads.Length; sIndex++)
-                {
-                    for (int uIndex = 0; uIndex < currentFieldData.teamDatas[tIndex].squads[sIndex].units.Length; uIndex++)
-                    {
-                        if (temp == currentFieldData.teamDatas[tIndex].squads[sIndex].units[uIndex].memberID)
-                        {
-                            baseUnitData.ID = UnitInSquadData.GetNewUnitID(currentFieldData);
-                        }
-                    }
-                }
-            }
-        }
-        // 게임오브젝트 이름은 패스
+    //    // 아이디값 설정
+    //    // 아이디가 0이 아니라도 일단 아무거나면 됐죠 으이?
+    //    // 여기 람다쓰지말고 for루프 사용하자
+    //    int temp = baseUnitData.ID;
+    //    //baseUnitData.ID = GetNewUnitID(currentFieldData);
+    //    if (temp == -1) temp = UnitInSquadData.GetNewUnitID(currentFieldData);
+    //    else
+    //    {
+    //        for (int tIndex = 0; tIndex < currentFieldData.teamDatas.Length; tIndex++)
+    //        {
+    //            bool isFound = false;
+    //            for (int sIndex = 0; sIndex < currentFieldData.teamDatas[tIndex].squads.Length; sIndex++)
+    //            {
+    //                for (int uIndex = 0; uIndex < currentFieldData.teamDatas[tIndex].squads[sIndex].units.Length; uIndex++)
+    //                {
+    //                    if (temp == currentFieldData.teamDatas[tIndex].squads[sIndex].units[uIndex].memberID)
+    //                    {
+    //                        baseUnitData.ID = UnitInSquadData.GetNewUnitID(currentFieldData);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    // 게임오브젝트 이름은 패스
 
-        // 위치
-        if (currentFieldData.currentPlayLocation != null)
-        {
-            if (currentFieldData.currentPlayLocation.Length > 0)
-            {
-                baseUnitData.nameOfLocation = currentFieldData.currentPlayLocation[0];
-            }
-        }
-        baseUnitData.isUnitStayedThatPlace = true;
-        baseUnitData.position = position;
-        baseUnitData.direction = new Vector3(0, 0, -1);
+    //    // 위치
+    //    if (currentFieldData.currentPlayLocation != null)
+    //    {
+    //        if (currentFieldData.currentPlayLocation.Length > 0)
+    //        {
+    //            baseUnitData.nameOfLocation = currentFieldData.currentPlayLocation[0];
+    //        }
+    //    }
+    //    baseUnitData.isUnitStayedThatPlace = true;
+    //    baseUnitData.position = position;
+    //    baseUnitData.direction = new Vector3(0, 0, -1);
 
-        // 컴포넌트 정보
-        //baseUnitData.usingComponentNames = ComponentDataTypeToString(componentDatas);
-        //AddComponentData(componentDatas, ref currentFieldData, ref baseUnitData);
+    //    // 컴포넌트 정보
+    //    //baseUnitData.usingComponentNames = ComponentDataTypeToString(componentDatas);
+    //    //AddComponentData(componentDatas, ref currentFieldData, ref baseUnitData);
 
-        //AddElementInArray(ref currentFieldData.unitDatas, baseUnitData);
-    }
+    //    //AddElementInArray(ref currentFieldData.unitDatas, baseUnitData);
+    //}
     #endregion
-    public void RegisterUnit(ref BaseUnitData baseUnitData, HumanUnitInfoData humanUnitInfoData, Vector3 position, params object[] componentsDatas)
-    {
-        // 휴먼 유닛을 필드 데이터에 넣어줍니다
-        // 베이스 유닛 데이터를 집어넣습니다.
+    //public void RegisterUnit(ref BaseUnitData baseUnitData, HumanUnitInfoData humanUnitInfoData, Vector3 position, params object[] componentsDatas)
+    //{
+    //    // 휴먼 유닛을 필드 데이터에 넣어줍니다
+    //    // 베이스 유닛 데이터를 집어넣습니다.
         
-    }
-    public void RegisterUnit(ref BaseUnitData baseUnitData, MachineUnitInfoData machineUnitInfoData, Vector3 position, params object[] componentsDatas)
-    {
-        // 머신 유닛을 필드 데이터에 넣어줍니다.
-        // EX) 유닛을 설치할때 사용합니다.
-        // 필드 데이터에 유닛의 정보를 추가합니다.
-        // 만약 매개변수로 들어온 값이 완전하지 않으면, 알아서 디펄트값을 채워줍니다.
+    //}
+    //public void RegisterUnit(ref BaseUnitData baseUnitData, MachineUnitInfoData machineUnitInfoData, Vector3 position, params object[] componentsDatas)
+    //{
+    //    // 머신 유닛을 필드 데이터에 넣어줍니다.
+    //    // EX) 유닛을 설치할때 사용합니다.
+    //    // 필드 데이터에 유닛의 정보를 추가합니다.
+    //    // 만약 매개변수로 들어온 값이 완전하지 않으면, 알아서 디펄트값을 채워줍니다.
 
-        RegisterUnitHelper_NewUnitData(ref baseUnitData, position);
-        baseUnitData.unitType = "machine";
+    //    RegisterUnitHelper_NewUnitData(ref baseUnitData, position);
+    //    baseUnitData.unitType = "machine";
 
-        AddElementInArray(ref currentFieldData.unitDatas, baseUnitData);
+    //    if (currentFieldData.teamDatas == null) { currentFieldData.teamDatas = new TeamData[0] { }; }
+    //    int index = Array.FindIndex(currentFieldData.teamDatas, a => "Machine" == a.name);
+    //    if (index == -1)
+    //    {
+    //        TeamData teamData = new TeamData();
+    //        teamData.name = "Machine";
+    //        AddElementInArray(ref currentFieldData.teamDatas, teamData);
+    //    }
 
-        Debug.Log("DEBUG_GameManager.RegisterUnit: 새로운 유닛 아이디가 배치됨 " + baseUnitData.ID);
-    }
+
+
+    //    AddElementInArray(ref currentFieldData.unitDatas, baseUnitData);
+
+    //    Debug.Log("DEBUG_GameManager.RegisterUnit: 새로운 유닛 아이디가 배치됨 " + baseUnitData.ID);
+    //}
 
 
 
@@ -2309,7 +2714,7 @@ public class GameManager : MonoBehaviour
     public string ComponentDataTypeToString(object componentDatas)
     {
         System.Type dataType = componentDatas.GetType();
-        if (dataType == typeof(HumanUnitBase.OrganListData))
+        if (dataType == typeof(HumanUnitBase.HumanUnitBaseData))
         {
             return "HumanUnitBase";
         }

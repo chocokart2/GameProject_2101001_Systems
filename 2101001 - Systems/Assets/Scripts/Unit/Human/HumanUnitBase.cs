@@ -35,6 +35,9 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
 
     #endregion
 
+    #region 유니티 함수
+
+
     void Awake()
     {
         HumanOrganNameList = new Dictionary<int, string>();
@@ -86,11 +89,18 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
         // GetInstanceID는 어려울 것 같습니다 -> 일일히 컴포넌트를 참조시키는건 어떨까
 
     }
-    
+    #endregion
 
 
 
     #region 필드
+    #region 파일 입출력용 데이터
+    HumanUnitBaseData humanUnitBaseData;
+
+
+    #endregion
+
+
     #region 1회용 필드
     //bool isEyeSightBooted = false;
 
@@ -109,7 +119,6 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
 
 
 
-
     public List<BaseOrganSystem> OrganSystems;
     public void organSystemsSet()
     {
@@ -117,6 +126,11 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
         
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        humanUnitBaseData = new HumanUnitBaseData();
+        humanUnitBaseData.type = "human";
+
+
+
         OrganSystems = new List<BaseOrganSystem>();
         OrganSystems.Add(new DigestiveSystem(gameManager, setDefaultData()));
         OrganSystems.Add(new CirculatorySystem(gameManager, setDefaultData()));
@@ -145,10 +159,6 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
             OrganSystems.Add(new IntegumentarySystem(gameManager, organData.organSystemDatas[8]));
         }
         else organSystemsSet();
-    }
-    public HumanUnitBaseData OrganSystemsGet()
-    {
-        
     }
     BaseOrganSystemData setDefaultData()
     {
@@ -193,18 +203,13 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
     #region IComponentDataIOAble 함수
     public void SetData(HumanUnitBaseData input)
     {
-        organSystemsSet(input); 
+        organSystemsSet(input);
     }
-    get
-    #endregion
-    #region 외부와 약속된 함수
-    public void SetComponentData(OrganListData organData)
+    public HumanUnitBaseData GetData()
     {
-        organSystemsSet(organData);
+        HumanUnitBaseData returnValue = new HumanUnitBaseData(OrganSystems);
+        return returnValue;
     }
-
-
-
     #endregion
     #region 함수
 
@@ -225,8 +230,23 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
     [System.Serializable]
     public class HumanUnitBaseData
     {
-        public string type;
-        public BaseOrganSystemData[] organSystemDatas;
+        #region 생성자
+        public HumanUnitBaseData() { }
+        public HumanUnitBaseData(List<BaseOrganSystem> baseOrganSystems)
+        {
+            type = "human";
+            organSystemDatas.CopyTo(baseOrganSystems.ToArray(), 0);
+        }
+        public HumanUnitBaseData(string typeName, List<BaseOrganSystem> baseOrganSystems)
+        {
+            type = typeName;
+            organSystemDatas.CopyTo(baseOrganSystems.ToArray(), 0);
+        }
+        #endregion
+        #region 변수
+        public string type; // 유닛의 타입입니다.
+        public BaseOrganSystemData[] organSystemDatas; // 내부 시스템입니다.
+        #endregion
     }
     [System.Serializable]
     public class BaseOrganSystemData

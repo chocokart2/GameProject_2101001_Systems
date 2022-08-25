@@ -20,9 +20,18 @@ public class UnitSight : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        #region 함수 설명
+
+        // 타일 블럭이 충돌함
+        // 이벤트 발생?
+
+        #endregion
+
+
+
         //Debug.Log("Ouch");
         //if(other.gameObject.layer == 8)
-        if(other.gameObject.layer == 8)
+        if (other.gameObject.layer == 8)
         {
             // 충돌한 물체의 타일을 저장.
             TileBlock tileBlock = other.GetComponent<TileBlock>();
@@ -44,7 +53,7 @@ public class UnitSight : MonoBehaviour
         }
         if(other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightEnter(transform.parent.gameObject.GetComponent<UnitBase>().unitBaseData.teamID);
+            other.gameObject.GetComponent<UnitBase>().SightEnter(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID.ToString());
         }
 
 
@@ -54,7 +63,7 @@ public class UnitSight : MonoBehaviour
     {
         if (other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitBase>().unitBaseData.teamID);
+            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID.ToString());
         }
     }
 

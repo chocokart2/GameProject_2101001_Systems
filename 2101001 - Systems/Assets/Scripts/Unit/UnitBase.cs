@@ -237,6 +237,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         }
         #endregion
 
+        public string prefabName;
         public string unitType
         {
             get 
@@ -253,8 +254,11 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         }
         public string teamName { get; set; } // 자신을 포함하는 인스턴스가 누구인지를 가리킵니다.
         //public bool isUnitTypeSet = false;
+        public Vector3 position;
         public Vector3 direction;
         public int instanceId; // 1) instantiate할때마다 생성됩니다. 2) GameManager에서 유닛을 찾는데 이용합니다.
+        public int gameManagerID;
+
         //public int gameManagerId; // 어레이에 없어짐으로서 더이상 사용하지 않음
 
 
@@ -284,18 +288,11 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     {
         return unitBaseData;
     }
-
-
-
-
-
+    #endregion
     public void UnitBaseDataNewSet(string _unitType, int _id)
     {
         unitBaseData = new UnitBaseData(_unitType, _id);
     }
-
-    #endregion
-
     #region 이벤트로 통제되는 유닛의 행동들
     // 1. 이벤트에 들어갈 형식을 생각해둡니다.
     public delegate void EventHandlerVoid();
