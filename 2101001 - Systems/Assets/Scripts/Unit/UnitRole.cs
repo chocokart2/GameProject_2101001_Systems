@@ -6,6 +6,7 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
 {
     #region 어디에 쓰이는 클래슨고?
     // 이 유닛의 직업에 대해서 다룹니다.
+    // 속해있는 유닛, 스쿼드, 팀을 특정할 수 있는 정보를 가지고 있습니다.
     // 인간 유형이 아니더라도, 특정한 역할을 맡을 수 있다면 이 컴포넌트를 주입하세요.
 
     #endregion
@@ -55,6 +56,8 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
         // 유동적으로 변하는 INDEX값은 아닙니다!
         // 또한 게임이 끝나면 이 ID값은 파기될겁니다.
         // WorldManager 수준에서 각 팀 / 스쿼드 / 유닛을 특정하는 정보는 따로 만들어야 합니다.
+        MemberInfo memberInfo;
+
         public int teamID; // TeamID는 인덱스 값이 아닙니다!
         public int squadID; // 자신이 소속한 스쿼드 아이디 (!인덱스가 아님!)
         public int unitID; //UnitID는 인덱스 값이 아닙니다!
@@ -65,7 +68,15 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
 
         #endregion
     }
+    public struct MemberInfo
+    {
+        public int teamID;
+        public string teamName;
 
+        public int squadID;
+
+        public int unitID;
+    }
 
     #region 필드들
 

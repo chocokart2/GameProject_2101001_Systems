@@ -13,7 +13,7 @@ public class UnitSight : MonoBehaviour
     HumanUnitBase myHumanUnitBase;
     //Transform playerTf;
     GameObject memoryBlockPrefab;
-    MemoryBlock memoryBlockComponent;
+    MemoryBlock memoryBlockComponent; // 이 변수를 가지고 있는 이유는 유닛을 납치했을때 지역 정보도 얻을 수 있기 때문입니다.
     bool isInitCalled = false;
 
     public GameObject FollowingObject = null;
@@ -53,7 +53,21 @@ public class UnitSight : MonoBehaviour
         }
         if(other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightEnter(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID.ToString());
+            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {other.gameObject.name}");
+            UnitBase recvUnitBase = other.gameObject.GetComponent<UnitBase>();
+
+            if (recvUnitBase == null) Debug.Log("Error_UnitSight.OnTriggerEnter : 널 값입니다.");
+            if (transform.parent == null) Debug.Log("Error_UnitSight.OnTriggerEnter : transform.parent 널 값입니다.");
+            if (transform.parent.gameObject == null) Debug.Log("Error_UnitSight.OnTriggerEnter : transform.parent.gameObject널 값입니다.");
+            if (transform.parent.gameObject.GetComponent<UnitRole>() == null) Debug.Log("Error_UnitSight.OnTriggerEnter : UnitRole이 널 값입니다.");
+            if (transform.parent.gameObject.GetComponent<UnitRole>().GetData() == null) Debug.Log("Error_UnitSight.OnTriggerEnter : UnitRole.GetData()이 널 값입니다.");
+            if (transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID == null) Debug.Log("Error_UnitSight.OnTriggerEnter : UnitRole.GetData().teamID이 널 값입니다.");
+            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {recvUnitBase.name}");
+
+            //other.gameObject.GetComponent<UnitBase>().
+            recvUnitBase.
+                SightEnter(
+                transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
         }
 
 
@@ -63,7 +77,7 @@ public class UnitSight : MonoBehaviour
     {
         if (other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID.ToString());
+            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
         }
     }
 

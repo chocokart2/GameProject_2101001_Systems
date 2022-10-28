@@ -23,7 +23,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     //public int lightCountForSensor = 0;
     //public int lightCount = 0;
     public Dictionary<int, int> lightCount; // 받은 빛마다 나뉘어집니다. Key: 빛의 종류(0: 랜더링용 가시광선, 1: 적외선, 2+: 사용자 지정 광선), Value:그 빛을 닿고 있는 갯수.
-    public Dictionary<string, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 Name이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
+    public Dictionary<int, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 ID이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
     public List<string> hierarchyGameObjectNameForRendering;
 
     #region 다른 컴포넌트로 옮겨야 할 부분
@@ -53,11 +53,22 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
 
     #region 컴포넌트들
+
+
+    #region 게임오브젝트 내 컴포넌트
+
+    #endregion
+    #region 다른 게임오브젝트
+
+    #endregion
+    #region 다른 게임오브젝트의 컴포넌트
+    GameManager gameManager;
+
+    #endregion
     MeshRenderer myMeshRenderer;
     UnitItemPack myUnitItemPack;
     UnitMovable myUnitMovable;
     HumanUnitBase myHumanUnitBase;
-    GameManager gameManager;
 
 
 
@@ -238,20 +249,9 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         #endregion
 
         public string prefabName;
-        public string unitType
-        {
-            get 
-            {
-                return unitType;
-            }
-            private set
-            {
-                if (unitType == null)
-                {
-                    unitType = value;
-                }
-            }
-        }
+
+        public string unitType;
+        
         public string teamName { get; set; } // 자신을 포함하는 인스턴스가 누구인지를 가리킵니다.
         //public bool isUnitTypeSet = false;
         public Vector3 position;
@@ -484,13 +484,14 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     #region 퍼블릭 메서드 - checkRenderingCondition, SightEnter, SightExit, LightEnter, LightExit, LightEnterForSensor, LightExitForSensor
     public void checkRenderingCondition() // 예외, 자기 팀원은 밝기에 상관없이 그대로 표시됩니다.
     {
-        string myTeamName = "Player";//GameObject.Find("GameManager").GetComponent<GameManager>().playerTeam;
+        int myTeamID = gameManager.currentFieldData.GetPlayerTeamID();
+        //string myTeamName = "Player";//GameObject.Find("GameManager").GetComponent<GameManager>().playerTeam;
 
         // 1. lightCount가 1보다 높을 것
         // 2. 자기편 UnitSight에 닿을 것 sightCount[myTeamName] > 0을 체크
         // 이런경우 랜더링됩니다.
 
-        bool isTeamLooking = lightCount[0] > 0 && sightCount[myTeamName] > 0;
+        bool isTeamLooking = lightCount[0] > 0 && sightCount[myTeamID] > 0;
 
         for (int index = 0; index < hierarchyGameObjectNameForRendering.Count; index++)
         {
@@ -514,20 +515,34 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
             }
         }
     }
-    public void SightEnter(string teamName)
+    /// <summary>
+    /// 어떤 유닛A의 시야 범위에 이 유닛이 들어온 경우 A의 컴포넌트가 이 함수를 호출하여
+    /// 이 유닛이 어떤 유닛들에게 볼 "수" 있는지 기록합니다
+    /// </summary>
+    /// <param name="teamID"> 이 유닛을 발견한 유닛의 teamID입니다. teamID는 월드매니저에서 구합니다.</param>
+    /// 
+    public void SightEnter(int teamID)
     {
+        #region 함수 설명
+        // 이 유닛이 어느 유닛의 시야에 들어왔는가?
+        // 입력 : 이 컴포넌트를 발견한 다른 유닛의 팀 이름(아군 적군 상관없이)
+        // 출력 : 없음
+        // 결과 : 이 유닛을 발견한 팀 X의 멤버수()가 증가합니다.
+
+        #endregion
+
         if (sightCount == null)
         {
-            sightCount = new Dictionary<string, int>();
-            sightCount.Add("Player", 1);
+            sightCount = new Dictionary<int, int>();
+            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1);
         }
-        if (sightCount.ContainsKey(teamName) == true)
+        if (sightCount.ContainsKey(teamID) == true)
         {
-            sightCount[teamName] += 1;
+            sightCount[teamID] += 1;
         }
         else
         {
-            sightCount.Add(teamName, 1);
+            sightCount.Add(teamID, 1);
         }
         if (lightCount == null)
         {
@@ -536,17 +551,17 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         }
         checkRenderingCondition();
     }
-    public void SightExit(string teamName)
+    public void SightExit(int teamID)
     {
-        sightCount[teamName] -= 1;
+        sightCount[teamID] -= 1;
         checkRenderingCondition();
     }
     public void LightEnter(int lightNumber)
     {
         if (sightCount == null)
         {
-            sightCount = new Dictionary<string, int>();
-            sightCount.Add("Player", 1);
+            sightCount = new Dictionary<int, int>();
+            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1);
         }
         if(lightCount == null)
         {

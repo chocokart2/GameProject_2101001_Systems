@@ -367,7 +367,9 @@
 "Assets/Scripts/System/Data/GameData.cs"
 "Assets/Scripts/System/DataBase.cs"
 "Assets/Scripts/System/DebuggerComponent.cs"
+"Assets/Scripts/System/EditorManager.cs"
 "Assets/Scripts/System/FieldCameraController.cs"
+"Assets/Scripts/System/GameDataBaseAccesser.cs"
 "Assets/Scripts/System/GameManager.cs"
 "Assets/Scripts/System/PrefabList.cs"
 "Assets/Scripts/System/Test/Beacon.cs"
@@ -407,6 +409,7 @@
 "Assets/Scripts/Unit/Machine/LightSensorChildCylinder.cs"
 "Assets/Scripts/Unit/Machine/LightSensorChildRay.cs"
 "Assets/Scripts/Unit/Machine/MachinePlacement.cs"
+"Assets/Scripts/Unit/Machine/MachineUnitBase.cs"
 "Assets/Scripts/Unit/Machine/NetworkAntennaConnector.cs"
 "Assets/Scripts/Unit/Machine/NetworkAntennaConnectorChild.cs"
 "Assets/Scripts/Unit/Machine/NetworkConnector.cs"
@@ -418,7 +421,6 @@
 "Assets/Scripts/Unit/Machine/UnitAnalyzer.cs"
 "Assets/Scripts/Unit/Machine/UnitMainWorks/SensorCamera.cs"
 "Assets/Scripts/Unit/Machine/UnitMainWorks/SensorString.cs"
-"Assets/Scripts/Unit/MachineUnitBase.cs"
 "Assets/Scripts/Unit/SmallObject/AttackObject.cs"
 "Assets/Scripts/Unit/SmallObject/BulletController.cs"
 "Assets/Scripts/Unit/SmallObject/KnifeController.cs"
@@ -427,6 +429,7 @@
 "Assets/Scripts/Unit/UnitMovable.cs"
 "Assets/Scripts/Unit/UnitRole.cs"
 "Assets/Scripts/Unit/UnitRotateToCamera.cs"
+"Assets/Scripts/Unit/UnitVisibleController.cs"
 "Assets/Scripts/UnitSight.cs"
 -langversion:9.0
 

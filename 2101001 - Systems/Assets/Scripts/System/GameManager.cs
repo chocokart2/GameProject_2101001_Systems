@@ -42,6 +42,26 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+
+        // 게임 모드에 따라 달라지는 행동
+        GameMode gameMode = GetGameMode();
+        if (gameMode == GameMode.GamePlay)
+        {
+            ReadyPlayMode();
+        }
+        else if (gameMode == GameMode.EditAndTest)
+        {
+            ReadyTestMode();
+        }
+        else
+        {
+            Console.WriteLine("ERROR_GameManager.Start() : 알 수 없는 게임모드입니다.");
+        }
+
+
+
+
+
         // 
         TileMapSetup();
         FieldSetup();
@@ -93,33 +113,109 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
+    #region Start 함수 호출 루틴
+    
+    // 1. 자신이 어떤 모드인지 결정합니다.
+    GameMode GetGameMode()
+    {
+        EditorManager em = GameObject.Find("EditorManager")?.GetComponent<EditorManager>();
 
+        if (em == null)
+            return GameMode.GamePlay;
+        else
+            return GameMode.EditAndTest;
+    }
+
+    // 2. 해당하는 모드에 대해서 설정합니다.
+    void ReadyPlayMode()
+    {
+
+
+
+
+
+        // 1. 파일을 읽습니다.
+        FieldData _fieldData = new FieldData();
+        string _filePath = "Assets/GameFile/Field/fieldData.json";
+        if (DataLoading(_filePath, ref _fieldData) == false)
+        {
+            // 파일이 없으면 파일이 없다고 에러 메시지를 보냅니다.
+            throw new CannotReeachFileException($"파일 경로{_filePath} 위치에 파일을 찾을 수 없습니다.");
+        }
+
+        // 2. 작전 목표를 읽습니다.
+        // 자신의 팀이 누구인지 파악합니다.
+        // 각 팀의 작전 목표를 파악합니다.
+        //_fieldData.teamDatas[0].goal
+
+
+
+
+
+    }
+    void ReadyTestMode()
+    {
+        // (패스) UI Controller -> UI Controller가 알아서 해 줘야 해
+
+
+
+        RealTileMap = new Dictionary<Vector3, int>();
+        ReadyRealTileMap(ref RealTileMap);
+
+    }
+
+
+
+    #region 열거형
+    enum GameMode
+    {
+        GamePlay,
+        EditAndTest
+    }
+    enum SceneMode
+    {
+        Field,
+        WorldMap
+    }
+    #endregion
+
+
+    #endregion
     #region 길찾기 알고리즘 보조역할
-
+    public event TileMap2Void ReadyRealTileMap = delegate (ref Dictionary<Vector3, int> myMap) { };
 
 
 
     Dictionary<Vector3, int> RealTileMap;
     void TileMapSetup() { RealTileMap = new Dictionary<Vector3, int>(); }
 
-    public void SetTileMap(Vector3 vec3, int blockTileID)
+    public void SetTileMap(ref Dictionary<Vector3, int> _map , Vector3 vec3, int blockTileID)
     {
+        #region 이 함수는 작전 필드의 에디터용 함수입니다.
+        // 이 함수는 필요한 존재인가?
+        // 게임 맵에서는 객체가 먼저 존재하고, 게임오브젝트는 존재하지 않을 것이다
+        // 따라서 게임오브젝트의 블럭 정보를 저장하는 일은 없을 것이다. 왜냐하면 파일에서 따온 정보를 이용하면 되니까.
+        // 이 함수는 게임 맵에서 필요하지 않다
+        // 그러면 에디터 맵에 필요한 존재인가? 그렇다!
+        #endregion
         // <!> 이벤트 발생시키기 -> TileBlock으로부터 데이터를 주입하도록 호출합니다.
+
+        
 
 
 
         // NOTE:
         // a. Dictionary에서 .Add 함수를 이용할때 ArgumentException을 이용한 코드 : 사용해도 괜찮음!
         // b. Dictionary에서 .TryAdd 함수를 이용한 코드 : 유니티에서 TryAdd 함수를 못 알아먹는듯.
-        if (RealTileMap.ContainsKey(vec3) == true) // 자기 위치를 저장할때 : 메모리맵에 자기 위치에 해당하는 정보가 이미 있습니다.
+        if (_map.ContainsKey(vec3) == true) // 자기 위치를 저장할때 : 메모리맵에 자기 위치에 해당하는 정보가 이미 있습니다.
         {
-            RealTileMap.Remove(vec3);
-            RealTileMap.Add(vec3, blockTileID);
+            _map.Remove(vec3);
+            _map.Add(vec3, blockTileID);
             //Debug.Log("타일맵이 저장되었습니다. : " + vec3);
         }
         else // 자기 위치를 저장할때 : 신규 블럭 등록
         {
-            RealTileMap.Add(vec3, blockTileID);
+            _map.Add(vec3, blockTileID);
             //Debug.Log("타일맵이 저장되었습니다. : " + vec3 + ", " + blockTileID);// 작동함!
         }
     }
@@ -736,18 +832,15 @@ public class GameManager : MonoBehaviour
     // 유닛 정보 / 팀 정보 / 스쿼드 정보를 긁어오거나 데모 데이터를 필드에 저장합니다.
 
     #region Class - Field Manager
+    #region 이 클래스가 가지고 있는 공통적인 내용
+    // 한 순간 이외에 사용되지 않음
+    // - 씬을 로딩하거나 성과를 저장할 때만 사용.
+    // 나머지는 컴포넌트에 저장되어 업데이트됨.
+    // 스쿼드 및
+    #endregion
+
 
     #region Base - Class-Field Manager
-
-    //public class Field
-    //{
-    //    public List<BaseUnitData> unitDatas;
-    //    public List<HumanUnitInfoData> humanUnitDatas;
-    //    public List<MachineUnitInfoData> machineUnitDatas;
-    //
-    //    public List<TeamData> teamDatas;
-    //}
-
     [System.Serializable]
     public class FieldManager
     {
@@ -757,11 +850,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
+
 
     [System.Serializable]
-    public struct FieldData // <!> 아직 완벽하지 않은 데이터입니다! 야전에 추가할 정보가 있으면 더 추가해주세요.
+    public class FieldData // <!> 아직 완벽하지 않은 데이터입니다! 야전에 추가할 정보가 있으면 더 추가해주세요.
     {
+        #region 클래스 설명 및 자주 묻는 질문
+
+
+
+        // 전투 장소에 대한 전반적인 정보를 담고 있습니다.
+        // 게임 플레이 상황을 저장할 수 있고 JSON으로 만들어 직렬화 할 수 있어야 합니다.
+        // 또 게임이 재개되면 이 인스턴스를 이용해 상황을 재구현할 수 있어야 합니다.
+
+        #region 자주 묻는 질문
+            #region 이 클래스의 일부 멤버들만 지역의 이름을 제한적으로 가지고 있는 이유
+                // "굳이 필요하지 않아서"
+                // FieldData는 멤버 변수로 이미 자신의 지역 이름을 가지고 있습니다.
+                // 지역이 정해지고, 미션이 정해지면 구체적인 작전 장소가 정해지게 됩니다.
+                // 이때 그 멤버들도 자신이 위치하고 있는 지역의 이름을 가지려고 한다면, 생성자를 생성할때, 데이터를 할당할 때, 제공해야 하는 정보는 많아지게 됩니다.
+                // 예외적으로 SquadData는 분대 단위로 지역을 이곳저곳 움직이고, 바깥에서도 쓸만한 클래스이므로 지역의 이름을 가지고 있습니다.
+            #endregion
+
+            #region 유닛들에 대한 정보를 항상 동기화하지 않는 이유
+                // "이미 유닛을 찾아서 저장하면 되기 때문"
+
+
+            #endregion
+
+            #region 이 씬의 전투 장소에 대해서는 어디서 저장해야 하는가? : FieldData
+                // 필드데이터는 실제 작전을 위한 필드데이터입니다.
+            #endregion
+            #region 언제 / 어디서 개별 필드 데이터가 게임용 필드 데이터로 합쳐지는가?
+                // 월드 지도에서는 개별 필드 데이터로 지정이 된다
+                // 게임을 로딩하는 중에서는 사용자가 기다려 줄 수 있으므로 여기서 일을 몰빵해보자
+                // 그 외에서는 즉각즉각 처리해야 해서 좀 약해보인다
+            #endregion
+        #endregion
+        #endregion
         #region 생성자
         public FieldData()
         {
@@ -775,7 +901,7 @@ public class GameManager : MonoBehaviour
                 }
             };
             machineUnitDatas = new MachineUnitData[0];
-            blockDatas = new BlockData[0];
+            blocksData = new BlocksData();
         }
         #endregion
         #region 프로퍼티
@@ -792,17 +918,36 @@ public class GameManager : MonoBehaviour
         // 현재 플레이어의 목표는 스쿼드의 미션을 확인하세요. 현재 위치에 존재하는 스쿼드의 미션이 곧 현재의 목표입니다.
         //
         #endregion
-        public string[] currentPlayLocation;
+        public string[] currentPlayLocation; // 불러온 지역의 이름들입니다. 아마 키 값으로 쓸만할텐데
 
         #region 유닛에 대한 필드
         // 팀에 대한 정보들
         public string playerTeamName; // 플레이어가 통제하는 팀의 이름입니다.
+        public int playerTeamID
+        {
+            get
+            {
+                int returnValue = -1;
+
+                if(teamDatas != null)
+                {
+                    for (int teamIndex = 0; teamIndex < teamDatas.Length; teamIndex++)
+                    {
+                        if (playerTeamName == teamDatas[teamIndex].name)
+                            return teamDatas[teamIndex].ID;
+                    }
+                }
+
+
+                return returnValue;
+            }
+        }
         public TeamData[] teamDatas; // 분대에 대한 정보, 유닛이 존재하는 지역을 담습니다
         // 머신 유닛에 대한 필드들
         public MachineUnitData[] machineUnitDatas; // 이런 클래스 만들기
         #endregion        
         // 블럭에 대한 정보
-        public BlockData[] blockDatas;
+        public BlocksData blocksData;
 
         // 거점에 대한 정보
 
@@ -811,86 +956,28 @@ public class GameManager : MonoBehaviour
         #region public Method
         public void AddUnitData(BaseUnitData baseUnitData, HumanUnitInfoData humanUnitInfoData, params object[] componentDatas)
         {
-
+            
         }
         public void AddUnitData(MachineUnitData machineUnitData, params object[] componentDatas) // 에러가 있습니다!
         {
-            AddElementInArray(ref machineUnitDatas, machineUnitData); // 이건 진짜로 내가 하고싶었던 것
+            AddElementInArrayStatic(ref machineUnitDatas, machineUnitData);
+        }
+        public int GetPlayerTeamID()
+        {
+            #region 함수 설명
+            // FieldData에서 playerTeamName와 동일한 팀 이름을 가진 존재를 찾는다.
+            // 만약 찾으면 팀의 아이디 값을 리턴한다.
 
-            // 에러 분석
+            #endregion
 
-            PingPong(); // GameManager의 함수. 함수 호출 가능한지 여부를 확인하기 위해 존재한다.
-
-            // 이제 알거 같은 부분
-
-            GameManager gm = new GameManager();
-            gm.AddElementInArray(ref machineUnitDatas, machineUnitData);
-            // ㄴ 음... 뭔가 마음에 들지 않는다. 다른 방법이 없을까?
-            
-            gm.AddElementInArrayStatic(ref machineUnitDatas, machineUnitData)
-
+            return -1;
         }
 
-
         #endregion
 
 
 
         #endregion
-
-
-        // 현재 Field에 보여주고 있는 플레이어와 지역, 입장 등에 대한 데이터가 저장되는 곳입니다.
-
-
-
-        // 여러 야전의 전반적인 데이터가 저장되는 곳입니다.
-
-
-        // 유닛에 대한 정보입니다.
-        //public BaseUnitData[] unitDatas;
-        //public HumanUnitInfoData[] humanUnitDatas;
-        //public MachineUnitInfoData[] machineUnitDatas;
-        // 유닛 프리펩에 붙는 컴포넌트에 대한 정보입니다.
-        // 휴먼 유닛
-        //public UnitBase.UnitBaseData[] unitBaseComponentData;
-        //public HumanUnitBase.OrganListData[] organListComponentData;
-        //public UnitItemPack.UnitItemPackData[] unitItemPackComponentData;
-        // 머신 유닛 - 머신 번호 순서 -> ABC순서
-        // 머신 컴포넌트에 대한 어레이입니다.
-
-
-
-
-
-
-
-
-
-        //public BaseTileData[] tileDatas;
-
-
-
-
-        //
-        // FUNCTION
-        //
-
-
-
-        //public BaseUnitData TryGetBaseUnitData(int id)
-        //{
-        //    if (unitDatas == null) return null;
-        //
-        //    for (int index = 0; index < unitDatas.Length; index++)
-        //    {
-        //        if (unitDatas[index].ID == id)
-        //        {
-        //          return unitDatas[index];
-        //        }
-        //    }
-        //
-        //    return null;
-        //}
     }
 
 
@@ -902,17 +989,73 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class TeamData
     {
+        #region 생성자 : void / int
+        public TeamData() { }
+        public TeamData(int id)
+        {
+            this.ID = id;
+        }
+        #endregion
+
         // 팀을 특정하기 위한 클래스입니다.
         public string name; // 유저에게 표시할 이름
         public int ID; // 이름이 같더라도 컴퓨터가 팀을 특정할 수 있도록 합니다.
+        public UnitID unitID;
+
+
+        public FieldData fieldData
+        {
+            get
+            {
+                return GameObject.Find("GameMananger").GetComponent<GameManager>().currentFieldData;
+            }
+        }
 
         // 팀 내부에 대한 정보입니다.
         public SquadData[] squads; // 팀 내부에 어떤 분대가 있는가
+        #region 인덱서 - squad 참조
+        public SquadData this[int index]
+        {
+            get { return squads[index]; }
+            set { this[index] = squads[index]; }
+        }
+        public SquadData this[string name]
+        {
+            get
+            {
+                if (squads == null) return null;
+                for(int index = 0; index < squads.Length; index++)
+                {
+                    if(squads[index].name == name) return squads[index];
+                }
+                return null;
+            }
+            set
+            {
+                if (squads == null)
+                {
+                    Debug.Log("<!>FunctionWillNotWorking_TeamData.this[string] : 접근하려는 squad가 Null입니다.");
+                    return;
+                }
+                for (int index = 0; index < squads.Length; index++)
+                {
+                    if (squads[index].name == name)
+                    {
+                        squads[index] = value;
+                    }
+                }
+            }
+        }
+        #endregion
+
         public GoalData goal; // 이 팀의 승리 조건
         public BlockMemoryData[] blockMemorys; // 이 팀이 기억하고 있는 지도
-        public RelationData[] relations; // 다른 팀과의 관계
+        public DiplomacyData[] relations; // 다른 팀과의 관계
 
         public string[] DataTag; // 추가적인 데이터입니다. 무슨 일이 생겨서 가라로 추가해야 하는 정보가 있을 때 사용합니다.
+
+        // 자신을 포함하는 필드데이터를 참조하기 위한 포인터 프로퍼티입니다.
+
         #region static method
         public static int GetNewTeamID(FieldData fieldData)
         {
@@ -932,6 +1075,25 @@ public class GameManager : MonoBehaviour
             }
             return returnValue + 1;
         }
+
+        #endregion
+        #region public instance method
+
+        #region factory method
+        public TeamData CreateTeamData()
+        {
+            TeamData returnValue = new TeamData();
+            returnValue.unitID = new UnitID()
+            {
+                //team = GetNewTeamID()
+                squad = new int[0], // 만약 생성하게 된다면
+                unit = new int[0]
+            };
+            return returnValue;
+        }
+        #endregion
+        
+
 
         #endregion
     }
@@ -1226,7 +1388,7 @@ public class GameManager : MonoBehaviour
     #endregion
     #region 1.4. Relations
     [System.Serializable]
-    public class RelationData
+    public class DiplomacyData
     {
         #region Help
         // 다른 상대와 관계 상태를 저장하기 위한 정보입니다.
@@ -1243,8 +1405,104 @@ public class GameManager : MonoBehaviour
         }
     }
     #endregion
+    #region 1.x Univarsal class
+    public class UnitID
+    {
+        #region 클래스 설명
+        #region 클래스의 용도
+        // 자신이 속한 팀 / 스쿼드 및 자신의 아이디를 알리는 역할을 합니다.
+        // 또한 팀 / 스쿼드가 자신에 속한 스쿼드 / 유닛을 알리기 위한 용도도 있습니다.\
+        #region 더 멍청한 나를 위한 설명
+        // 팀인 경우
+        // team : 자신의 팀 아이디를 넣음
+        // squad : 자신에게 속한 스쿼드 값을 넣음
+        // unit : 자신에게 속한 유닛의 아이디 값을 넣음
+        // 스쿼드인 경우
+        // team : 자신이 속한 팀 아이디를 넣음
+        // squad : 자신의 스쿼드 아이디 값을 넣음
+        // unit : 자신에게 속한 유닛의 아이디 값을 넣음
+        // 유닛인 경우
+        // team : 자신이 속한 팀 아이디 값을 넣음
+        // squad : 자신이 속한 스쿼드 아이디 값을 넣음
+        // unit : 자신의 유닛 아이디 값을 넣음
+
+        #endregion
+        #endregion
+
+        #endregion
+
+        public int team;
+        public int[] squad;
+        public int[] unit;
+    }
+
+
+    #endregion
     #endregion
     #region 2. BlockData
+    [System.Serializable]
+    public class BlocksData
+    {
+        #region 클래스 설명
+        // 블럭들에 대한 데이터를 담고 있습니다.
+        // 블럭들에 대한 정보를 저장하고 불러오는 메소드를 담기 위해 따로 클래스를 만들었습니다.
+        #endregion
+        #region 생성자
+        public BlocksData()
+        {
+            blocks = new BlockData[0];
+        }
+        #endregion
+        #region 필드
+        public BlockData[] blocks;
+        #endregion
+        #region 메서드
+        public void Add(BlockData blockData)
+        {
+            #region 메소드 설명
+
+            #endregion
+        }
+        /// <summary>
+        /// 매개변수로 받은 블럭을 blocks에 넣습니다. 이때, [해당 위치에 블럭이 없음 : 그 위치에 블럭을 추가합니다.] / [해당 위치에 블럭이 있음 : 그 위치의 블럭을 지우고 덮어씁니다.]
+        /// </summary>
+        /// <param name="NewBlock">새로 끼워넣을 블럭입니다.</param>
+        public void Change(BlockData newBlock)
+        {
+
+        }
+        public void Delete(Vector3 blockPos)
+        {
+
+        }
+        /// <summary>
+        /// 해당하는 좌표에 있는 블럭을 찾습니다.
+        /// </summary>
+        /// <param name="blockPos"></param>
+        /// <returns> 블럭을 찾았으면 : 해당 좌표에 위치하고 있는 BlockData,
+        /// 만약 못 찾았으면 : null
+        /// </returns>
+        public BlockData Get(Vector3 blockPos)
+        {
+            for(int i = 0; i < blocks.Length; i++)
+            {
+                if (blocks[i].position.x == blockPos.x &&
+                    blocks[i].position.y == blockPos.y &&
+                    blocks[i].position.z == blockPos.z)
+                {
+                    return blocks[i];
+                }
+            }
+            return null;
+        }
+        public void Sort()
+        {
+
+        }
+        #endregion
+    }
+
+
     [System.Serializable]
     public class BlockData
     {
@@ -1333,6 +1591,12 @@ public class GameManager : MonoBehaviour
         /// 이 머신이 어떤 종류의 머신인가요?
         /// </summary>
         public int machineTypeID;
+        public int machineID; // 이 필드에 존재하는 몇 번째 머신인지 판단
+        #region machineID에 대한 정보 및 질문
+        // 필드를 재 로딩했을때, 이 머신이 어디에 위치해 있는지를 알려줍니다.
+        // 이 머신과 다른 머신에 상호관계가 놓여 있을때, 필드를 재 로딩했을때, 그 관계가 지워지지 않게 만들기 위함입니다.
+        // 아이디 값은 인덱스 값이 아니라, 아이디 값을 발급할 당시 게임 매니저에서 여태껏 머신 아이디를 제공한 값 중에서 가장 큰 값 + 1을 받습니다.
+        #endregion
 
         #region 머신 유닛이 "가질 수 있는" 컴포넌트 필드의 데이터들
 
@@ -1350,6 +1614,24 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
+    #region 5. Location
+    [System.Serializable]
+    public class SceneLocate
+    {
+        #region 클래스 설명
+
+
+        #endregion
+
+        public string[] location;
+        
+    }
+
+
+
+
+	#endregion
+
     #region Interface
     public interface IComponentDataIOAble<T>
     {
@@ -1724,7 +2006,7 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    
+
     //public void AddComponentData(UnitBase.UnitBaseData componentData, ref FieldData targetFieldData, ref BaseUnitData baseUnitData)
     //{
     //    AddComponentDataHelper(ref targetFieldData.unitBaseComponentData, ref baseUnitData, componentData, "UnitBase");
@@ -1737,6 +2019,8 @@ public class GameManager : MonoBehaviour
     //{
     //    AddComponentDataHelper(ref targetFieldData.unitItemPackComponentData, ref baseUnitData, componentData, "UnitItemPack");
     //}
+
+
 
     public void AddComponentData<ComponentDataClass>(ComponentDataClass componentData, ref FieldData targetFieldData, ref BaseUnitData baseUnitData)
     {
@@ -1927,7 +2211,7 @@ public class GameManager : MonoBehaviour
         string PlayerTeam = "PlayerTeam";
         string EnemyTeam = "EnemyTeam";
 
-
+        //Debug.Log("DEBUG_GameManager.DemoFieldLoader() : 그 곳에 있습니다.");
 
         FieldData returnValue = new()
         {
@@ -1936,10 +2220,9 @@ public class GameManager : MonoBehaviour
             playerTeamName = PlayerTeam,
             teamDatas = new TeamData[3]
             {
-                new()
+                new(0)
                 {
                     name = PlayerTeam,
-                    ID = 0, // <!하드코딩!>
                     //ID = dataBase.GetNewTeamID(); // 만들어야 할 것들 // 아무래도 여기서도 불가능 할 것 같다\.
                     // 할당이 이미 끝난 상태에서 아이디값을 나눠주도록 하자.
 
@@ -1961,32 +2244,32 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new("human")
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
                                     organListData = new(),
                                     unitItemPackData = new("Radios", "Pistol", "Knife")
-                                },
+                                }, // 감시자
                                 new()
                                 {
                                     unitBaseData = new("human")
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
                                     organListData = new(),
                                     unitItemPackData = new("BuildTool", "Pistol", "Knife")
-                                },
+                                }, // 엔지니어
                                 new()
                                 {
                                     unitBaseData = new("human")
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
                                     organListData = new(),
                                     unitItemPackData = new("BuildTool", "Pistol", "Knife")
-                                }
+                                } // 엔지니어
                             }
                         },
                         new()
@@ -2010,7 +2293,7 @@ public class GameManager : MonoBehaviour
                     },
                     goal = new()
                 }, // 플레이어 팀
-                new()
+                new(1)
                 {
                     name = "EnemyTeam",
                     ID = 1,
@@ -2033,7 +2316,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
                                     organListData = new(),
@@ -2043,7 +2326,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
                                     organListData = new(),
@@ -2053,7 +2336,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
                                     organListData = new(),
@@ -2063,7 +2346,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
-                                        direction = new Vector3(0,0,-1),
+                                        direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
                                     organListData = new(),
@@ -2073,19 +2356,18 @@ public class GameManager : MonoBehaviour
                         } // 적 공격팀
                     }
                 }, // 적 팀에 대한 정보
-                new()
+                new(2)
                 {
                     name = "Neutral",
-                    ID = 2
+                    ID = 2,
+
+                    squads = new SquadData[0]
                 } // 중립 팀
             },
 
             machineUnitDatas = new MachineUnitData[0],
 
-            blockDatas = new BlockData[0]
-            {
-                // 9 x 13의 블럭 맵이 필요합니다.
-            },
+            blocksData = new()
             
         };
         //returnValue.playerTeamName = "Player";
@@ -2291,6 +2573,7 @@ public class GameManager : MonoBehaviour
                     // 매개변수로 들어간 유닛을 하나하나 골라서 인스턴스화합니다.
                     UnitInSquadData unit = data.teamDatas[teamIndex].squads[squadIndex].units[unitIndex];
                     if (unit == null) continue;
+                    if (unit.unitBaseData == null) continue;
                     #region 1.1. 인스턴스화 - 프리펩 결정
                     // 유닛 타입 체크
                     // 타입에 따라 해당하는 유닛 타입 배열에 자신과 아이디가 같은 녀석을 찾음
@@ -2299,9 +2582,11 @@ public class GameManager : MonoBehaviour
 
                     // 일단 스위치 문으로 구현한 다음에
                     // 클래스와 상속을 이용한 다형성을 사용해서 다시 구현해보자.
+                    
                     switch (unit.unitBaseData.prefabName)
                     {
                         // 인간 타입
+                        case null:
                         case "HumanUnitDefault":        
                             prefab = HumanPrefabDefaultSkin;
                             break;
@@ -2922,6 +3207,20 @@ public class GameManager : MonoBehaviour
     #region Camera
     bool isCamera1stPerson = false;
     #endregion
+    #region Delegate
+    public delegate void Void2Void();
+    public delegate void TileMap2Void(ref Dictionary<Vector3, int> TileMap);
+    #endregion
+    #region 예외 Exception
+
+
+    class CannotReeachFileException : Exception
+    {
+        public CannotReeachFileException() : base () { }
+        public CannotReeachFileException(string message) : base(message) { }
+    }
+    #endregion
+
 
     public void PingPong()
     {

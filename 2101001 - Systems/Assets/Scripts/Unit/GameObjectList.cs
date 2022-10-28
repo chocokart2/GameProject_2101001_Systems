@@ -258,9 +258,11 @@ public class GameObjectList : MonoBehaviour
                 isSetable = true;
                 // Collider은 아마 네모 상자일 것입니다.
 
+
+
                 GameManager.BaseUnitData baseUnitDataMachine = new GameManager.BaseUnitData();
                 GameManager.MachineUnitInfoData machineUnitInfoDataMachine = new GameManager.MachineUnitInfoData();
-                gm.RegisterUnit(ref baseUnitDataMachine, machineUnitInfoDataMachine, instantiatePosition);
+                //gm.RegisterUnit(ref baseUnitDataMachine, machineUnitInfoDataMachine, instantiatePosition);
                 //
 
                 //if (RayToFindPlacementHit.collider.gameObject.transform.Find("FixedMachinePosition(clone)") == null) return; // 부딛힌 목표물의 자식에 끼울 수있는 오브젝트가 있는가
@@ -300,7 +302,7 @@ public class GameObjectList : MonoBehaviour
 
                 GameManager.BaseUnitData baseUnitDataNetworkAntenna = new GameManager.BaseUnitData();
                 GameManager.MachineUnitInfoData machineUnitInfoDataNetworkAntenna = new GameManager.MachineUnitInfoData();
-                gm.RegisterUnit(ref baseUnitDataNetworkAntenna, machineUnitInfoDataNetworkAntenna, instantiatePosition);
+                //gm.RegisterUnit(ref baseUnitDataNetworkAntenna, machineUnitInfoDataNetworkAntenna, instantiatePosition);
 
                 // 이거 함수화시키면 좋지 않을까
                 break;
