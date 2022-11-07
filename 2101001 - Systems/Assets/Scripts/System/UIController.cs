@@ -257,10 +257,11 @@ public class UIController : MonoBehaviour
 
                     if (hit.collider.gameObject.GetComponent<UnitBase>().unitBaseData.unitType == "human")
                     {
-                        Debug.Log("DEBUG_UIController.SelectUnit: humanUnit Hit : " + GameObject.Find("GameManager").GetComponent<GameManager>().playerTeam + ", " + hit.collider.gameObject.GetComponent<UnitBase>().unitBaseData.teamName);
+                        Debug.Log($"DEBUG_UIController.SelectUnit: humanUnit Hit : {GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName}, {hit.collider.gameObject.GetComponent<UnitRole>().roleForEditMode.teamName}, " +
+                            $"{GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName.Equals(hit.collider.gameObject.GetComponent<UnitRole>().roleForEditMode.teamName)}");
 
 
-                        if (GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName == hit.collider.gameObject.GetComponent<UnitBase>().unitBaseData.teamName) // 자신의 팀과 게임오브젝트의 팀이 똑같은지 체크
+                        if (GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName.Equals(hit.collider.gameObject.GetComponent<UnitRole>().roleForEditMode.teamName)) // 자신의 팀과 게임오브젝트의 팀이 똑같은지 체크
                         {
                             selectedUnit = hit.collider.gameObject;
 

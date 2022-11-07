@@ -933,6 +933,8 @@ public class GameManager : MonoBehaviour
 
         #region 유닛에 대한 필드
         // 팀에 대한 정보들
+        [Tooltip("플레이어가 통제할 팀입니다. \n" +
+            "만약 멀티플레이라면 이 값이 다르개 설정될 수 있습니다.")]
         public string playerTeamName; // 플레이어가 통제하는 팀의 이름입니다.
         public int playerTeamID
         {
@@ -2351,16 +2353,16 @@ public class GameManager : MonoBehaviour
         Dictionary<string[], int> _squadNameToID = new Dictionary<string[], int>(); // {팀 이름, 스쿼드 이름} 을 키 값으로 받습니다,
         Dictionary<string, int> _unitNameToID = new Dictionary<string, int>();
 
+        Dictionary<String, Dictionary<String, int>> _teamAndSquadName2index = new Dictionary<string, Dictionary<string, int>>();
+
+
 #warning 다 비슷한 로직이니까 다음에 위 3개를 배열로 만든 다음에, for 문 돌려서 각각 처리하자
 
-        for(int index = 0; index < target.Length; index++)
+        for (int index = 0; index < target.Length; index++)
         {
-            if (currentFieldData?.teamDatas.Length > 0) Debug.Log($"DEBUG_GameManager.SetCurrentUnitRoleToFieldData : currentFieldData에서 이미 팀 값이 있습니다! {currentFieldData.teamDatas.Length}");
-
-
             UnitRole _targetRole = target[index].GetComponent<UnitRole>();
             int _teamID = 0, _squadID = 0, _unitID = 0; // 비어있는 TeamDataArray를 채워주므로
-            int _teamIndex = -1, _squadIndex = 0, _unitIndex = -1; // 미할당인데, 일단 컴파일러 에러는 피하면서, 사용하면 예외를 내뿜도록 합니다.
+            int _teamIndex = -1, _squadIndex = 0, _unitIndex = -1; // 미할당인데, 일단 컴파일러 에러는 피하면서, 사용하면 예외를 내뿜도록 합니다. // 스쿼드 인덱스는 팀이 바뀔때마다, 0부터 다시 시작합니다.
             // 팀 작업
             string _inputTeamName = _targetRole.roleForEditMode.teamName;
             if (_teamNameToID.ContainsKey(_inputTeamName))
@@ -2408,8 +2410,22 @@ public class GameManager : MonoBehaviour
                     _squadID = one.Value;
                     break;
                 }
-                _squadIndex++; // 있건(찾은 인덱스) 없건(새로운 인덱스) 맞는 인덱스를 찾도록 합니다.
             }
+
+            // 인덱스 값 찾기
+            if(_teamAndSquadName2index.ContainsKey(_inputTeamName))
+            {
+                if (_teamAndSquadName2index[_inputTeamName].ContainsKey(_inputSquadName) == false)
+                {
+                    _teamAndSquadName2index[_inputTeamName].Add(_inputSquadName, _teamAndSquadName2index[_inputTeamName].Count);
+                }
+            }
+            else
+            {
+                _teamAndSquadName2index.Add(_inputTeamName, new Dictionary<string, int>());
+                _teamAndSquadName2index[_inputTeamName].Add(_inputSquadName, _teamAndSquadName2index[_inputTeamName].Count);
+            }
+            _squadID = _teamAndSquadName2index[_inputTeamName][_inputSquadName];
 
             // 팀으로 작업 했을때랑 비슷한 알고리즘입니다. 윗부분 주석 읽으시면 됩니다.
             if (_squadNameFound == false)
@@ -2458,9 +2474,9 @@ public class GameManager : MonoBehaviour
 
                 // _squadIndex와 length를 구해본다.
                 Debug.Log($"DEBUG_GameManager.SetCurrentUnitRoleToFieldData : _squadIndex : {_squadIndex}, Length : {currentFieldData.teamDatas[_teamIndex].squads.Length}");
-#warning IndexOutOfRangeException: Index was outside the bounds of the array.
-                AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].squads[_squadIndex].UnitID.unit, _unitID);
-                AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].unitID.unit, _unitID);
+#warning IndexOutOfRangeException: Index was outside the bounds of the array. ㅔ; currentFieldData.teamDatas[_teamIndex].squads가 작아서 늘려야 할지도,
+
+                AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].unitID.unit, _unitID); // 전화번호부 설정
 
                 _newUnit.squadID = _squadID;
 
@@ -2475,7 +2491,7 @@ public class GameManager : MonoBehaviour
                 // 
                 AddElementInArray(ref currentFieldData.teamDatas[_teamIndex]
                     .squads[_squadIndex].units, _newUnit);
-
+                AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].squads[_squadIndex].UnitID.unit, _unitID);
             }
 
             AddElementInArray(ref result, new int[] { _teamID, _squadID, _unitID });
@@ -2740,7 +2756,7 @@ public class GameManager : MonoBehaviour
         #endregion
 
         string location = "Demo";
-        string PlayerTeam = "PlayerTeam";
+        string PlayerTeam = "Player";
         string EnemyTeam = "EnemyTeam";
 
         //Debug.Log("DEBUG_GameManager.DemoFieldLoader() : 그 곳에 있습니다.");
