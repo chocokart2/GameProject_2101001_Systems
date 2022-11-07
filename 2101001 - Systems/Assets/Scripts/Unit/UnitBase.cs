@@ -111,6 +111,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
         switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
         {
+#warning 머신 유닛도 this.unitBaseData.unitType이 human으로 입력된 것으로 추론됩니다. 버그 같습니다.
             case "human": // 인간인 경우
                 //Debug.Log("human 반응 잡힘");
                 Debug.Log("DEBUG_UnitBase.BeingAttacked: 공격을 받은 유닛의 이름 - " + gameObject.name + ", 유닛의 인스턴스 아이디 - " + GetInstanceID());

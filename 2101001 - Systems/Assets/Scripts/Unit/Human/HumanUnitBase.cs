@@ -610,7 +610,7 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
         {
             Debug.Log("Yee");
             this.gameObjectList = gameObjectList;
-            gameObjectList.UnitSightMake();
+            //gameObjectList.UnitSightMake();
             UnitSightRange = 6.0f;
         }
         public SensorySystem(GameManager _gameManager, GameObjectList gameObjectList, BaseOrganSystemData InputData) : base(_gameManager, InputData)
@@ -618,7 +618,7 @@ public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<Hum
             Debug.Log("Yee");
 
             this.gameObjectList = gameObjectList;
-            gameObjectList.UnitSightMake();
+            //gameObjectList.UnitSightMake();
             UnitSightRange = 6.0f;
 
             position.Add(new Vector3(-0.2f, 1.0f, -1.0f));
