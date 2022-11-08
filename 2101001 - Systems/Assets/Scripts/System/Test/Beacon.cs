@@ -60,7 +60,7 @@ public class Beacon : MonoBehaviour
         GameObject.Find("GameManager").GetComponent<GameManager>().BeconEventForUnit += delegate (ref GameManager.FieldData myData)
         {
             Debug.Log("*** info_Beacon_Start : Beacon " + gameObject.name + " added Fake UnitInfo " + transform.position);
-            RegisterWithGameManagerCallBack(ref myData);
+            //RegisterWithGameManagerCallBack(ref myData);
         };
         //Debug.Log("DEBUG_Beacon.Start:저 작동 중입니다! 2 " + transform.position);
     }
@@ -70,10 +70,17 @@ public class Beacon : MonoBehaviour
 
     }
 
+
+    /*
     public void RegisterWithGameManagerCallBack(ref GameManager.FieldData targetField)
     {
+        #region 함수 설명
+        // 나도 뭔지 모르겠다.
+        #endregion
+
+
         Debug.Log("DEBUG_Beacon: 야호! " + transform.position);
-        // 1. TeamAndSquads
+        // 1. teamDatas
 
         // 알고리즘 수정
         // 만약에 targetField에서 UnitBaseTeam의 내용을 이름으로 하고 있는 팀이 있는지 여부를 판단.
@@ -82,18 +89,18 @@ public class Beacon : MonoBehaviour
         // 자신의 팀이 어디 있는지 찾는 배열입니다.
         bool isTeamFound = false; int myTeamIndex = 0; // 자신의 팀이 어느 인덱스에 존재하는지 알려줍니다.
         bool isSquadFound = false; int mySquadIndex = 0; // 자신의 스쿼드가 어느 인덱스에 존재하는지 알려줍니다.
-        for(int teamIndex = 0; targetField.teamsAndSquads.Length > teamIndex; teamIndex++) // 팀 배열의 머리부터 발끝까지 뒤집니다.
+        for(int teamIndex = 0; targetField.teamDatas.Length > teamIndex; teamIndex++) // 팀 배열의 머리부터 발끝까지 뒤집니다.
         {
             #region Error Hunter: Null cacher
-            if(targetField.teamsAndSquads[teamIndex] == null)
+            if(targetField.teamDatas[teamIndex] == null)
             {
-                Debug.Log("DEBUG_Beacon.RegisterWithGameManagerCallBack: targetField의 teamsAndSquad가 null입니다.");
+                Debug.Log("DEBUG_Beacon.RegisterWithGameManagerCallBack: targetField의 teamDatas가 null입니다.");
                 continue;
             }
 
             #endregion
 
-            if (targetField.teamsAndSquads[teamIndex].name == UnitBaseTeam) // 만약 이번 팀이 찾는 팀의 이름과 동일하다면
+            if (targetField.teamDatas[teamIndex].name == UnitBaseTeam) // 만약 이번 팀이 찾는 팀의 이름과 동일하다면
             {
                 //팀을 찾은거고,
                 isTeamFound = true;
@@ -110,9 +117,9 @@ public class Beacon : MonoBehaviour
             // 자신의 팀에 자신의 유닛을 집어넣습니다.
 
             // 스쿼드를 이름따라 찾고 인덱스를 찾습니다.
-            for(int squadIndex = 0; targetField.teamsAndSquads[myTeamIndex].squads.Length > squadIndex; squadIndex++)
+            for(int squadIndex = 0; targetField.teamDatas[myTeamIndex].squads.Length > squadIndex; squadIndex++)
             {
-                if(targetField.teamsAndSquads[myTeamIndex].squads[squadIndex].name == UnitBaseSquad)
+                if(targetField.teamDatas[myTeamIndex].squads[squadIndex].name == UnitBaseSquad)
                 {
                     isSquadFound = true; mySquadIndex = squadIndex;
                     break;
@@ -126,12 +133,12 @@ public class Beacon : MonoBehaviour
             {
                 GameManager.SquadData dummySquad = new GameManager.SquadData();
 
-                dummySquad.SquadID = gameManager.GetNewSquadID(targetField);
+                dummySquad.SquadID = GameManager.SquadData.GetNewSquadID(targetField);
                 dummySquad.name = UnitBaseSquad;
                 // locaction, pastlocaction은 null로 둡니다.
                 ///dummySquad.memberID = new int[1] { fakeBaseUnitData.ID };
                 // assignedMission은 null로 둡니다. 목표가 현재 없습니다.
-                gameManager.AddElementInArray(ref targetField.teamsAndSquads[myTeamIndex].squads, dummySquad);
+                gameManager.AddElementInArray(ref targetField.teamDatas[myTeamIndex].squads, dummySquad);
             }
 
 
@@ -144,12 +151,12 @@ public class Beacon : MonoBehaviour
             #region 여기에 추가할 팀 만들기
 
             beaconTeam.name = UnitBaseTeam;
-            beaconTeam.ID = gameManager.GetNewTeamID(targetField);
+            beaconTeam.ID = GameManager.TeamData.GetNewTeamID(targetField);
 
             
             GameManager.SquadData dummySquad = new GameManager.SquadData();
             #region 이 팀에 추가할 스쿼드 만들기.
-            dummySquad.SquadID = gameManager.GetNewSquadID(targetField);
+            dummySquad.SquadID = GameManager.SquadData.GetNewSquadID(targetField);// gameManager.GetNewSquadID(targetField);
             dummySquad.name = UnitBaseSquad;
             // locaction, pastlocaction은 null로 둡니다.
             //dummySquad.memberID = new int[1] { fakeBaseUnitData.ID };
@@ -158,36 +165,43 @@ public class Beacon : MonoBehaviour
             #endregion
             gameManager.AddElementInArray(ref beaconTeam.squads, dummySquad);
             #endregion
-            gameManager.AddElementInArray(ref targetField.teamsAndSquads, beaconTeam);
+            gameManager.AddElementInArray(ref targetField.teamDatas, beaconTeam);
         }
 
 
 
         // 해야 할 것. 팀에다가 자신의 아이디를 집어넣기
-
+        #region 숨기기
         // 2. BaseUnitData
-        GameManager.BaseUnitData fakeBaseUnitData = new GameManager.BaseUnitData();
-        fakeBaseUnitData.ID = gameManager.GetNewUnitID(targetField);
-        fakeBaseUnitData.unitType = unitType;
-        fakeBaseUnitData.gameObjectName = gameObjectName;
-        fakeBaseUnitData.isUnitStayedThatPlace = true;
-        fakeBaseUnitData.position = transform.position;
-        fakeBaseUnitData.direction = direction;
-        fakeBaseUnitData.isDummyData = true;
+        //GameManager.BaseUnitData fakeBaseUnitData = new GameManager.BaseUnitData();
+        //fakeBaseUnitData.ID = GameManager.UnitInSquadData.GetNewUnitID(targetField);
+        //fakeBaseUnitData.unitType = unitType;
+        //fakeBaseUnitData.gameObjectName = gameObjectName;
+        //fakeBaseUnitData.isUnitStayedThatPlace = true;
+        //fakeBaseUnitData.position = transform.position;
+        //fakeBaseUnitData.direction = direction;
+        //fakeBaseUnitData.isDummyData = true;
+        #endregion
+        // 2. UnitInSquadData 추가하기
+        GameManager.UnitInSquadData fakeUnitData = new GameManager.UnitInSquadData();
+
+        
+
+
         // 컴포넌트 정보 추가하기
         gameManager.AddComponentData(new UnitBase.UnitBaseData(fakeBaseUnitData, UnitBaseTeam), ref targetField, ref fakeBaseUnitData);
         gameManager.AddComponentData(new HumanUnitBase.OrganListData(), ref targetField, ref fakeBaseUnitData);
         gameManager.AddComponentData(new UnitItemPack.UnitItemPackData(item1, item2, item3), ref targetField, ref fakeBaseUnitData);
         // Add this to there
         gameManager.AddElementInArray(ref targetField.unitDatas, fakeBaseUnitData);
-        gameManager.AddElementInArray(ref targetField.teamsAndSquads[myTeamIndex].squads[mySquadIndex].memberID, fakeBaseUnitData.ID);
+        gameManager.AddElementInArray(ref targetField.teamDatas[myTeamIndex].squads[mySquadIndex].memberID, fakeBaseUnitData.ID);
 
         // 3. HumanUnitInfoData
         GameManager.HumanUnitInfoData fakeHumanUnitInfoData = new GameManager.HumanUnitInfoData();
-        fakeHumanUnitInfoData.SquadID = targetField.teamsAndSquads[myTeamIndex].squads[mySquadIndex].SquadID;
+        fakeHumanUnitInfoData.SquadID = targetField.teamDatas[myTeamIndex].squads[mySquadIndex].SquadID;
         fakeHumanUnitInfoData.BaseUnitDataID = fakeBaseUnitData.ID;
         fakeHumanUnitInfoData.charactor = "kart";
-        fakeHumanUnitInfoData.TeamID = targetField.teamsAndSquads[myTeamIndex].ID;
+        fakeHumanUnitInfoData.TeamID = targetField.teamDatas[myTeamIndex].ID;
         gameManager.AddElementInArray(ref targetField.humanUnitDatas, fakeHumanUnitInfoData);
 
         Debug.Log("Debug_Becon.RegisterWithGameManagerCallBack: 자신의 주둔군 여부 : " + fakeBaseUnitData.isUnitStayedThatPlace);
@@ -242,7 +256,7 @@ public class Beacon : MonoBehaviour
         //fakeUnitData.HoldingPosition = transform.position;
         //targetField.Add(fakeUnitData);
     }
-
+    /**/
 
 
     // 1. Public으로 외부에서 데이터를 입력

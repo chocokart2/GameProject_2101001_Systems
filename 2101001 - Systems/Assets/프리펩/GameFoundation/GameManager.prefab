@@ -49,25 +49,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FixturePosition: []
   currentFieldData:
-    playerTeamName: 
     currentPlayLocation: []
-    teamsAndSquads: []
-    unitDatas: []
-    humanUnitDatas: []
+    playerTeamName: 
     machineUnitDatas: []
-    unitBaseComponentData: []
-    organListComponentData: []
-    unitItemPackComponentData: []
-    tileDatas: []
-    missionDatas: []
-    GameCurrentLocation: 
+    blocksData:
+      blocks: []
   baseUnitList: []
   humanUnitList: []
   machineUnitList: []
   playerTeam: 
+  unitInEditor: []
+  humanUnitInEditor: []
   HumanPrefabDefaultSkin: {fileID: 3516928186645611712, guid: 40322c3fbafda8947a8a556c941aea0d,
     type: 3}
   HumanPrefabKartSkin: {fileID: 402454375768657497, guid: 0cad6d07d48e90a40ba3226589c9ac2b,
+    type: 3}
+  WarningIcon: {fileID: 3022355733642138919, guid: 33e3426d95764434b9954bd1e94fe029,
     type: 3}
   EnergyStorage: {fileID: 0}
   EnergyTransmission: {fileID: 0}

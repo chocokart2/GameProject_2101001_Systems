@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 9d02a96e9f301ec479fb5f439f4a9db1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - BorderQuad: {fileID: 202802514756316038, guid: 66ff55bfa86735542bcafdfcf12ff4f9,
+      type: 3}
+  executionOrder: 0
+  icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

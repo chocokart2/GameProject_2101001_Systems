@@ -70,7 +70,7 @@ public class NetworkConnector : MonoBehaviour
     #region Field 채우는 함수
     void FieldSetup()
     {
-        UnitBaseID = GetComponent<UnitBase>().unitBaseData.gameManagerId;
+        UnitBaseID = GetComponent<MachineUnitBase>().machineUnitBaseData.ID;
 
 
         /*

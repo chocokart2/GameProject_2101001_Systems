@@ -8,7 +8,7 @@ using UnityEngine;
 // 이 컴포넌트의 함수를 호출하면 해당하는 연결된 컴포넌트의 메서드를 부릅니다. 없으면 말고.
 // 이벤트는 사용하지 않습니다! 이벤트를 쓰면 다른 녀석들의 이벤트도 호출되기에 유일한 객체의 이벤트여야 합니다.
 
-public class UnitBase : MonoBehaviour
+public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
 {
     #region 필드
 
@@ -23,7 +23,7 @@ public class UnitBase : MonoBehaviour
     //public int lightCountForSensor = 0;
     //public int lightCount = 0;
     public Dictionary<int, int> lightCount; // 받은 빛마다 나뉘어집니다. Key: 빛의 종류(0: 랜더링용 가시광선, 1: 적외선, 2+: 사용자 지정 광선), Value:그 빛을 닿고 있는 갯수.
-    public Dictionary<string, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 Name이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
+    public Dictionary<int, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 ID이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
     public List<string> hierarchyGameObjectNameForRendering;
 
     #region 다른 컴포넌트로 옮겨야 할 부분
@@ -53,11 +53,22 @@ public class UnitBase : MonoBehaviour
 
 
     #region 컴포넌트들
+
+
+    #region 게임오브젝트 내 컴포넌트
+
+    #endregion
+    #region 다른 게임오브젝트
+
+    #endregion
+    #region 다른 게임오브젝트의 컴포넌트
+    GameManager gameManager;
+
+    #endregion
     MeshRenderer myMeshRenderer;
     UnitItemPack myUnitItemPack;
     UnitMovable myUnitMovable;
     HumanUnitBase myHumanUnitBase;
-    GameManager gameManager;
 
 
 
@@ -100,6 +111,7 @@ public class UnitBase : MonoBehaviour
 
         switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
         {
+#warning 머신 유닛도 this.unitBaseData.unitType이 human으로 입력된 것으로 추론됩니다. 버그 같습니다.
             case "human": // 인간인 경우
                 //Debug.Log("human 반응 잡힘");
                 Debug.Log("DEBUG_UnitBase.BeingAttacked: 공격을 받은 유닛의 이름 - " + gameObject.name + ", 유닛의 인스턴스 아이디 - " + GetInstanceID());
@@ -200,50 +212,66 @@ public class UnitBase : MonoBehaviour
     [System.Serializable]
     public class UnitBaseData // GameManager에서 사용하는 클래스입니다. 변할 수 있는 값들을 여기에 저장합니다.(이벤트는 기본적으로 설정됨.)
     {
-        public string unitType = "human"; // 소문자로 작성합니다. 두 단어 이상인 경우 두번째 단어부터 대문자를 쓰고 붙여씁니다.
-        public bool isUnitTypeSet = false;
-        public Vector3 direction;
-        public int instanceId; // 1) instantiate할때마다 생성됩니다. 2) GameManager에서 유닛을 찾는데 이용합니다.
-        public int gameManagerId;
-        public string teamID; // Unassigned값은
-
+        #region 생성자 목록
         public UnitBaseData()
         {
             unitType = "human";
-            isUnitTypeSet = false;
             direction = new Vector3(1, 0, 0);
             instanceId = -1;
-            teamID = "Player";
+            teamName = "Player";
         }
         public UnitBaseData(string _unitType)
         {
             this.unitType = _unitType;
-            this.isUnitTypeSet = true;
             this.direction = new Vector3(0, 1, 0);
             this.instanceId = -1;
-            teamID = "Player";
+            teamName = "Player";
         }
+        // 매개변수에 _instanceId를 사용하는 경우는 이미 존재하는 게임오브젝트를 데이터에 집어넣을 때 입니다.
         public UnitBaseData(string _unitType, int _instanceId)
         {
             this.unitType = _unitType;
-            this.isUnitTypeSet = true;
             this.direction = new Vector3(0, 1, 0);
             this.instanceId = _instanceId;
-            teamID = "Player";
+            teamName = "Player";
         }
         public UnitBaseData(string _unitType, int _instanceId, string _team) : this(_unitType, _instanceId)
         {
-            teamID = _team;
+            teamName = _team;
         }
         public UnitBaseData(GameManager.BaseUnitData unitData, string team)
         {
             unitType = unitData.unitType;
-            isUnitTypeSet = true;
             direction = unitData.direction;
             instanceId = -1;
-            gameManagerId = unitData.ID;
-            teamID = team;
+            //gameManagerId = unitData.ID;
+            teamName = team;
         }
+        #endregion
+
+        public string prefabName;
+
+        public string unitType;
+        
+        public string teamName { get; set; } // 자신을 포함하는 인스턴스가 누구인지를 가리킵니다.
+        //public bool isUnitTypeSet = false;
+        public Vector3 position;
+        public Vector3 direction;
+        public int instanceId; // 1) instantiate할때마다 생성됩니다. 2) GameManager에서 유닛을 찾는데 이용합니다.
+        public int gameManagerID;
+
+        //public int gameManagerId; // 어레이에 없어짐으로서 더이상 사용하지 않음
+
+
+        #region 함수들
+
+        
+
+
+
+
+        #endregion
+
     }
 
 
@@ -252,14 +280,20 @@ public class UnitBase : MonoBehaviour
     // 어느 팀에 속해 있나? -> 팀에 속해있으면 UI에서 보여집니다.
     //public int id; // instantiate할때마다 생성됩니다.
 
-    #region 정보 삽입 메서드
+    #region IComponentDataIOAble 메서드
+    public void SetData(UnitBaseData inputData)
+    {
+        unitBaseData = inputData;
+    }
+    public UnitBaseData GetData()
+    {
+        return unitBaseData;
+    }
+    #endregion
     public void UnitBaseDataNewSet(string _unitType, int _id)
     {
         unitBaseData = new UnitBaseData(_unitType, _id);
     }
-
-    #endregion
-
     #region 이벤트로 통제되는 유닛의 행동들
     // 1. 이벤트에 들어갈 형식을 생각해둡니다.
     public delegate void EventHandlerVoid();
@@ -437,7 +471,7 @@ public class UnitBase : MonoBehaviour
     {
         if(gameObject.name == "Player")
         {
-            unitBaseData.teamID = "Player";
+            unitBaseData.teamName = "Player";
         }
     }
 
@@ -451,13 +485,14 @@ public class UnitBase : MonoBehaviour
     #region 퍼블릭 메서드 - checkRenderingCondition, SightEnter, SightExit, LightEnter, LightExit, LightEnterForSensor, LightExitForSensor
     public void checkRenderingCondition() // 예외, 자기 팀원은 밝기에 상관없이 그대로 표시됩니다.
     {
-        string myTeamName = "Player";//GameObject.Find("GameManager").GetComponent<GameManager>().playerTeam;
+        int myTeamID = gameManager.currentFieldData.GetPlayerTeamID();
+        //string myTeamName = "Player";//GameObject.Find("GameManager").GetComponent<GameManager>().playerTeam;
 
         // 1. lightCount가 1보다 높을 것
         // 2. 자기편 UnitSight에 닿을 것 sightCount[myTeamName] > 0을 체크
         // 이런경우 랜더링됩니다.
 
-        bool isTeamLooking = lightCount[0] > 0 && sightCount[myTeamName] > 0;
+        bool isTeamLooking = lightCount[0] > 0 && sightCount[myTeamID] > 0;
 
         for (int index = 0; index < hierarchyGameObjectNameForRendering.Count; index++)
         {
@@ -474,19 +509,33 @@ public class UnitBase : MonoBehaviour
             if (targetObject.GetComponent<ChildObjectOfUnit>().isRenderingChangable == true)
             {
                 targetObject.GetComponent<Renderer>().enabled = isTeamLooking;
-                if (unitBaseData.teamID == gameManager.playerTeam)
+                if (unitBaseData.teamName == gameManager.playerTeam)
                 {
                     //targetObject.GetComponent<Renderer>().enabled = true;
                 }
             }
         }
     }
-    public void SightEnter(string teamID)
+    /// <summary>
+    /// 어떤 유닛A의 시야 범위에 이 유닛이 들어온 경우 A의 컴포넌트가 이 함수를 호출하여
+    /// 이 유닛이 어떤 유닛들에게 볼 "수" 있는지 기록합니다
+    /// </summary>
+    /// <param name="teamID"> 이 유닛을 발견한 유닛의 teamID입니다. teamID는 월드매니저에서 구합니다.</param>
+    /// 
+    public void SightEnter(int teamID)
     {
+        #region 함수 설명
+        // 이 유닛이 어느 유닛의 시야에 들어왔는가?
+        // 입력 : 이 컴포넌트를 발견한 다른 유닛의 팀 이름(아군 적군 상관없이)
+        // 출력 : 없음
+        // 결과 : 이 유닛을 발견한 팀 X의 멤버수()가 증가합니다.
+
+        #endregion
+
         if (sightCount == null)
         {
-            sightCount = new Dictionary<string, int>();
-            sightCount.Add("Player", 1);
+            sightCount = new Dictionary<int, int>();
+            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1);
         }
         if (sightCount.ContainsKey(teamID) == true)
         {
@@ -503,7 +552,7 @@ public class UnitBase : MonoBehaviour
         }
         checkRenderingCondition();
     }
-    public void SightExit(string teamID)
+    public void SightExit(int teamID)
     {
         sightCount[teamID] -= 1;
         checkRenderingCondition();
@@ -512,8 +561,8 @@ public class UnitBase : MonoBehaviour
     {
         if (sightCount == null)
         {
-            sightCount = new Dictionary<string, int>();
-            sightCount.Add("Player", 1);
+            sightCount = new Dictionary<int, int>();
+            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1);
         }
         if(lightCount == null)
         {

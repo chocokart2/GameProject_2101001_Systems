@@ -8,14 +8,21 @@ public class UnitAnalyzer : MonoBehaviour
 
     public MachineUnitBase.MachineNetMessage Analyze(Collider[] colliders)
     {
+        #region 함수 설명
+
+
+
+        #endregion
+
+
         // 머신 설치 유닛만 분석합니다.
         // 만약 콜라이더에 인간을 발견하면 등록합니다 - gameObjects와gameObjectsInstanceIdList에 올립니다.
         // 만약 콜라이더에 머신을 발견하면, 그 머신을 기반으로 설치 유닛 게임오브젝트를 발견합니다.
         // 만약 동일한 설치 유닛이 둘 있다면 제거합니다.
 
-        
+
         // + 설치 머신은 0.15만큼 y축으로 내려가 있습니다
-        
+
         // Message 필드
         MachineUnitBase.MachineNetMessage returnValue = new MachineUnitBase.MachineNetMessage();
         returnValue.type = "SenseAboutUnitAnalyzed";
@@ -73,6 +80,7 @@ public class UnitAnalyzer : MonoBehaviour
             returnValueSubData.Add(gameObjects[gameObjectsIndex].GetInstanceID().ToString());
 
             // 2. GameObject의 UnitBase를 참조합니다.
+            // 아무래도 팀이 무엇인지를 참조하는 것 같네.
             string Team = "Unknown";
             if (gameObjects[gameObjectsIndex].name.StartsWith("Machine"))
             {
@@ -80,7 +88,7 @@ public class UnitAnalyzer : MonoBehaviour
             }
             else if (gameObjects[gameObjectsIndex].name.StartsWith("Human"))
             {
-                Team = gameObjects[gameObjectsIndex].GetComponent<UnitBase>().unitBaseData.teamID;
+                Team = gameObjects[gameObjectsIndex].GetComponent<UnitBase>().unitBaseData.teamName;
             }
             returnValueSubData.Add(Team);
 

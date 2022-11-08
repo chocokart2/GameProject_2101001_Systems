@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 // Instantiate 관련하여 작업을 도와주는 컴포넌트입니다.
@@ -78,8 +79,10 @@ public class GameObjectList : MonoBehaviour
     #region 2. 게임오브젝트 관련 작업 (주로 인스턴스화)
     // 순서: 오브젝트의 ABC순서대로.
     #region UnitSight
-    public void UnitSightMake()
+    public void UnitSightMake([CallerFilePath] string caller = "")
     {
+        Debug.Log($"DEBUG_GameObjectList.UnitSightMake : 호출자 : {caller}");
+
         // UnitSight 프리펩을 이 인스턴스의 자식으로서 생성
         GameObject UnitSightInstance;
         UnitSightInstance = Instantiate(UnitSightPrefab, transform.position, Quaternion.identity) as GameObject;
@@ -93,11 +96,19 @@ public class GameObjectList : MonoBehaviour
         transform.Find("UnitSight(Clone)").localScale = new Vector3(radius * 2, 2, radius * 2);
         UnitSightRadius = radius;
     }
+    /// <summary>
+    /// 유닛이 바라보는 방향에 따라서 UnitSight의 위치를 변경합니다.
+    /// (추론)연속적으로 호출됩니다
+    /// </summary>
+    /// <param name="vector3">이 유닛이 바라보는 방향입니다. 호출자가 인자로 넣어줍니다.</param>
     public void UnitSightDirectionSet(Vector3 vector3)
     {
         vector3 = vector3 * UnitSightRadius;
-
-        transform.Find("UnitSight(Clone)").position = new Vector3(transform.position.x + vector3.x, 0, transform.position.z + vector3.z);
+        Transform _unitSight = transform.Find("UnitSight(Clone)");
+        if (_unitSight != null)
+        {
+            _unitSight.position = new Vector3(transform.position.x + vector3.x, 0, transform.position.z + vector3.z);
+        }
     }
     #endregion
 
@@ -258,9 +269,11 @@ public class GameObjectList : MonoBehaviour
                 isSetable = true;
                 // Collider은 아마 네모 상자일 것입니다.
 
+
+
                 GameManager.BaseUnitData baseUnitDataMachine = new GameManager.BaseUnitData();
                 GameManager.MachineUnitInfoData machineUnitInfoDataMachine = new GameManager.MachineUnitInfoData();
-                gm.RegisterUnit(ref baseUnitDataMachine, machineUnitInfoDataMachine, instantiatePosition);
+                //gm.RegisterUnit(ref baseUnitDataMachine, machineUnitInfoDataMachine, instantiatePosition);
                 //
 
                 //if (RayToFindPlacementHit.collider.gameObject.transform.Find("FixedMachinePosition(clone)") == null) return; // 부딛힌 목표물의 자식에 끼울 수있는 오브젝트가 있는가
@@ -300,7 +313,7 @@ public class GameObjectList : MonoBehaviour
 
                 GameManager.BaseUnitData baseUnitDataNetworkAntenna = new GameManager.BaseUnitData();
                 GameManager.MachineUnitInfoData machineUnitInfoDataNetworkAntenna = new GameManager.MachineUnitInfoData();
-                gm.RegisterUnit(ref baseUnitDataNetworkAntenna, machineUnitInfoDataNetworkAntenna, instantiatePosition);
+                //gm.RegisterUnit(ref baseUnitDataNetworkAntenna, machineUnitInfoDataNetworkAntenna, instantiatePosition);
 
                 // 이거 함수화시키면 좋지 않을까
                 break;
@@ -450,85 +463,58 @@ public class GameObjectList : MonoBehaviour
         {
             case 0:
                 return "비어있음";
-                break;
             case 101:
                 return "에너지 스토리지";
-                break;
             case 102:
                 return "에너지 전달탑";
-                break;
             case 103:
                 return "에너지 팜";
-                break;
             case 201:
                 return "고정형 거치대";
-                break;
             case 202:
                 return "드론형 거치대";
-                break;
             case 203:
                 return "거미형 로봇(삭제됨)";
-                break;
             case 204:
                 return "RC카 거치대";
-                break;
             case 301:
                 return "센서 스트링";
-                break;
             case 302:
                 return "센서 카메라";
-                break;
             case 303:
                 return "센서 마이크(삭제됨)";
-                break;
             case 501:
                 return "유선 통신기";
-                break;
             case 502:
                 return "무선 통신기";
-                break;
             case 503:
                 return "중추 통신기";
-                break;
             case 601:
                 return "컨트롤 함수";
-                break;
             case 602:
                 return "컨트롤 메모리";
-                break;
             case 701:
                 return "확산용 폭탄";
-                break;
             case 702:
                 return "발사용 터렛";
-                break;
             case 703:
                 return "가시 집게";
-                break;
             case 801:
                 return "바리게이트";
-                break;
             case 802:
                 return "위장용 홀로그램";
-                break;
             case 803:
                 return "라이트블럽";
-                break;
             case 901:
                 return "채취 디바이스";
-                break;
             case 902:
                 return "전달 디바이스";
-                break;
             case 903:
                 return "가공 디바이스";
-                break;
             case 904:
                 return "저장 디바이스";
-                break;
             default:
                 return "ERROR_GameObjectList";
-                break;
         }
     }
 

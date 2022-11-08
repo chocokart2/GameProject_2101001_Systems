@@ -26,7 +26,7 @@ using UnityEngine;
 // 기관계 필드를 저장하는 클래스입니다.
 // 구체적으로 Data가 더 필요하다면 파생 클래스가 만들어 질 것입니다.
 
-public class HumanUnitBase : MonoBehaviour
+public class HumanUnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<HumanUnitBase.HumanUnitBaseData>
 {
     #region ReadOnlyStatic Field
     public static Dictionary<int, string> HumanOrganNameList;
@@ -34,6 +34,9 @@ public class HumanUnitBase : MonoBehaviour
 
 
     #endregion
+
+    #region 유니티 함수
+
 
     void Awake()
     {
@@ -86,11 +89,18 @@ public class HumanUnitBase : MonoBehaviour
         // GetInstanceID는 어려울 것 같습니다 -> 일일히 컴포넌트를 참조시키는건 어떨까
 
     }
-    
+    #endregion
 
 
 
     #region 필드
+    #region 파일 입출력용 데이터
+    HumanUnitBaseData humanUnitBaseData;
+
+
+    #endregion
+
+
     #region 1회용 필드
     //bool isEyeSightBooted = false;
 
@@ -107,6 +117,8 @@ public class HumanUnitBase : MonoBehaviour
     #endregion
 
 
+
+
     public List<BaseOrganSystem> OrganSystems;
     public void organSystemsSet()
     {
@@ -114,6 +126,11 @@ public class HumanUnitBase : MonoBehaviour
         
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        humanUnitBaseData = new HumanUnitBaseData();
+        humanUnitBaseData.type = "human";
+
+
+
         OrganSystems = new List<BaseOrganSystem>();
         OrganSystems.Add(new DigestiveSystem(gameManager, setDefaultData()));
         OrganSystems.Add(new CirculatorySystem(gameManager, setDefaultData()));
@@ -125,7 +142,7 @@ public class HumanUnitBase : MonoBehaviour
         OrganSystems.Add(new SynthesisSystem(gameManager, setDefaultData()));
         OrganSystems.Add(new IntegumentarySystem(gameManager, setDefaultData()));
     }
-    public void organSystemsSet(OrganListData organData)
+    public void organSystemsSet(HumanUnitBaseData organData)
     {
         if (organData.organSystemDatas.Length == 9 && organData.type == "human")
         {
@@ -183,14 +200,16 @@ public class HumanUnitBase : MonoBehaviour
 
 
     #endregion
-    #region 외부와 약속된 함수
-    public void SetComponentData(OrganListData organData)
+    #region IComponentDataIOAble 함수
+    public void SetData(HumanUnitBaseData input)
     {
-        organSystemsSet(organData);
+        organSystemsSet(input);
     }
-
-
-
+    public HumanUnitBaseData GetData()
+    {
+        HumanUnitBaseData returnValue = new HumanUnitBaseData(OrganSystems);
+        return returnValue;
+    }
     #endregion
     #region 함수
 
@@ -207,12 +226,27 @@ public class HumanUnitBase : MonoBehaviour
 
     //
 
-    #region [데이터 입출력용 클래스] OrganListData, BaseOrganSystemData
+    #region [데이터 입출력용 클래스] HumanUnitBaseData, BaseOrganSystemData
     [System.Serializable]
-    public class OrganListData
+    public class HumanUnitBaseData
     {
-        public string type;
-        public BaseOrganSystemData[] organSystemDatas;
+        #region 생성자
+        public HumanUnitBaseData() { }
+        public HumanUnitBaseData(List<BaseOrganSystem> baseOrganSystems)
+        {
+            type = "human";
+            organSystemDatas.CopyTo(baseOrganSystems.ToArray(), 0);
+        }
+        public HumanUnitBaseData(string typeName, List<BaseOrganSystem> baseOrganSystems)
+        {
+            type = typeName;
+            organSystemDatas.CopyTo(baseOrganSystems.ToArray(), 0);
+        }
+        #endregion
+        #region 변수
+        public string type; // 유닛의 타입입니다.
+        public BaseOrganSystemData[] organSystemDatas; // 내부 시스템입니다.
+        #endregion
     }
     [System.Serializable]
     public class BaseOrganSystemData
@@ -384,6 +418,7 @@ public class HumanUnitBase : MonoBehaviour
         // 구성 물질들
         // 작동하는 부분(bool 형식)
     }
+    
     // 소화계
     public class DigestiveSystem : BaseOrganSystem
     {
@@ -575,7 +610,7 @@ public class HumanUnitBase : MonoBehaviour
         {
             Debug.Log("Yee");
             this.gameObjectList = gameObjectList;
-            gameObjectList.UnitSightMake();
+            //gameObjectList.UnitSightMake();
             UnitSightRange = 6.0f;
         }
         public SensorySystem(GameManager _gameManager, GameObjectList gameObjectList, BaseOrganSystemData InputData) : base(_gameManager, InputData)
@@ -583,7 +618,7 @@ public class HumanUnitBase : MonoBehaviour
             Debug.Log("Yee");
 
             this.gameObjectList = gameObjectList;
-            gameObjectList.UnitSightMake();
+            //gameObjectList.UnitSightMake();
             UnitSightRange = 6.0f;
 
             position.Add(new Vector3(-0.2f, 1.0f, -1.0f));

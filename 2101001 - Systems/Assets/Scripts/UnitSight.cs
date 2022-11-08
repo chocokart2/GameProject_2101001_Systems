@@ -13,16 +13,26 @@ public class UnitSight : MonoBehaviour
     HumanUnitBase myHumanUnitBase;
     //Transform playerTf;
     GameObject memoryBlockPrefab;
-    MemoryBlock memoryBlockComponent;
+    MemoryBlock memoryBlockComponent; // 이 변수를 가지고 있는 이유는 유닛을 납치했을때 지역 정보도 얻을 수 있기 때문입니다.
     bool isInitCalled = false;
+    bool isReady;
 
     public GameObject FollowingObject = null;
 
     void OnTriggerEnter(Collider other)
     {
+        #region 함수 설명
+
+        // 타일 블럭이 충돌함
+        // 이벤트 발생?
+
+        #endregion
+
+
+
         //Debug.Log("Ouch");
         //if(other.gameObject.layer == 8)
-        if(other.gameObject.layer == 8)
+        if (other.gameObject.layer == 8)
         {
             // 충돌한 물체의 타일을 저장.
             TileBlock tileBlock = other.GetComponent<TileBlock>();
@@ -44,7 +54,15 @@ public class UnitSight : MonoBehaviour
         }
         if(other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightEnter(transform.parent.gameObject.GetComponent<UnitBase>().unitBaseData.teamID);
+            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {other.gameObject.name}");
+            UnitBase recvUnitBase = other.gameObject.GetComponent<UnitBase>();
+
+            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {recvUnitBase.name}");
+
+            //other.gameObject.GetComponent<UnitBase>().
+            recvUnitBase.
+                SightEnter(
+                transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
         }
 
 
@@ -54,7 +72,7 @@ public class UnitSight : MonoBehaviour
     {
         if (other.gameObject.GetComponent<UnitBase>() != null)
         {
-            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitBase>().unitBaseData.teamID);
+            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
         }
     }
 

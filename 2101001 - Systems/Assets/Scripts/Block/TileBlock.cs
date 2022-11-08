@@ -20,6 +20,7 @@ public class TileBlock : MonoBehaviour
     {
         myTransform = GetComponent<Transform>();
         myTransform.position = new Vector3(Mathf.RoundToInt(myTransform.position.x), Mathf.RoundToInt(myTransform.position.y), Mathf.RoundToInt(myTransform.position.z));
+
     }
 
     /// <summary>
@@ -52,7 +53,13 @@ public class TileBlock : MonoBehaviour
         if (triggerGameManager)
         {
             thatGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-            thatGameManager.SetTileMap(myTransform.position, blockTypeID);
+            //thatGameManager.ReadyRealTileMap += thatGameManager.SetTileMap(myTransform.)
+            thatGameManager.ReadyRealTileMap += delegate (ref Dictionary<Vector3, int> _map)
+            {
+                thatGameManager.SetTileMap(ref _map, myTransform.position, blockTypeID);
+            };
+            
+            //thatGameManager.SetTileMap(myTransform.position, blockTypeID);
             triggerGameManager = false;
             //Debug.Log("yee"); // 작동함!
         }
