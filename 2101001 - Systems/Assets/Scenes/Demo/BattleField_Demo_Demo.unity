@@ -939,11 +939,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1180591825566635236, guid: 40322c3fbafda8947a8a556c941aea0d,
-        type: 3}
-      propertyPath: roleForEditMode.teamName
-      value: Player
-      objectReference: {fileID: 0}
     - target: {fileID: 3516928186645611712, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
       propertyPath: m_Name
