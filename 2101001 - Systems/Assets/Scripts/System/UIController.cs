@@ -524,9 +524,14 @@ public class UIController : MonoBehaviour
                 Debug.Log("ItemUse");
 
             }
-            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.LeftShift)) && (!Input.GetKey(KeyCode.Space)))
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.E)) && (!Input.GetKey(KeyCode.Space)))
             {
-                selectedUnit.GetComponent<UnitBase>().ItemSkill(AttackDirection);
+                selectedUnit.GetComponent<UnitBase>().ItemSkillE(AttackDirection);
+                Debug.Log("ItemSkill");
+            }
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.F)) && (!Input.GetKey(KeyCode.Space)))
+            {
+                selectedUnit.GetComponent<UnitBase>().ItemSkillF(AttackDirection);
                 Debug.Log("ItemSkill");
             }
             else if (Input.GetKeyDown(KeyCode.R) && (!Input.GetKey(KeyCode.Space)))
@@ -562,7 +567,7 @@ public class UIController : MonoBehaviour
             return; // 컴포넌트가 존재하지 않습니다.
         }
         
-        if (thatInventory.inventory[thatInventory.inventoryIndex].GetItemType() == "BuildTool")
+        if (thatInventory.inventory[thatInventory.inventoryIndex].ItemType == "BuildTool")
         {
             // 빌드툴이 맞습니다.
         }
@@ -659,7 +664,7 @@ public class UIController : MonoBehaviour
                     float x = Mathf.Round(hit.point.x);
                     float z = Mathf.Round(hit.point.z);
 
-                    if (Input.GetKey(KeyCode.F))
+                    if (Input.GetKey(KeyCode.Q))
                     {
                         selectedUnit.GetComponent<UnitBase>().AutoAttack(new Vector3(x, 0.0f, z));
                     }
@@ -685,7 +690,7 @@ public class UIController : MonoBehaviour
 
 
 
-            if (Input.GetKey(KeyCode.F))
+            if (Input.GetKey(KeyCode.Q))
             {
                 // 오른클릭하면 작동
             }

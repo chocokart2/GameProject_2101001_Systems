@@ -284,6 +284,7 @@ public class GameManager : MonoBehaviour
 
     #region 실제로 사용되는 클래스: AttackClass, chemical, ChemicalReaction
 
+#warning 아래 클래스의 내용을 science/attackclass로 옮기기.
     public class AttackClass
     {
         public List<chemical> chemicals;
@@ -398,7 +399,7 @@ public class GameManager : MonoBehaviour
             return returnValue;
         }
     }
-    public class ChemicalReaction
+    public class ChemicalReaction // 만들었습니다.
     {
         public List<chemical> input;
         public List<chemical> output;
@@ -602,6 +603,27 @@ public class GameManager : MonoBehaviour
         }
         */
 
+        bool isFound;
+        for (int inputIndex = 0; inputIndex < inputValue.Count; inputIndex++)
+        {
+            isFound = false;
+            for (int returnIndex = 0; returnIndex < returnValue.Count; returnIndex++)
+            {
+                if (returnValue[returnIndex].matter == inputValue[inputIndex].matter)
+                {
+                    isFound = true;
+                    returnValue[returnIndex].quantity += inputValue[inputIndex].quantity;
+                }
+            }
+            if (isFound == false)
+            {
+                returnValue.Add(inputValue[inputIndex]);
+            }
+        }
+        return returnValue;
+    }
+    public List<chemical> Mix(List<chemical> returnValue, List<chemical> inputValue)
+    {
         bool isFound;
         for (int inputIndex = 0; inputIndex < inputValue.Count; inputIndex++)
         {
@@ -2474,7 +2496,7 @@ public class GameManager : MonoBehaviour
 
                 // _squadIndex와 length를 구해본다.
                 Debug.Log($"DEBUG_GameManager.SetCurrentUnitRoleToFieldData : _squadIndex : {_squadIndex}, Length : {currentFieldData.teamDatas[_teamIndex].squads.Length}");
-#warning IndexOutOfRangeException: Index was outside the bounds of the array. ㅔ; currentFieldData.teamDatas[_teamIndex].squads가 작아서 늘려야 할지도,
+#warning IndexOutOfRangeException: Index was outside the bounds of the array. currentFieldData.teamDatas[_teamIndex].squads가 작아서 늘려야 할지도,
 
                 AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].unitID.unit, _unitID); // 전화번호부 설정
 
@@ -3155,7 +3177,6 @@ public class GameManager : MonoBehaviour
                                 default:
                                     Debug.Log("DEBUG_GameManager.UnitInstantiate: 이 유닛의 타입(" + unit.unitBaseData.unitType + ")을 통해 프리펩을 결정할 수 없습니다.");
                                     continue;
-                                    break;
                             }
 
 
@@ -3430,7 +3451,7 @@ public class GameManager : MonoBehaviour
         }
         else if (humanUnitBase != null && unit.organListData == null)
         {
-            humanUnitBase.organSystemsSet(unit.organListData);
+            humanUnitBase.initiateIndividual(unit.organListData);
         }
 
         // UnitItemPack 컴포넌트 집어넣기.

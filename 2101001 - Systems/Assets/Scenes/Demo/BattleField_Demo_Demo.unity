@@ -939,6 +939,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1180591825566635236, guid: 40322c3fbafda8947a8a556c941aea0d,
+        type: 3}
+      propertyPath: roleForEditMode.teamName
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1180591825566635236, guid: 40322c3fbafda8947a8a556c941aea0d,
+        type: 3}
+      propertyPath: roleForEditMode.unitName
+      value: 112
+      objectReference: {fileID: 0}
+    - target: {fileID: 1180591825566635236, guid: 40322c3fbafda8947a8a556c941aea0d,
+        type: 3}
+      propertyPath: roleForEditMode.squadName
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3516928186645611712, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
       propertyPath: m_Name
@@ -1621,7 +1636,7 @@ PrefabInstance:
     - target: {fileID: 6461474512201008256, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 6461474512201008256, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
@@ -1631,7 +1646,7 @@ PrefabInstance:
     - target: {fileID: 6461474512201008256, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 6461474512201008256, guid: 40322c3fbafda8947a8a556c941aea0d,
         type: 3}
@@ -4763,6 +4778,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f535f09c62057a0459479e4a09ea4b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &846819572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846819569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8533ef87a3660a747a829b97e4f501c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  KnifeBlade: {fileID: 7349551938747291488, guid: 006c1c3042e59f94ab0eb5e618ab3d54,
+    type: 3}
+  KnifeHand: {fileID: 0}
+  UnitSightPrefab: {fileID: 2582533030928220571, guid: 1899de7d30b91954e92701aea8ee1f44,
+    type: 3}
+  EnergyStorage: {fileID: 434823172946834840, guid: 5ca17aee82e13364b844619c800d86f0,
+    type: 3}
+  EnergyTransmission: {fileID: 7710862785368572221, guid: f7713930f7c3f554496ef201a191b144,
+    type: 3}
+  EnergyFarm: {fileID: 7227679414761953378, guid: 6c71e6f0bef06ee44812af3b16b305d5,
+    type: 3}
+  PlacementFixture: {fileID: 6933711212470791875, guid: d1d7cc2452b712e4398f40d156a3bd4d,
+    type: 3}
+  PlacementDrone: {fileID: 5770033144022579235, guid: 4f6958295fb3bd842925480603bf6846,
+    type: 3}
+  PlacementRcCar: {fileID: 0}
+  SensorString: {fileID: 8306087332928653514, guid: b1e1045a220df0b448fb3f47f149df81,
+    type: 3}
+  SensorCamera: {fileID: 0}
+  NetworkCircuit: {fileID: 0}
+  NetworkAntenna: {fileID: 5274552058813666489, guid: 691b77da977476844a8b033d6770694b,
+    type: 3}
+  NetworkRouter: {fileID: 0}
+  AttackBomb: {fileID: 0}
+  AttackTurret: {fileID: 3719170197599077008, guid: 0f50ae24bf2ef604392a1a485877b01a,
+    type: 3}
+  DisturberWall: {fileID: 0}
+  DisturberCamo_hologram: {fileID: 0}
+  DisturberLight: {fileID: 6250590557529770511, guid: 803c5ac4e23a88246b6440da13efa88b,
+    type: 3}
+  ProductMine: {fileID: 0}
+  ProductMove: {fileID: 0}
+  ProductCraft: {fileID: 0}
+  ProductSave: {fileID: 0}
+  MachineSettingGUI: {fileID: 3539557358890066545, guid: 2c76a38fdc107864686954a9ab400d9d,
+    type: 3}
 --- !u!1001 &847746885
 PrefabInstance:
   m_ObjectHideFlags: 0

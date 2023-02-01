@@ -36,7 +36,7 @@ public class HumanActingGuiController : MonoBehaviour
 
     // HideSubItem 함수 설명
     // 자신의 자식을 전부 제거합니다.
-    public void ShowSubItem(UnitItemPack.BuildTool buildTool)
+    public void ShowSubItem(ItemHelper.BuildTool buildTool)
     {
         // 머신들 인벤토리 상태를 보여줍니다.
         // 9개의 방향으로 머신 이름을 보여주고, 갯수도 보여줍니다.
@@ -45,7 +45,7 @@ public class HumanActingGuiController : MonoBehaviour
         // 각 인덱스마다
         // EachClassIndex를 표시합니다.
 
-        if (buildTool.IsEachClassIndexNull()) return; // 빌드툴 아이템이 없습니다.
+        if (buildTool.subItems == null) return; // 빌드툴 아이템이 없습니다.
 
         HideSubItem();
 
@@ -61,25 +61,25 @@ public class HumanActingGuiController : MonoBehaviour
             // 머신의 이름 삽입
             //string MachineName = buildTool.EachClassIndex[buildTool.selectedIndex].ToString();
             //string MachineName = buildTool.GetEachClassIndexElement(typeIndex).ToString();
-            string MachineName = GameObjectList.MachineIdToNameKR(buildTool.GetEachClassIndexElement(typeIndex));
+            string MachineName = GameObjectList.MachineIdToNameKR(buildTool.EachClassMachineID[typeIndex]);
 
 
-            switch (buildTool.GetEachClassIndexElement(typeIndex)) // 숫자를 통해서
+            switch (buildTool.EachClassMachineID[typeIndex]) // 숫자를 통해서
             {
                 default:
                     break;
             }
             // 머신의 갯수 삽입
-            if(buildTool.GetEachClassIndexElement(typeIndex) != 0)
+            if(buildTool.EachClassMachineID[typeIndex] != 0)
             {
-                MachineName += " (" + buildTool.subItem[("MachineUnit" + buildTool.GetEachClassIndexElement(typeIndex).ToString())] + " Left)";
+                MachineName += " (" + buildTool.subItems[$"MachineUnit{buildTool.EachClassMachineID[typeIndex]}"].result + " Left)";
             }
 
             // 게임오브젝트에 텍스트 삽입
             instantiatedObject.GetComponent<TextMesh>().text = MachineName;
 
             // 색깔 바꾸기: 이 게임오브젝트가 현재 선택된 인덱스와 같은경우.
-            if(typeIndex == buildTool.GetSelectedIndex())
+            if(typeIndex == buildTool.CursorIndex)
             {
                 instantiatedObject.GetComponent<TextMesh>().color = Color.cyan;
             }
