@@ -26,7 +26,7 @@ public class EnergyHelper : BaseComponent
     }
 
     [System.Serializable]
-    public class Energies : INameKeyArray<Energy>
+    public class Energies : INameKeyArray<Energy>, IExpandable<Energy>
     {
         public Energy this[int index]
         {
@@ -56,6 +56,11 @@ public class EnergyHelper : BaseComponent
         public Energies(params Energy[] energies)
         {
             self = energies;
+        }
+        
+        public void Add(Energy element)
+        {
+            AddElementArray<Energy>(ref self, element);
         }
     }
 }

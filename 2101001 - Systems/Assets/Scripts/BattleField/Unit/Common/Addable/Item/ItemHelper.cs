@@ -335,7 +335,8 @@ public class ItemHelper : BaseComponent
         {
             if (subItems[0].amount > 0)
             {
-                gameObjectList.PistolBulletShot(subItems[0].attackInfo, vector3);
+                if (subItems[0].attackInfo == null) Debug.Log("DEBUG_Pistol.Use(GameObject,Vector3) : subItem이 null 입니다.");
+                GameObjectList.PistolBulletShot(user, subItems[0].attackInfo, vector3);
                 subItems[0].amount--;
                 // 발사 소리
                 return 0.3f;
@@ -413,7 +414,7 @@ public class ItemHelper : BaseComponent
 
             if (subItems["ammo"].result.amount > 0)
             {
-                gameObjectList.PistolBulletShot(subItems["ammo"].result.attackInfo, vector3);
+                GameObjectList.PistolBulletShot(user, subItems["ammo"].result.attackInfo, vector3);
                 this.subItems["ammo"].result.amount--;
                 return 0.3f;
             }
@@ -553,6 +554,38 @@ public class ItemHelper : BaseComponent
             // 그 외에는 result에서 특정 값이 들어갔음을 의미
             selectedMachineClassID = result;
             EachClassIndex[buildClassIndex] = selectedMachineClassID;
+        }
+    }
+    #endregion
+    #endregion
+
+    #region item - debug
+    #region item - debug - fieldStick
+    /// <summary>
+    ///     닿은 유닛의 정보를 UI로 표현합니다.
+    /// </summary>
+    [System.Serializable]
+    public class FieldStick : Item
+    {
+        public override float ESkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float FSkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Supply(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Update(GameObject user, float deltaTime)
+        {
+            return 0.0f;
+        }
+        public override float Use(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
         }
     }
     #endregion

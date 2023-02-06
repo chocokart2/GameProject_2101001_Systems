@@ -54,10 +54,18 @@ public class UnitSight : MonoBehaviour
         }
         if(other.gameObject.GetComponent<UnitBase>() != null)
         {
-            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {other.gameObject.name}");
             UnitBase recvUnitBase = other.gameObject.GetComponent<UnitBase>();
+            if(recvUnitBase != null)
+            {
+                Hack.Say(Hack.isDebugUnitSight, $"DEBUG_UnitSight.OnTriggerEnter : 게임오브젝트 이름 [{other.gameObject.name}]\n 유닛 이름 [{recvUnitBase.name}]");
+            }
+            else
+            {
+                Hack.Say(Hack.isDebugUnitSight, $"DEBUG_UnitSight.OnTriggerEnter : 게임오브젝트 이름 [{other.gameObject.name}]");
+            }
 
-            Debug.Log($"DEBUG_UnitSight.OnTriggerEnter : {recvUnitBase.name}");
+
+
 
             //other.gameObject.GetComponent<UnitBase>().
             recvUnitBase.

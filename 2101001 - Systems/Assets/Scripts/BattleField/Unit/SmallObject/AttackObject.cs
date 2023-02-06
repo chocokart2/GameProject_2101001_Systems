@@ -7,10 +7,9 @@ public class AttackObject : AttackClassHelper
     // 필드
     public AttackInfo attackInfo;
     // 공격 방향을 정의합니다.
-    public Vector3 direction;
+    public Vector3 direction; bool isNullDirection = true;
     
     bool AttackClassSet = false;
-    
     
     
     // Start is called before the first frame update
@@ -43,7 +42,10 @@ public class AttackObject : AttackClassHelper
 
     public void Attack(Collider other)
     {
-#warning direction 변수가 초기화 되지 않았습니다.
+        if(isNullDirection == true)
+        {
+            Debug.Log("<!>WARNING_AttackObject.Attack() : 이 공격체의 공격 방향은 정해지지 않았습니다!");
+        }
         other.gameObject.GetComponent<UnitBase>().beingAttacked(transform.position, direction, attackInfo);
     }
 
@@ -61,7 +63,7 @@ public class AttackObject : AttackClassHelper
         if (AttackClassSet == false)
         {
             attackInfo = _attackInfo;
-            direction = _direction;
+            direction = _direction; isNullDirection = false;
             AttackClassSet = true;
         }
         else Debug.Log("WARNING_AttackObject.Set() 이미 초기화된 대상입니다.");

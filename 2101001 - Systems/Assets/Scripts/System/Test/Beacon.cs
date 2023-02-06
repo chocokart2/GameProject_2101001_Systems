@@ -59,7 +59,8 @@ public class Beacon : MonoBehaviour
         // 이벤트에 등록
         GameObject.Find("GameManager").GetComponent<GameManager>().BeconEventForUnit += delegate (ref GameManager.FieldData myData)
         {
-            Debug.Log("*** info_Beacon_Start : Beacon " + gameObject.name + " added Fake UnitInfo " + transform.position);
+#warning 여기에 아무것도 안함.
+            Hack.Say(Hack.isDebugBeacon, $"*** info_Beacon_Start : Beacon {gameObject.name} added Fake UnitInfo {transform.position}");
             //RegisterWithGameManagerCallBack(ref myData);
         };
         //Debug.Log("DEBUG_Beacon.Start:저 작동 중입니다! 2 " + transform.position);

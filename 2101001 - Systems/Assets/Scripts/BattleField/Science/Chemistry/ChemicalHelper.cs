@@ -261,7 +261,8 @@ public class ChemicalHelper : BaseComponent
             return result;
         }
         public INameKey GetItem(int index) => self[index];
-        public void Add(Chemical chemical) { Add(chemical); }
+#warning 이 add 함수는 모호합니다. 의도는 Add(params chemical[])입니다면 재귀 함수가 되어버렸습니다.
+        public void Add(Chemical chemical) { AddElementArray<Chemical>(ref self, chemical); }
         public void Add(params Chemical[] newChemicals)
         {
             // 캐미컬을 추가합니다.

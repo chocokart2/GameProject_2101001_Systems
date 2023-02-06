@@ -52,17 +52,17 @@ public class ChemicalReactionDemoData : MonoBehaviour
         chemicalReactions.Sort(new GameManager.ChemicalReactionComparerByResponsiveness());
 
         // Debugger
-        Debug.Log("DEBUG_호출됨: ChemicalReactionData.Setup");
+        Hack.Say(Hack.isDebugChemicalReactionDemoData, "DEBUG_ChemicalReactionData.Setup(): 호출됨");
         for(int CrIndex = 0; CrIndex < chemicalReactions.Count; CrIndex++)
         {
-            Debug.Log((CrIndex + 1) + "번째 화학반응 테이블");
+            Hack.Say(Hack.isDebugChemicalReactionDemoData, $"{CrIndex + 1}번째 화학반응 테이블");
             foreach(GameManager.chemical oneOfInput in chemicalReactions[CrIndex].input)
             {
-                Debug.Log("반응물 : " + oneOfInput.matter);
+                Hack.Say(Hack.isDebugChemicalReactionDemoData, $"반응물 : {oneOfInput.matter}");
             }
             foreach(GameManager.chemical oneOfOutput in chemicalReactions[CrIndex].output)
             {
-                Debug.Log("생성물 : " + oneOfOutput.matter);
+                Hack.Say(Hack.isDebugChemicalReactionDemoData, $"생성물 : {oneOfOutput.matter}");
             }
         }
 

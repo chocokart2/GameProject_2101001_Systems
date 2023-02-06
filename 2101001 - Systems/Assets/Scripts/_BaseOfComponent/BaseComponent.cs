@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -146,11 +147,16 @@ public class BaseComponent : MonoBehaviour
             where ArrayClass : IArray<ElementClass>
             where ElementClass : INameKey
         {
-            int[] result = new int[sample.Length];
-            for (int sampleIndex = 0; sampleIndex < population.Length; sampleIndex++)
+            Debug.Log($"DEBUG_BaseComponent.Find() : sample.Length = {sample.Length}");
+
+
+            // 일단 모든 존재를 찾지 못했다고 가정합니다.
+            int[] result = Enumerable.Repeat(NOT_FOUND, sample.Length).ToArray();
+
+            for (int sampleIndex = 0; sampleIndex < sample.Length; sampleIndex++)
             {
                 bool found = false;
-                for(int populationIndex = 0; populationIndex < sample.Length; populationIndex++)
+                for(int populationIndex = 0; populationIndex < population.Length; populationIndex++)
                 {
                     if (population[populationIndex].Name.Equals(sample[sampleIndex].Name))
                     {
@@ -209,14 +215,25 @@ public class BaseComponent : MonoBehaviour
     {
         // 사칙연산
         public static void Add<ArrayClass, ElementClass>(ref ArrayClass target, ArrayClass addend)
-            where ArrayClass : IArray<ElementClass>
+            where ArrayClass : IArray<ElementClass>, IExpandable<ElementClass>
             where ElementClass : INameKey, IMeasurable
         {
-            int[] indexArray = new int[addend.Length];
+#warning indexArray에 내용이 없는 것 같아요!
+            int[] indexArray = NameKeyArrayHelper.Find<ArrayClass, ElementClass>(target, addend);
             
             for(int index = 0; index < indexArray.Length; ++index)
             {
-                target[indexArray[index]].Quantity += addend[index].Quantity;
+                if (indexArray[index] == NOT_FOUND)
+                {
+                    target.Add(addend[index]);
+                }
+                else
+                {
+                    Debug.Log($"DEBUG_NamedQuantityArrayHelper.Add() : indexArray[{index}] = {indexArray[index]}");
+                    Debug.Log($"DEBUG_NamedQuantityArrayHelper.Add() : target의 길이 = {target.Length}");
+
+                    target[indexArray[index]].Quantity += addend[index].Quantity;
+                }
             }
         }
         /// <summary>

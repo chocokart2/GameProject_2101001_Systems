@@ -15,20 +15,20 @@ public class DemoAttackInfo : AttackClassHelper
     ///         암흑 물질입니다. 암흑 물질은 어떤
     ///     </para>
     /// </remarks>
-    static public AttackInfo GetDemoAttackInfoData()
+    public static AttackInfo GetDemoAttackInfoData()
     {
         AttackInfo result = new AttackInfo();
         result.energies = new EnergyHelper.Energies(
             new EnergyHelper.Energy()
             {
-                type = "kinetic",
+                type = DemoEnergy.Default,
                 amount = 10.0f
             }
             );
         result.chemicals = new ChemicalHelper.Chemicals(
             new ChemicalHelper.Chemical()
             {
-                matter = "theousia",
+                matter = DemoChemical.Default,
                 quantity = 100.0f
             }
             );

@@ -2495,7 +2495,7 @@ public class GameManager : MonoBehaviour
                 _unitNameToID.Add(_inputUnitName, _unitID);
 
                 // _squadIndex와 length를 구해본다.
-                Debug.Log($"DEBUG_GameManager.SetCurrentUnitRoleToFieldData : _squadIndex : {_squadIndex}, Length : {currentFieldData.teamDatas[_teamIndex].squads.Length}");
+                Hack.Say(Hack.isDebugGameManager_SetCurrentUnitRoleToFieldData, $"DEBUG_GameManager.SetCurrentUnitRoleToFieldData : _squadIndex : {_squadIndex}, Length : {currentFieldData.teamDatas[_teamIndex].squads.Length}");
 #warning IndexOutOfRangeException: Index was outside the bounds of the array. currentFieldData.teamDatas[_teamIndex].squads가 작아서 늘려야 할지도,
 
                 AddElementInArray(ref currentFieldData.teamDatas[_teamIndex].unitID.unit, _unitID); // 전화번호부 설정

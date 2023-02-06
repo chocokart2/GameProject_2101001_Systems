@@ -167,9 +167,9 @@ public class GameObjectList : MonoBehaviour
         {
             get
             {
-                if (m_bulletFlying == null)
-                    m_bulletFlying = Resources.Load<GameObject>($"{M_ATTACK_OBJECT_FOLDER}/KnifeBlade");
-                return m_bulletFlying;
+                if (m_knifeBlade == null)
+                    m_knifeBlade = Resources.Load<GameObject>($"{M_ATTACK_OBJECT_FOLDER}/KnifeBlade");
+                return m_knifeBlade;
             }
         }
 
@@ -263,6 +263,12 @@ public class GameObjectList : MonoBehaviour
         transform.Find("UnitSight(Clone)").localScale = new Vector3(radius * 2, 2, radius * 2);
         UnitSightRadius = radius;
     }
+#warning 함수 구현 작업중
+    public static void UnitSightScale(GameObject unit, float radius)
+    {
+        unit.transform.Find("UnitSight(Clone)").localScale = new Vector3(radius * 2, 2, radius * 2);
+#warning 여기에 UnitSightRadius = radius; 관련 작업이 있어야 합니다.
+    }
     /// <summary>
     /// 유닛이 바라보는 방향에 따라서 UnitSight의 위치를 변경합니다.
     /// (추론)연속적으로 호출됩니다
@@ -299,11 +305,11 @@ public class GameObjectList : MonoBehaviour
     }
     #endregion
     #region Pistol: 사용
-    public void PistolBulletShot(AttackClassHelper.AttackInfo attackInfo, Vector3 direction)
+    public static void PistolBulletShot(GameObject attacker, AttackClassHelper.AttackInfo attackInfo, Vector3 direction)
     {
         direction.Normalize(); // 더 이상 이 벡터의 크기는 중요하지 않습니다.
-        GameObject instantiatedGameObject = Instantiate(AttackObjectPrefabs.BulletFlying, transform.position, Quaternion.LookRotation(direction, Vector3.up));
-        instantiatedGameObject.GetComponent<BulletController>().Init(direction, gameObject.GetInstanceID());
+        GameObject instantiatedGameObject = Instantiate(AttackObjectPrefabs.BulletFlying, attacker.transform.position, Quaternion.LookRotation(direction, Vector3.up));
+        instantiatedGameObject.GetComponent<BulletController>().Init(direction, attacker.GetInstanceID());
         instantiatedGameObject.GetComponent<AttackObject>().Set(attackInfo, direction);
     }
     #endregion

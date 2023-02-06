@@ -24,6 +24,9 @@ public class BiologicalPartBase : UnitPartBase
             get => hp / maxHP;
             set => hp = value * maxHP;
         }
+        /// <summary>
+        ///     maxHP값을 먼저 제공해야 합니다.
+        /// </summary>
         public float HP
         {
             get => hp;
@@ -39,7 +42,9 @@ public class BiologicalPartBase : UnitPartBase
         public float RecoveryRate;
         
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         float hp;
 
         public OrganPart() : base()
@@ -82,7 +87,7 @@ public class BiologicalPartBase : UnitPartBase
 
         public BioUnit()
         {
-            type = "creature";
+            type = Species.DEFAULT;
         }
 
         // 0.2 버전입니다.
@@ -194,4 +199,13 @@ public class BiologicalPartBase : UnitPartBase
         }
     }
 
+    /// <summary>
+    ///     종의 이름을 명시한 구간입니다. </summary>
+    /// <remarks>
+    ///     만약 새로운 종을 만들 일이 있다면, 여기에 새로운 종족 이름을 추가하시면 됩니다.</remarks>
+    public static class Species
+    {
+        public const string DEFAULT = "creature";
+        public const string HUMAN = "human";
+    }
 }

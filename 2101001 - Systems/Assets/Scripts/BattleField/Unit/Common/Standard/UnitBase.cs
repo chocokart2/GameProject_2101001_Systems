@@ -9,9 +9,38 @@ using UnityEngine;
 // 이 컴포넌트의 함수를 호출하면 해당하는 연결된 컴포넌트의 메서드를 부릅니다. 없으면 말고.
 // 이벤트는 사용하지 않습니다! 이벤트를 쓰면 다른 녀석들의 이벤트도 호출되기에 유일한 객체의 이벤트여야 합니다.
 
+#warning 작업중 :  UnitBase 코드 클린 코드로 정리하기
+/// <summary>
+/// 
+/// </summary>
+/// <remarks>
+///     이 컴포넌트의 함수를 호출하면, 연결된 컴포넌트의 메서드를 부릅니다. </remarks>
 public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
 {
     #region 필드
+    // Public Field
+
+
+
+    // Public Property
+    /// <summary>
+    ///     유닛이 바라보는 방향입니다.
+    /// </summary>
+    public Vector3 Direction { get => m_direction; }
+
+
+    // Private Field
+    /// <summary>
+    ///     유닛이 바라보는 방향입니다.
+    /// </summary>
+    private Vector3 m_direction;
+
+
+
+    #region innerClass
+
+
+    #endregion
 
     public bool unitNeedDefaultData = true; // 만약 트루라면 디펄트 데이터를 집어넣지 않습니다.
     #region 변수 unitNeedDefaultData에 대한 설명: 전투 중 생성과 데이터로 인한 생성시 발생하는 필드 채우기에 대한 딜레마를 극복한다.
@@ -72,7 +101,11 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     BiologicalPartBase myBiologicalPartBase;
     HumanUnitBase myHumanUnitBase;
 
+    #region
+    public UnitAI myUnitAI;
 
+
+    #endregion
 
     // 외부에서 들어옴
     //-> 함수 호출
@@ -140,7 +173,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
         {
 #warning 머신 유닛도 this.unitBaseData.unitType이 human으로 입력된 것으로 추론됩니다. 버그 같습니다.
-            case "human": // 인간인 경우
+            case BiologicalPartBase.Species.HUMAN: // 인간인 경우
                 //Debug.Log("human 반응 잡힘");
                 Debug.Log("DEBUG_UnitBase.BeingAttacked: 공격을 받은 유닛의 이름 - " + gameObject.name + ", 유닛의 인스턴스 아이디 - " + GetInstanceID());
 #warning 새로운 버전
@@ -238,14 +271,8 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     }
     #endregion
 
-    #region
-    public UnitAI myUnitAI;
 
-
-    #endregion
-
-
-
+    // 클래스
     [System.Serializable]
     public class UnitBaseData // GameManager에서 사용하는 클래스입니다. 변할 수 있는 값들을 여기에 저장합니다.(이벤트는 기본적으로 설정됨.)
     {
@@ -310,6 +337,43 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
         #endregion
 
     }
+
+    // 유니티 메서드
+    // Start is called before the first frame update
+    void Start()
+    {
+        // 독립적인 정보
+        isMaterialSetted = (MaterialPositiveX != null) && (MaterialPositiveY != null) && (MaterialNegativeX != null) && (MaterialNegativeY != null);
+
+
+        // 빛과 관계된 것은 함수가 불러질때 실행됩니다.
+        //lightCount = new Dictionary<int, int>();
+        //lightCount.Add(0, 0);
+        //sightCount = new Dictionary<string, int>();
+        //sightCount.Add("Player", 0);
+        ComponentSetup();
+        EventSetup();
+
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        unitBaseData = new UnitBaseData();
+        ForceSetup();
+
+
+        //GameManager의 팀 값을 가져옵니다.
+
+
+    }
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    // 메서드
+
+
+
+
 
 
     //public bool isHuman = true;
@@ -487,35 +551,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     #endregion
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // 독립적인 정보
-        isMaterialSetted = (MaterialPositiveX != null) && (MaterialPositiveY != null) && (MaterialNegativeX != null) && (MaterialNegativeY != null);
 
-
-        // 빛과 관계된 것은 함수가 불러질때 실행됩니다.
-        //lightCount = new Dictionary<int, int>();
-        //lightCount.Add(0, 0);
-        //sightCount = new Dictionary<string, int>();
-        //sightCount.Add("Player", 0);
-        ComponentSetup();
-        EventSetup();
-
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        unitBaseData = new UnitBaseData();
-        ForceSetup();
-
-
-        //GameManager의 팀 값을 가져옵니다.
-
-
-    }
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     void ForceSetup()
     {
@@ -643,7 +679,6 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
         // 자신의 각도를 변경합니다.
         unitBaseData.direction = direction;
-        Vector3 vecDirection = direction.normalized;
 
         // 자신의 외형을 변경합니다.
         if (isMaterialSetted && (myMeshRenderer != null))

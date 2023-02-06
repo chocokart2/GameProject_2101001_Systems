@@ -28,28 +28,29 @@ public class UnitPartBase : BaseComponent
     [System.Serializable]
     public abstract class UnitPart
     {
+
         // 온전성
         // 화학 물질
         // 작동하는 것
         // 충돌 범위
 
-        
+
         protected ChangeController changeController; // 화학 반응시 참고
 #warning chemicalController의 역할은 changeController로 옮겨갈 예정입니다.
         ChemicalController chemicalController;
 
         // public
         // STATIC_VALUE
-        public float REACTION_RATIO_CHEMICAL = 0.5f;
+        public const float REACTION_RATIO_CHEMICAL = 0.5f;
         /// <summary>
         /// 화학 반응을 하는데 들어가는 에너지의 비율입니다.
         /// </summary>
-        public float REACTION_RATIO_ENERGY = 0.5f;
-        public float PIERCE_RATIO_CHEMICAL = 0.5f;
+        public const float REACTION_RATIO_ENERGY = 0.5f;
+        public const float PIERCE_RATIO_CHEMICAL = 0.5f;
         /// <summary>
         /// 관통 데미지를 주는데 들어가는 에너지의 비율입니다.
         /// </summary>
-        public float PIERCE_RATIO_ENERGY = 0.5f;
+        public const float PIERCE_RATIO_ENERGY = 0.5f;
         // non Static Value
         /// <summary>
         /// 이 UnitPart를 구성하는 화학물질입니다.
@@ -104,6 +105,8 @@ public class UnitPartBase : BaseComponent
 
         public UnitPart()
         {
+            Hack.Say(Hack.isDebugUnitPartBase, "DEBUG_UnitPart.UnitPart() : 생성자가 호출되었습니다.");
+
             chemicalController = GameObject.Find("GameManager").GetComponent<ChemicalController>();
             changeController = GameObject.Find("GameManager").GetComponent<ChangeController>();
 
@@ -413,6 +416,9 @@ public class UnitPartBase : BaseComponent
             if (isTaggedExist == false) return false;
 
             // 모든 chemicalWholeness를 체크합니다.
+#warning chemicalWholeness 값이 null 입니다!
+#warning DEBUG
+            Debug.Log($"DEBUG_UnitPart.IsPassing(float) chemicalWholeness 값이 Null 여부 {chemicalWholeness == null}");
             for(int index = 0; index < chemicalWholeness.Length; ++index)
             {
                 if (chemicalWholeness[index].GetAngleWholeness(angle) <= 0)
@@ -523,7 +529,10 @@ public class UnitPartBase : BaseComponent
             set => m_self[index] = value;
         }
 
-        private SingleChemicalWholeness[] m_self;
+        /// <summary>
+        ///     수정하지 마세요. 직렬화를 지원하지 않아 private를 public으로 바꿨을 뿐입니다.
+        /// </summary>
+        public SingleChemicalWholeness[] m_self;
 
         public bool IsBroken(float angle)
         {

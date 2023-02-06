@@ -30,7 +30,9 @@ using UnityEngine;
 /// <summary>
 /// 생물의 기관계중 인간의 기관계를 정의하고 상태를 저장합니다.
 /// </summary>
-public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAble<HumanUnitBase.HumanUnitBaseData>
+public class HumanUnitBase :
+    BiologicalPartBase, 
+    GameManager.IComponentDataIOAble<HumanUnitBase.HumanUnitBaseData>
 {
     // 필드
     public int SightRange = 6;
@@ -127,19 +129,7 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     //public List<OrganPart> OrganSystems;
     public void initiateIndividual()
     {
-        individual = new BioUnit();
-        individual.species = "human";
-        individual.organParts = new OrganPart[9];
-
-        individual.organParts[0] = new DigestiveSystem(getDefaultOrganPart());
-        individual.organParts[1] = new CirculatorySystem(getDefaultOrganPart());
-        individual.organParts[2] = new ExcretorySystem(getDefaultOrganPart());
-        individual.organParts[3] = new SensorySystem(getDefaultOrganPart(), GetComponent<GameObjectList>());
-        individual.organParts[4] = new NervousSystem(getDefaultOrganPart());
-        individual.organParts[5] = new MotorSystem(getDefaultOrganPart());
-        individual.organParts[6] = new ImmuneSystem(getDefaultOrganPart());
-        individual.organParts[7] = new SynthesisSystem(getDefaultOrganPart());
-        individual.organParts[8] = new IntegumentarySystem(getDefaultOrganPart());
+        individual = DemoHumanPart.GetDemoHuman(gameObject);
     }
     public void initiateIndividual(HumanUnitBaseData data)
     {
@@ -220,8 +210,11 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
 
         result.species = "human";
 
-        AddElementArray(ref result.organParts, new DigestiveSystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new CirculatorySystem(getDefaultOrganPart()));
+#warning 작업중 : getDefaultOrganPart 함수 대신에 그에 맞는 부모 클래스를 호출해야 합니다.
+        AddElementArray(ref result.organParts, new DigestiveSystem(DemoHumanPart.GetDemoDigestiveSystem()));
+        //AddElementArray(ref result.organParts, new DigestiveSystem(getDefaultOrganPart()));
+#warning 매개변수에 게임매니저 컴포넌트를 넣을 수도 있습니다.
+        AddElementArray(ref result.organParts, new CirculatorySystem(DemoHumanPart.GetDemoCirculatorySystem()));
         AddElementArray(ref result.organParts, new ExcretorySystem(getDefaultOrganPart()));
         AddElementArray(ref result.organParts, new SensorySystem(getDefaultOrganPart(), GetComponent<GameObjectList>()));
         AddElementArray(ref result.organParts, new NervousSystem(getDefaultOrganPart()));
@@ -242,21 +235,21 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     /// <returns></returns>
     private OrganPart getDefaultOrganPart()
     {
-        OrganPart result = new OrganPart();
+        OrganPart result = DemoBiologyPart.GetDemoOrganPart();
 
-        result.tagged = new ChemicalHelper.Chemicals(
-            new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
-            new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
-            );
-        result.demand = new ChemicalHelper.Chemicals(
-            new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
-            new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
-            );
+        //result.tagged = new ChemicalHelper.Chemicals(
+        //    new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
+        //    new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
+        //    );
+        //result.demand = new ChemicalHelper.Chemicals(
+        //    new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
+        //    new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
+        //    );
 
-        result.Name = "이름없음";
-        result.RecoveryRate = 1.04f;
-        result.maxHP = 100.0f;
-        result.HP = 100.0f;
+        //result.Name = "이름없음";
+        //result.RecoveryRate = 1.04f;
+        //result.maxHP = 100.0f;
+        //result.HP = 100.0f;
 
         return result;
     }
@@ -343,7 +336,16 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     // 순환계
     public class CirculatorySystem : OrganPart
     {
-        public CirculatorySystem(GameManager _gameManager) : base()
+        public CirculatorySystem() : base()
+        {
+            Name = "CirculatorySystem";
+
+            collisionRangeSphere.Add(
+                new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
+        }
+
+
+        public CirculatorySystem(OrganPart data, GameManager _gameManager) : base()
         {
 
         }
@@ -496,6 +498,15 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     // 배출계
     public class ExcretorySystem : OrganPart
     {
+
+        public ExcretorySystem()
+        {
+            Name = "excretorySystem";
+            collisionRangeSphere.Add(
+                new Sphere() { position = new Vector3(-0.2f, -0.2f, -1.0f), radius = 0.3f },
+                new Sphere() { position = new Vector3(0.2f, -0.2f, -1.0f), radius = 0.3f }
+                );
+        }
         public ExcretorySystem(GameManager _gameManager) : base()
         {
 
@@ -508,24 +519,35 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
                 );
         }
     }
+#warning 작업중 : UnitSightScale 함수가 호출될 시점에는 UnitSightRange의 값도 따라 변해야 합니다
     // 감각계
+    /// <summary>
+    ///     김각계 </summary>
+    /// <remarks>
+    ///     시각을 담당하는 유닛 파트입니다.</remarks>
     public class SensorySystem : OrganPart
     {
+        public GameObject unit;
         public GameObjectList gameObjectList;
-        float UnitSightRange;
+        public float UnitSightRange;
         //false면 감각을 받아들일 수 없게 됩니다.
         //
 
+        public SensorySystem() : base()
+        {
+
+        }
         public SensorySystem(GameObjectList gameObjectList) : base()
         {
-            Debug.Log("Yee");
+            Hack.Say(Hack.isDebugHumanUnitBase, "Yee");
+
             this.gameObjectList = gameObjectList;
             //gameObjectList.UnitSightMake();
             UnitSightRange = 6.0f;
         }
         public SensorySystem(OrganPart data, GameObjectList gameObjectList) : base(data)
         {
-            Debug.Log("Yee");
+            Hack.Say(Hack.isDebugHumanUnitBase, "Yee");
 
             this.gameObjectList = gameObjectList;
             //gameObjectList.UnitSightMake();
@@ -536,17 +558,23 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
                 new Sphere() { position = new Vector3(0.2f, 1.0f, -1.0f), radius = 0.3f }
                 );
         }
-        [System.Obsolete("이 함수는 사용되지 않습니다.")]
-        public void ChemicalReactionCheck(GameManager.chemical[] _chemicals)
+        public override void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
         {
-            Debug.Log("DEBUG_SensorySystem.ChemicalReactionCheck : 종료 -> 이 함수는 사용하지 않습니다");
-
-            //base.ChemicalReactionCheck(_chemicals);
-
-            gameObjectList.UnitSightNewScale(wholeness * UnitSightRange);
-
-            //OrganSystemOperatingRate; // 이 값으로 UnitSight의 크기를 변경합니다.
+            base.BeingAttacked(ref attack, angle);
+            GameObjectList.UnitSightScale(unit, wholeness * UnitSightRange);
         }
+
+        //[System.Obsolete("이 함수는 사용되지 않습니다.")]
+        //public void ChemicalReactionCheck(GameManager.chemical[] _chemicals)
+        //{
+        //    Debug.Log("DEBUG_SensorySystem.ChemicalReactionCheck : 종료 -> 이 함수는 사용하지 않습니다");
+
+        //    //base.ChemicalReactionCheck(_chemicals);
+
+        //    gameObjectList.UnitSightNewScale(wholeness * UnitSightRange);
+
+        //    //OrganSystemOperatingRate; // 이 값으로 UnitSight의 크기를 변경합니다.
+        //}
 
         //UnitSight의 컨트롤하는 기관
         // OrganSystemOperatingRate가 작아질수록 EyeSight의 크기도 작아진다
@@ -558,7 +586,22 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
         //false면 통제를 할 수 없게 됩니다
         public NervousSystem() : base()
         {
-
+            // 두뇌 중추 신경계
+            collisionRangeSphere.Add(
+                // 중앙
+                new Sphere() { position = new Vector3(0.0f, 1.0f, 0.2f), radius = 0.6f },
+                // 앞 쪽
+                new Sphere() { position = new Vector3(0.6f, 1.0f, -0.2f), radius = 0.6f },
+                new Sphere() { position = new Vector3(-0.6f, 1.0f, -0.2f), radius = 0.6f },
+                // 뒷 쪽
+                new Sphere() { position = new Vector3(0.6f, 1.0f, 0.6f), radius = 0.6f },
+                new Sphere() { position = new Vector3(-0.6f, -0.2f, 0.6f), radius = 0.6f },
+                // 허리 중추 신경계
+                new Sphere() { position = new Vector3(0.0f, 0.8f, 1.0f), radius = 0.4f },
+                new Sphere() { position = new Vector3(0.0f, 0.4f, 1.0f), radius = 0.4f },
+                new Sphere() { position = new Vector3(0.0f, 0.0f, 1.0f), radius = 0.4f },
+                new Sphere() { position = new Vector3(0.0f, -0.4f, 1.0f), radius = 0.4f }
+                );
         }
         public NervousSystem(OrganPart data) : base(data)
         {
@@ -585,7 +628,18 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     {
         public MotorSystem() : base()
         {
-
+            collisionRangeSphere.Add(
+                // 팔
+                new Sphere() { position = new Vector3(-0.8f, 0.0f, -0.2f), radius = 0.4f },
+                new Sphere() { position = new Vector3(-0.8f, 0.0f, -0.6f), radius = 0.4f },
+                new Sphere() { position = new Vector3(0.8f, 0.0f, -0.2f), radius = 0.4f },
+                new Sphere() { position = new Vector3(0.8f, 0.0f, -0.6f), radius = 0.4f },
+                // 다리
+                new Sphere() { position = new Vector3(-0.4f, -1.0f, -0.4f), radius = 0.6f },
+                new Sphere() { position = new Vector3(0.4f, -1.0f, -0.4f), radius = 0.6f },
+                new Sphere() { position = new Vector3(-0.4f, -1.0f, 0.4f), radius = 0.6f },
+                new Sphere() { position = new Vector3(0.4f, -1.0f, 0.4f), radius = 0.6f }
+                );
         }
         public MotorSystem(OrganPart data) : base(data)
         {
@@ -621,6 +675,12 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     // 합성계
     public class SynthesisSystem : OrganPart
     {
+        public SynthesisSystem() : base()
+        {
+            // 오른쪽 허리
+            collisionRangeSphere.Add(
+                new Sphere() { position = new Vector3(-0.6f, 0.0f, 0.6f), radius = 0.4f });
+        }
         public SynthesisSystem(GameManager _gameManager) : base()
         {
 
@@ -635,6 +695,12 @@ public class HumanUnitBase : BiologicalPartBase, GameManager.IComponentDataIOAbl
     // 각질계
     public class IntegumentarySystem : OrganPart
     {
+        public IntegumentarySystem() : base()
+        {
+            // 어디를 맞아도 데미지
+            collisionRangeSphere.Add(
+                new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
+        }
         public IntegumentarySystem(GameManager _gameManager) : base()
         {
 
