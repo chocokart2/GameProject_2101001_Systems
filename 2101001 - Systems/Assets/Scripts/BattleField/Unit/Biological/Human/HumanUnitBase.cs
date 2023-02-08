@@ -32,7 +32,8 @@ using UnityEngine;
 /// </summary>
 public class HumanUnitBase :
     BiologicalPartBase, 
-    GameManager.IComponentDataIOAble<HumanUnitBase.HumanUnitBaseData>
+    BaseComponent.IDataGetableComponent<BiologicalPartBase.BioUnit>,
+    BaseComponent.IDataSetableComponent<BiologicalPartBase.BioUnit>
 {
     // 필드
     public int SightRange = 6;
@@ -191,68 +192,11 @@ public class HumanUnitBase :
 
 
     #endregion
-    #region IComponentDataIOAble 함수
-    public void SetData(HumanUnitBaseData input)
-    {
-        initiateIndividual(input);
-    }
-    public HumanUnitBaseData GetData()
-    {
-        HumanUnitBaseData returnValue = new HumanUnitBaseData(individual);
-        return returnValue;
-    }
-    #endregion
     #region 함수
-
-    private BioUnit getDefaultBioUnit()
-    {
-        BioUnit result = new BioUnit();
-
-        result.species = "human";
-
-#warning 작업중 : getDefaultOrganPart 함수 대신에 그에 맞는 부모 클래스를 호출해야 합니다.
-        AddElementArray(ref result.organParts, new DigestiveSystem(DemoHumanPart.GetDemoDigestiveSystem()));
-        //AddElementArray(ref result.organParts, new DigestiveSystem(getDefaultOrganPart()));
-#warning 매개변수에 게임매니저 컴포넌트를 넣을 수도 있습니다.
-        AddElementArray(ref result.organParts, new CirculatorySystem(DemoHumanPart.GetDemoCirculatorySystem()));
-        AddElementArray(ref result.organParts, new ExcretorySystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new SensorySystem(getDefaultOrganPart(), GetComponent<GameObjectList>()));
-        AddElementArray(ref result.organParts, new NervousSystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new MotorSystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new ImmuneSystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new SynthesisSystem(getDefaultOrganPart()));
-        AddElementArray(ref result.organParts, new IntegumentarySystem(getDefaultOrganPart()));
-
-        return result;
-    }
-#warning 언젠간 삭제할 코드
-    /// <summary>
-    /// [임시] OrganPart의 필드를 임시로 정의합니다.
-    /// </summary>
-    /// <remarks>
-    ///     [임시] 코드라 약간의 하드 코딩이 있습니다.
-    /// </remarks>
-    /// <returns></returns>
-    private OrganPart getDefaultOrganPart()
-    {
-        OrganPart result = DemoBiologyPart.GetDemoOrganPart();
-
-        //result.tagged = new ChemicalHelper.Chemicals(
-        //    new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
-        //    new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
-        //    );
-        //result.demand = new ChemicalHelper.Chemicals(
-        //    new ChemicalHelper.Chemical() { Name = "TEST_organicCarbon", Quantity = 20.0f },
-        //    new ChemicalHelper.Chemical() { Name = "TEST_ATP", Quantity = 10.0f }
-        //    );
-
-        //result.Name = "이름없음";
-        //result.RecoveryRate = 1.04f;
-        //result.maxHP = 100.0f;
-        //result.HP = 100.0f;
-
-        return result;
-    }
+    #region 인터페이스 함수
+    public BioUnit GetComponentData() => individual;
+    public void SetComponentData(BioUnit data) => individual = data;
+    #endregion
 
 
 
@@ -267,9 +211,11 @@ public class HumanUnitBase :
     //
 
     #region [데이터 입출력용 클래스] HumanUnitBaseData, BaseOrganSystemData
+#warning 이 클래스는 필요한가?
     /// <summary>
     /// 데이터 입출력 용 클래스입니다.
     /// </summary>
+    [System.Obsolete]
     [System.Serializable]
     public class HumanUnitBaseData
     {
@@ -311,7 +257,12 @@ public class HumanUnitBase :
     }
     #endregion
 
-    // 소화계
+
+
+
+
+    #region NestedClass
+    /// <summary> 소화계 OrganPart입니다. </summary>
     public class DigestiveSystem : OrganPart
     {
         public DigestiveSystem() : base()
@@ -333,7 +284,7 @@ public class HumanUnitBase :
                 );
         }
     }
-    // 순환계
+    /// <summary> 순환계 OrganPart입니다. </summary>
     public class CirculatorySystem : OrganPart
     {
         public CirculatorySystem() : base()
@@ -495,7 +446,7 @@ public class HumanUnitBase :
         }
 
     }
-    // 배출계
+    /// <summary> 배출계 OrganPart입니다. </summary>
     public class ExcretorySystem : OrganPart
     {
 
@@ -520,11 +471,7 @@ public class HumanUnitBase :
         }
     }
 #warning 작업중 : UnitSightScale 함수가 호출될 시점에는 UnitSightRange의 값도 따라 변해야 합니다
-    // 감각계
-    /// <summary>
-    ///     김각계 </summary>
-    /// <remarks>
-    ///     시각을 담당하는 유닛 파트입니다.</remarks>
+    /// <summary> 감각계 OrganPart입니다. </summary> <remarks> [인간 : 4번] 시각을 담당하는 유닛 파트입니다.</remarks>
     public class SensorySystem : OrganPart
     {
         public GameObject unit;
@@ -580,7 +527,7 @@ public class HumanUnitBase :
         // OrganSystemOperatingRate가 작아질수록 EyeSight의 크기도 작아진다
 
     }
-    // 신경계
+    /// <summary> 신경계 OrganPart입니다. </summary>
     public class NervousSystem : OrganPart
     {
         //false면 통제를 할 수 없게 됩니다
@@ -623,7 +570,7 @@ public class HumanUnitBase :
                 );
         }
     }
-    // 운동계
+    /// <summary> 운동계 OrganPart입니다. </summary>
     public class MotorSystem : OrganPart
     {
         public MotorSystem() : base()
@@ -658,7 +605,7 @@ public class HumanUnitBase :
         }
         // 활동량이0.1 이하로 떨어지면 활동을 못하게 막습니다.
     }
-    // 면역계
+    /// <summary> 면역계 OrganPart입니다. </summary>
     public class ImmuneSystem : OrganPart
     {
         public ImmuneSystem() : base()
@@ -672,7 +619,7 @@ public class HumanUnitBase :
                 new Sphere() { position = new Vector3(0.6f, 0.0f, 0.6f), radius = 0.4f });
         }
     }
-    // 합성계
+    /// <summary> 합성계 OrganPart입니다. </summary>
     public class SynthesisSystem : OrganPart
     {
         public SynthesisSystem() : base()
@@ -692,7 +639,7 @@ public class HumanUnitBase :
                 new Sphere() { position = new Vector3(-0.6f, 0.0f, 0.6f), radius = 0.4f });
         }
     }
-    // 각질계
+    /// <summary> 각질계 OrganPart입니다. </summary>
     public class IntegumentarySystem : OrganPart
     {
         public IntegumentarySystem() : base()
@@ -712,8 +659,5 @@ public class HumanUnitBase :
                 new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
         }
     }
-
-
-
-
+    #endregion
 }

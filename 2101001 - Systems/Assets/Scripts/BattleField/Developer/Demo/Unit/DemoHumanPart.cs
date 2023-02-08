@@ -28,6 +28,10 @@ public class DemoHumanPart : HumanUnitBase
     }
 
     // 기관계 인스턴스    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public static DigestiveSystem GetDemoDigestiveSystem()
     {
         DigestiveSystem result = DemoBiologyPart.GetDemoOrganPart<DigestiveSystem>();

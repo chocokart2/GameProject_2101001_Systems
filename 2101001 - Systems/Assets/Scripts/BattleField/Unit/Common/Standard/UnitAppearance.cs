@@ -17,6 +17,10 @@ public class UnitAppearance : MonoBehaviour
     [SerializeField] private Material materialPositiveY; // 유닛이 바라보는 방향이 양의 Y일때
     [SerializeField] private Material materialNegativeX; // 유닛이 바라보는 방향이 음의 X일때
     [SerializeField] private Material materialNegativeY; // 유닛이 바라보는 방향이 음의 Y일때
+    [SerializeField] private Material materialPositiveXDead; // 유닛이 바라보는 방향이 양의 X일때
+    [SerializeField] private Material materialPositiveYDead; // 유닛이 바라보는 방향이 양의 Y일때
+    [SerializeField] private Material materialNegativeXDead; // 유닛이 바라보는 방향이 음의 X일때
+    [SerializeField] private Material materialNegativeYDead; // 유닛이 바라보는 방향이 음의 Y일때
     // private static field
     private const string humanDefaultFolder = "Materials/BattleField/Unit/Biological/Human/Base";
     
@@ -67,5 +71,10 @@ public class UnitAppearance : MonoBehaviour
                 m_meshRenderer.material = materialNegativeX;
             }
         }
+    }
+
+    public void Kill()
+    {
+
     }
 }

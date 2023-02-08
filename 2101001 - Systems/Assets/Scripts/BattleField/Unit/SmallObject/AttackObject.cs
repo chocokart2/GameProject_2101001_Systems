@@ -46,7 +46,7 @@ public class AttackObject : AttackClassHelper
         {
             Debug.Log("<!>WARNING_AttackObject.Attack() : 이 공격체의 공격 방향은 정해지지 않았습니다!");
         }
-        other.gameObject.GetComponent<UnitBase>().beingAttacked(transform.position, direction, attackInfo);
+        other.gameObject.GetComponent<UnitBase>().BeingAttacked(transform.position, direction, attackInfo);
     }
 
     public void Set(AttackInfo _attackInfo)

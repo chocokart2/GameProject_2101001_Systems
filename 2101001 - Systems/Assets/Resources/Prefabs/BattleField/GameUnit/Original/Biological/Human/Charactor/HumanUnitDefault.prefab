@@ -157,6 +157,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PathFinderGuide: {fileID: 0}
+--- !u!114 &1180591825566635236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3516928186645611712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa409d8562d00cc44a19f593d7b98af4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roleForEditMode:
+    teamName: 
+    squadName: 
+    unitName: 
 --- !u!114 &1625623439334516601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,6 +186,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SightRange: 6
+  individual:
+    type: creature
+    species: 
+    organParts: []
 --- !u!114 &2027413653436620163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b1ba120c798c3f418296efcb7a91955, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory:
+    gameObject: {fileID: 0}
   inventoryIndex: 0
   Cooldown: 0
   CooldownKnifeSkill: 0
@@ -273,8 +295,6 @@ MonoBehaviour:
   KnifeBlade: {fileID: 7349551938747291488, guid: 006c1c3042e59f94ab0eb5e618ab3d54,
     type: 3}
   KnifeHand: {fileID: 0}
-  PistolBullet: {fileID: 381776451933462528, guid: 2c1f9b6c3f44fac4cbb5020e0171d102,
-    type: 3}
   UnitSightPrefab: {fileID: 2582533030928220571, guid: 1899de7d30b91954e92701aea8ee1f44,
     type: 3}
   EnergyStorage: {fileID: 434823172946834840, guid: 5ca17aee82e13364b844619c800d86f0,
@@ -320,7 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9aaf64a2e1300d4c9207f457cd7b167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1180591825566635236
+--- !u!114 &2382805190879139279
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -329,6 +349,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 3516928186645611712}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa409d8562d00cc44a19f593d7b98af4, type: 3}
+  m_Script: {fileID: 11500000, guid: d89f407b42fd3ab4e8cc03ad2d6e4e5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  self:
+    isLiving: 0

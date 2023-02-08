@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,9 @@ public class Hack : MonoBehaviour
 {
     // 변수
     // Unit.Common.Standard
+    public static bool isDebugUnitBase = true;
     public static bool isDebugUnitPartBase = false;
+    public static bool isDebugUnitSightController = false;
     // Unit.Biological
     // Unit.Biological.Human
     public static bool isDebugHumanUnitBase = false;
@@ -25,7 +28,57 @@ public class Hack : MonoBehaviour
     // gamemamager
     public static bool isDebugGameManager_SetCurrentUnitRoleToFieldData = false;
 
+    /// <summary>
+    ///     Say메서드를 빠르게 설정합니다. 어떤걸 체크할지 확인합니다.
+    /// </summary>
+    public enum check
+    {
+        /// <summary>
+        /// 자신의 메서드가 호출되었는지 여부를 빠르게 파악합니다.
+        /// </summary>
+        method = 0,
+        /// <summary>
+        /// 자신의 메서드가 오류가 있다고 표시합니다.
+        /// </summary>
+        error = 1,
+    }
 
+    public static void Say(bool isNotIgnore, check _mode, object callerClass, [CallerMemberName] string member = "알 수 없는 멤버 이름")
+    {
+        if (isNotIgnore)
+        {
+            switch (_mode)
+            {
+                case check.method:
+                    Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : 함수가 호출되었습니다.");
+                    break;
+                case check.error:
+                    Debug.Log($"<!> ERROR_{callerClass.GetType().Name}.{member}() : 의도지 않은 실행입니다.");
+                    break;
+                default:
+                    Debug.LogError($"알 수 없는 mode 이름");
+                    break;
+            }
+        }
+    }
+    public static void Say(bool isNotIgnore, check _mode, object callerClass, object message, [CallerMemberName] string member = "알 수 없는 멤버 이름")
+    {
+        if (isNotIgnore)
+        {
+            switch (_mode)
+            {
+                case check.method:
+                    Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : 함수가 호출되었습니다.\n{message}");
+                    break;
+                case check.error:
+                    Debug.Log($"<!> ERROR_{callerClass.GetType().Name}.{member}() : {message}");
+                    break;
+                default:
+                    Debug.LogError($"알 수 없는 mode 이름");
+                    break;
+            }
+        }
+    }
 
     /// <summary>
     ///     Debug.Log와 역할이 동일합니다. 대신 앞에 있는 매개변수는 이 메시지를 호출할지 여부를 판단합니다.

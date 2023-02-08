@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#warning 이 클래스 리펙토링 좀 해야겠다.
 // 역할
 // 유닛의 척추!
 // 유닛에 주렁주렁 달려있는 컴포넌트에 출입구 역할을 합니다.
@@ -11,53 +12,77 @@ using UnityEngine;
 
 #warning 작업중 :  UnitBase 코드 클린 코드로 정리하기
 /// <summary>
-/// 
+///     유닛 게임오브젝트에 잔뜩 달려있는 컴포넌트들의 출입구 역할을 합니다.
 /// </summary>
 /// <remarks>
-///     이 컴포넌트의 함수를 호출하면, 연결된 컴포넌트의 메서드를 부릅니다. </remarks>
-public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
+///     <para>
+///         이 컴포넌트의 함수를 호출하면, 연결된 컴포넌트의 메서드를 부릅니다.</para>
+///     <para>
+///         비주얼 변수도 존재합니다, 이건 UnitBase의 역할이 맞나요?</para>
+///     <para>
+///         빛과 시야를 담당하는 함수들도 존재합니다. 이들은 다른 컴포넌트에 담도록 합니다.</para></remarks>
+public class UnitBase : 
+    BaseComponent, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
+    //BaseComponent.IDataGetableComponent<>
 {
-    #region 필드
-    // Public Field
+    #region UnitBase member
+    #region field
+    // public field
+    /// <summary>
+    ///     변수 unitNeedDefaultData에 대한 설명: 전투 중 생성과 데이터로 인한 생성시 발생하는 필드 채우기에 대한 딜레마를 극복한다.
+    /// </summary>
+    /// <remarks>
+    ///     만약 데이터 로딩인 경우, unitNeedDefaultData을 false로 만듭니다. 그리고 컴포넌트에 데이터가 완벽하게 들어갔으면 unitFieldFilled를 true로 만드는 작업을 합니다.
+    ///     이때, 디펄트 데이터가 데이터 로딩보다 일찍 들어간 경우, 컴포넌트의 필드 정보들은 데이터 로딩에 의해 덮어씌어질것이며,
+    ///     만약, 데이터 로딩이 일찍 들어와 디펄트 데이터가 들어가려는 경우, unitNeedDefaultData이 true이면 데이터가 들어가지만, 그렇지 않으면 이미 데이터가 들어가 있구나 하면서 데이터를 넣지 않습니다.
+    /// </remarks>
+    public bool unitNeedDefaultData = true; // 만약 트루라면 디펄트 데이터를 집어넣지 않습니다.
+#warning isHuman은 필요한 함수입니까? 이건 프로퍼티로 충분할 것 같습니다.
+    //public bool isHuman = true;
+    //public int lightCountForSensor = 0;
+    //public int lightCount = 0;
+    // 어느 팀에 속해 있나? -> 팀에 속해있으면 UI에서 보여집니다.
+    //public int id; // instantiate할때마다 생성됩니다.
 
-
-
-    // Public Property
+    public Dictionary<int, int> lightCount; // 받은 빛마다 나뉘어집니다. Key: 빛의 종류(0: 랜더링용 가시광선, 1: 적외선, 2+: 사용자 지정 광선), Value:그 빛을 닿고 있는 갯수.
+    public Dictionary<int, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 ID이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
+    /// <summary>
+    /// 자신과 자식 게임오브젝트의 이름을 작성합니다.
+    /// </summary>
+    /// <remarks>
+    /// 이때, 자식 게임오브젝트중 UnitBase를 가지고 있는 게임오브젝트는 작성하지 않아도 됩니다.
+    /// 자식의 자식인경우, 폴더처럼 이름/자식/자식으로, 사이에 슬래쉬를 넣어주세요
+    /// 원래부터 투명한 게임오브젝트는 작성하지 않습니다.
+    /// 이 값은 자식 게임오브젝트에 있는 childObjectOfUnit 컴포넌트에 의해 작동됩니다
+    /// </remarks>
+    public List<string> hierarchyGameObjectNameForRendering;
+    
+    //public Vector3 direction = new Vector3(1,0,0);
+    
+    public UnitBaseData unitBaseData;
+    
+    public UnitAI myUnitAI;
+    // public property
     /// <summary>
     ///     유닛이 바라보는 방향입니다.
     /// </summary>
     public Vector3 Direction { get => m_direction; }
 
-
-    // Private Field
+    // private field
     /// <summary>
     ///     유닛이 바라보는 방향입니다.
     /// </summary>
     private Vector3 m_direction;
-
-
-
-    #region innerClass
-
-
-    #endregion
-
-    public bool unitNeedDefaultData = true; // 만약 트루라면 디펄트 데이터를 집어넣지 않습니다.
-    #region 변수 unitNeedDefaultData에 대한 설명: 전투 중 생성과 데이터로 인한 생성시 발생하는 필드 채우기에 대한 딜레마를 극복한다.
-    // 만약 데이터 로딩인 경우, unitNeedDefaultData을 false로 만듭니다. 그리고 컴포넌트에 데이터가 완벽하게 들어갔으면 unitFieldFilled를 true로 만드는 작업을 합니다.
-    // 이때, 디펄트 데이터가 데이터 로딩보다 일찍 들어간 경우, 컴포넌트의 필드 정보들은 데이터 로딩에 의해 덮어씌어질것이며,
-    // 만약, 데이터 로딩이 일찍 들어와 디펄트 데이터가 들어가려는 경우, unitNeedDefaultData이 true이면 데이터가 들어가지만, 그렇지 않으면 이미 데이터가 들어가 있구나 하면서 데이터를 넣지 않습니다.
-    #endregion
-
-
-    //public int lightCountForSensor = 0;
-    //public int lightCount = 0;
-    public Dictionary<int, int> lightCount; // 받은 빛마다 나뉘어집니다. Key: 빛의 종류(0: 랜더링용 가시광선, 1: 적외선, 2+: 사용자 지정 광선), Value:그 빛을 닿고 있는 갯수.
-    public Dictionary<int, int> sightCount; // 팀마다 나뉘어집니다. 어레이의 길이는 게임매니저의 Team 갯수만큼 결정됩니다. 키값은 Team의 ID이고, Value는 해당 팀 Sight의 닿는 갯수입니다.
-    public List<string> hierarchyGameObjectNameForRendering;
-
-    #region 다른 컴포넌트로 옮겨야 할 부분
-
+    private GameManager gameManager;
+    // 이 게임오브젝트의 컴포넌트
+    private MeshRenderer m_myMeshRenderer;
+    private UnitItemPack m_myUnitItemPack;
+    private UnitLife m_myUnitLife;
+    private UnitMovable m_myUnitMovable;
+    private UnitAppearance m_myUnitAppearance;
+    private BiologicalPartBase m_myBiologicalPartBase;
+    private HumanUnitBase m_myHumanUnitBase;
+    #region moving member
     #region 애니메이터로 옮겨야 할 부분 (먼 훗날에 할 것)
     public Material MaterialNull; // 기본형
     public Material MachineMaterialNull; // 머신 유닛 기본형
@@ -68,49 +93,40 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     bool isMaterialSetted = false;
     #endregion
 
-    // 이 유닛이 각도에 따라 달라지는 모습이 담긴 필드입니다.
 
     #endregion
 
-    // 자신과 자식 게임오브젝트의 이름을 작성합니다.
-    // 이때, 자식 게임오브젝트중 UnitBase를 가지고 있는 게임오브젝트는 작성하지 않아도 됩니다.
-    // 자식의 자식인경우, 폴더처럼 이름/자식/자식으로, 사이에 슬래쉬를 넣어주세요
-    // 원래부터 투명한 게임오브젝트는 작성하지 않습니다.
-    // 이 값은 자식 게임오브젝트에 있는 childObjectOfUnit 컴포넌트에 의해 작동됩니다
-
     #endregion
-    public UnitBaseData unitBaseData;
+    #region unity function
+    // Start is called before the first frame update
+    void Start()
+    {
+        // 독립적인 정보
+        isMaterialSetted = (MaterialPositiveX != null) && (MaterialPositiveY != null) && (MaterialNegativeX != null) && (MaterialNegativeY != null);
 
 
-    #region 컴포넌트들
+        // 빛과 관계된 것은 함수가 불러질때 실행됩니다.
+        //lightCount = new Dictionary<int, int>();
+        //lightCount.Add(0, 0);
+        //sightCount = new Dictionary<string, int>();
+        //sightCount.Add("Player", 0);
+        ComponentSetup();
+        EventSetup();
+
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        unitBaseData = new UnitBaseData();
+        ForceSetup();
 
 
-    #region 게임오브젝트 내 컴포넌트
-
-    #endregion
-    #region 다른 게임오브젝트
-
-    #endregion
-    #region 다른 게임오브젝트의 컴포넌트
-    GameManager gameManager;
-
-    #endregion
-    MeshRenderer myMeshRenderer;
-    UnitItemPack myUnitItemPack;
-    UnitMovable myUnitMovable;
-    BiologicalPartBase myBiologicalPartBase;
-    HumanUnitBase myHumanUnitBase;
-
-    #region
-    public UnitAI myUnitAI;
+        //GameManager의 팀 값을 가져옵니다.
 
 
-    #endregion
+    }
+    // Update is called once per frame
+    void Update()
+    {
 
-    // 외부에서 들어옴
-    //-> 함수 호출
-
-
+    }
     void OnTriggerEnter(Collider other)
     {
         //Debug.Log("UnitBase.OnTriggerEnter");
@@ -124,15 +140,20 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
 
         }
-
-        //if(otherBulletController.)
-
-
-
-
-
     }
-
+    #endregion
+    #region function
+    #region interface function
+    public void SetData(UnitBaseData inputData)
+    {
+        unitBaseData = inputData;
+    }
+    public UnitBaseData GetData()
+    {
+        return unitBaseData;
+    }
+    #endregion
+    #region public function
 #warning 이 함수는 수정되어야 합니다. 그러니까 이 함수를 호출받았을 때, UnitPart로 정보를 옮겨야 합니다.
 #warning (진행중) 2차 버전 : UnitPartBase의 함수를 호출합니다.
     /// <summary>
@@ -150,9 +171,9 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     /// <param name="attackClass"></param>
     /// <exception cref="NotImplementedException"></exception>
     //public void beingAttacked(Vector3 attackerPosition, Vector3 attackerDirection, GameManager.AttackClass attackClass)
-    public void beingAttacked(Vector3 attackerPosition, Vector3 attackerDirection, AttackClassHelper.AttackInfo attackClass)
+    public void BeingAttacked(Vector3 attackerPosition, Vector3 attackerDirection, AttackClassHelper.AttackInfo attackClass)
     {
-        Debug.Log("DEBUG_UnitBase : 호출됨_beingAttacked");
+        Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this);
 
         
 
@@ -178,7 +199,7 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
                 Debug.Log("DEBUG_UnitBase.BeingAttacked: 공격을 받은 유닛의 이름 - " + gameObject.name + ", 유닛의 인스턴스 아이디 - " + GetInstanceID());
 #warning 새로운 버전
                 // HumanUnitBase 값이 있을 것입니다.
-                myHumanUnitBase.individual.DamagePart(attackerPosition, attackerDirection, attackClass);
+                m_myHumanUnitBase.individual.DamagePart(attackerPosition, attackerDirection, attackClass);
 
 
 
@@ -194,13 +215,13 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
 //                // 2. 어디에 맞았는지 체크
 //                List<int> reachedOrganIndex = new List<int>(); // 닿은 OrganSystems의 Index를 기록합니다. (사실 순서는 상관없는 값입니다.)
-//                for(int organIndex = 0; organIndex < myHumanUnitBase.individual.organParts.Length; organIndex++) // 각 기관계마다 체크합니다.
+//                for(int organIndex = 0; organIndex < m_myHumanUnitBase.individual.organParts.Length; organIndex++) // 각 기관계마다 체크합니다.
 //                {
 //                    // 정상적인 루트
-//                    for (int posIndex = 0; posIndex < myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere.Length; posIndex++) // 이 기관계의 위치값마다 체크합니다.
+//                    for (int posIndex = 0; posIndex < m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere.Length; posIndex++) // 이 기관계의 위치값마다 체크합니다.
 //                    {
-//                        Vector3 DeltaVector = myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].position - AttackDirection;
-//                        if(DeltaVector.sqrMagnitude < Mathf.Pow(myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].radius, 2)) // 위치로 인해 기관계가 닿는 경우
+//                        Vector3 DeltaVector = m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].position - AttackDirection;
+//                        if(DeltaVector.sqrMagnitude < Mathf.Pow(m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].radius, 2)) // 위치로 인해 기관계가 닿는 경우
 //                        {
 //                            reachedOrganIndex.Add(organIndex); // 피해를 입은 기관계 목록에 등록
 //                            Debug.Log("DEBUG_UnitBase.beingAttacked: 한 기관계에 닿았습니다!"); // 디버그로 알림은 덤.
@@ -218,21 +239,21 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 //                    tempChemicals = gameManager.chemicalsMultiply(ref attackClass.chemicals, (1 / reachedOrganIndex.Count));
 
 //                    // 1. 물질을 넣고 화학반응을 체크합니다.
-//                    //myHumanUnitBase.OrganSystems[tempValue].chemicals = gameManager.MixChemical(myHumanUnitBase.OrganSystems[tempValue].chemicals, tempChemicals);
+//                    //m_myHumanUnitBase.OrganSystems[tempValue].chemicals = gameManager.MixChemical(m_myHumanUnitBase.OrganSystems[tempValue].chemicals, tempChemicals);
 //#warning 아래 코드를 대체할 것을 입력하세요.
-//                    //myHumanUnitBase.OrganSystems[tempValue].ChemicalReactionCheck(tempChemicals.ToArray());
+//                    //m_myHumanUnitBase.OrganSystems[tempValue].ChemicalReactionCheck(tempChemicals.ToArray());
 
 
 
 //                    // 2. 물리 데미지를 체크합니다.
 //#warning 아래 줄은 고치려고 했던 줄입니다.
 //#warning 이 코드 고치기 <- 각 UnitPart마다 충돌할때 생기는 데미지 처리 함수를 만들기
-//                    //myHumanUnitBase.OrganSystems[tempValue].PhysicalEnergyAttack(attackClass.mass * attackClass.speed, attackClass.volume);
-//                    //myHumanUnitBase.individual.organParts[tempValue].(attackClass.mass * attackClass.speed, attackClass.volume);
+//                    //m_myHumanUnitBase.OrganSystems[tempValue].PhysicalEnergyAttack(attackClass.mass * attackClass.speed, attackClass.volume);
+//                    //m_myHumanUnitBase.individual.organParts[tempValue].(attackClass.mass * attackClass.speed, attackClass.volume);
 
 
 //                    // Debug. 데미지 상태 출력
-//                    Debug.Log(" DEBUG_UnitBase.beingAttacked: " + HumanUnitBase.HumanOrganNameList[tempValue + 1] + "의 작동비율 : " + myHumanUnitBase.individual.organParts[tempValue].HP);
+//                    Debug.Log(" DEBUG_UnitBase.beingAttacked: " + HumanUnitBase.HumanOrganNameList[tempValue + 1] + "의 작동비율 : " + m_myHumanUnitBase.individual.organParts[tempValue].HP);
 //                }
 
 //                Debug.Log("맞췄습니다!");
@@ -253,26 +274,46 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
                 //break;
         }
     }
+    /// <summary>
+    ///     유닛의 각도를 변경합니다.
+    /// </summary>
+    /// <param name="direction">
+    ///     유닛이 바라보는 각도입니다.</param>
+    public void SetUnitDirection(Vector3 direction)
+    {
+        unitBaseData.direction = direction;
 
-
+        if(m_myUnitAppearance != null)
+        {
+            m_myUnitAppearance.SetUnitDirection(direction);
+        }
+    }
+    #endregion
+    #region private function
     void ComponentSetup()
     {
-        myMeshRenderer = transform.Find("Quad").GetComponent<MeshRenderer>();
+        m_myMeshRenderer = transform.Find("Quad").GetComponent<MeshRenderer>();
 
-        myUnitItemPack = null;
-        myUnitItemPack = GetComponent<UnitItemPack>();
-        myUnitMovable = null;
-        myUnitMovable = GetComponent<UnitMovable>();
+        m_myUnitAppearance = GetComponent<UnitAppearance>();
+        m_myUnitItemPack = GetComponent<UnitItemPack>();
+        m_myUnitMovable = GetComponent<UnitMovable>();
 
-        myBiologicalPartBase = GetComponent<BiologicalPartBase>();
-        myHumanUnitBase = GetComponent<HumanUnitBase>();
+        m_myBiologicalPartBase = GetComponent<BiologicalPartBase>();
+        m_myHumanUnitBase = GetComponent<HumanUnitBase>();
 
 
     }
+    void ForceSetup()
+    {
+        if(gameObject.name == "Player")
+        {
+            unitBaseData.teamName = "Player";
+        }
+    }
     #endregion
-
-
-    // 클래스
+    #endregion
+    #endregion
+    #region Nasted Class
     [System.Serializable]
     public class UnitBaseData // GameManager에서 사용하는 클래스입니다. 변할 수 있는 값들을 여기에 저장합니다.(이벤트는 기본적으로 설정됨.)
     {
@@ -338,59 +379,13 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
     }
 
-    // 유니티 메서드
-    // Start is called before the first frame update
-    void Start()
-    {
-        // 독립적인 정보
-        isMaterialSetted = (MaterialPositiveX != null) && (MaterialPositiveY != null) && (MaterialNegativeX != null) && (MaterialNegativeY != null);
 
-
-        // 빛과 관계된 것은 함수가 불러질때 실행됩니다.
-        //lightCount = new Dictionary<int, int>();
-        //lightCount.Add(0, 0);
-        //sightCount = new Dictionary<string, int>();
-        //sightCount.Add("Player", 0);
-        ComponentSetup();
-        EventSetup();
-
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        unitBaseData = new UnitBaseData();
-        ForceSetup();
-
-
-        //GameManager의 팀 값을 가져옵니다.
-
-
-    }
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    // 메서드
-
-
-
-
-
-
-    //public bool isHuman = true;
-    //public Vector3 direction = new Vector3(1,0,0);
-    // 어느 팀에 속해 있나? -> 팀에 속해있으면 UI에서 보여집니다.
-    //public int id; // instantiate할때마다 생성됩니다.
-
-    #region IComponentDataIOAble 메서드
-    public void SetData(UnitBaseData inputData)
-    {
-        unitBaseData = inputData;
-    }
-    public UnitBaseData GetData()
-    {
-        return unitBaseData;
-    }
     #endregion
+
+
+
+
+
     public void UnitBaseDataNewSet(string _unitType, int _id)
     {
         unitBaseData = new UnitBaseData(_unitType, _id);
@@ -429,28 +424,29 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     // 4. 각 이벤트를 실행시키는 public 함수를 만듭니다.
     public void Walk(Vector3 Direction)
     {
-        if(myUnitMovable != null)
+        Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this);
+        if(m_myUnitMovable != null)
         {
             switch (unitBaseData.unitType)
             {
                 //case "creature":
                 case "human":
                     // <!> ERROR HUNTER <!>
-                    if (myHumanUnitBase == null)
+                    if (m_myHumanUnitBase == null)
                     {
                         Debug.Log("<!> ERROR_UnitBase.Walk(Vector3 Direction) : 이 게임오브젝트에는 HumanUnitBase 컴포넌트가 존재하지 않습니다!");
                         break;
                     }
-                    if (myHumanUnitBase.individual == null)
+                    if (m_myHumanUnitBase.individual == null)
                     {
                         Debug.Log("<!> ERROR_UnitBase.Walk(Vector3 Direction) : HumanUnitBase의 필드 individual가 null값입니다.");
                         break;
                     }
 
-                    if(myHumanUnitBase != null)
+                    if(m_myHumanUnitBase != null)
                     {
-                        myUnitMovable.Move(Direction, myHumanUnitBase.individual.organParts[5].wholeness);
-                        Debug.Log($"DEBUG_UnitBase.Walk : wholeness = {myHumanUnitBase.individual.organParts[5].wholeness}");
+                        m_myUnitMovable.Move(Direction, m_myHumanUnitBase.individual.organParts[5].wholeness);
+                        Debug.Log($"DEBUG_UnitBase.Walk : wholeness = {m_myHumanUnitBase.individual.organParts[5].wholeness}");
                     }
 
 
@@ -485,37 +481,37 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     }
     public void ItemUse(Vector3 Direction)
     {
-        if(myUnitItemPack != null)
+        if(m_myUnitItemPack != null)
         {
-            myUnitItemPack.ItemUse(Direction);
+            m_myUnitItemPack.ItemUse(Direction);
         }
     }
     public void ItemSkillE(Vector3 Direction)
     {
-        if (myUnitItemPack != null)
+        if (m_myUnitItemPack != null)
         {
-            myUnitItemPack.ItemSkillE(Direction);
+            m_myUnitItemPack.ItemSkillE(Direction);
         }
     }
     public void ItemSkillF(Vector3 Direction)
     {
-        if (myUnitItemPack != null)
+        if (m_myUnitItemPack != null)
         {
-            myUnitItemPack.ItemSkillF(Direction);
+            m_myUnitItemPack.ItemSkillF(Direction);
         }
     }
     public void ItemSupply(Vector3 Direction)
     {
-        if (myUnitItemPack != null)
+        if (m_myUnitItemPack != null)
         {
-            myUnitItemPack.ItemSupply(Direction);
+            m_myUnitItemPack.ItemSupply(Direction);
         }
     }
     public void ItemSelect(int value)
     {
-        if(myUnitItemPack != null)
+        if(m_myUnitItemPack != null)
         {
-            myUnitItemPack.inventoryIndex = value;
+            m_myUnitItemPack.inventoryIndex = value;
 
         }
 
@@ -553,20 +549,15 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
 
 
 
-    void ForceSetup()
-    {
-        if(gameObject.name == "Player")
-        {
-            unitBaseData.teamName = "Player";
-        }
-    }
+
 
     // 외부에서 호출하는 함수들
 
 
 
 
-
+#warning 여기 좀 손보자.
+#warning 여기 좀 손보자.
     #region 빛과 시야
     #region 퍼블릭 메서드 - checkRenderingCondition, SightEnter, SightExit, LightEnter, LightExit, LightEnterForSensor, LightExitForSensor
     public void checkRenderingCondition() // 예외, 자기 팀원은 밝기에 상관없이 그대로 표시됩니다.
@@ -669,44 +660,6 @@ public class UnitBase : MonoBehaviour, GameManager.IComponentDataIOAble<UnitBase
     }
 
     #endregion
-
-    #endregion
-    #region 유닛의 각도와 외형
-    #region 퍼블릭 메서드
-    public void SetUnitDirection(Vector3 direction)
-    {
-        //Debug.Log("DEBUG_UnitBase.Setdirection: It Worked!");
-
-        // 자신의 각도를 변경합니다.
-        unitBaseData.direction = direction;
-
-        // 자신의 외형을 변경합니다.
-        if (isMaterialSetted && (myMeshRenderer != null))
-        {
-            //
-            if(direction.z > Mathf.Cos(45 * Mathf.Deg2Rad)) // 북쪽
-            {
-                myMeshRenderer.material = MaterialPositiveY;
-            }
-            else if (direction.z < Mathf.Cos(135 * Mathf.Deg2Rad)) // 남쪽
-            {
-                myMeshRenderer.material = MaterialNegativeY;
-            }
-            else if (direction.x >= Mathf.Cos(45 * Mathf.Deg2Rad)) // 동쪽
-            {
-                myMeshRenderer.material = MaterialPositiveX;
-            }
-            else
-            {
-                myMeshRenderer.material = MaterialNegativeX;
-            }
-        }
-    }
-    #endregion
-    #region 프라이빗 메서드
-
-    #endregion
-
 
     #endregion
 
