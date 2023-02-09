@@ -17,6 +17,11 @@ using UnityEngine;
 
 #endregion
 
+#warning 제발 GameManager 리펙토링하자..
+
+/// <summary>
+/// 
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     #region 어디에 쓰이는 클래슨고?
@@ -56,7 +61,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Console.WriteLine("ERROR_GameManager.Start() : 알 수 없는 게임모드입니다.");
+            Hack.Say(Hack.isDebugGameManager_Start, Hack.check.error, this, message: "알 수 없는 게임모드입니다.");
         }
 
 
@@ -273,6 +278,12 @@ public class GameManager : MonoBehaviour
     // 무기들이 사용되는 구조체입니다.
 
     void ChemicalReactionSetup() {
+        ChangeController m_changeController = GetComponent<ChangeController>();
+
+        m_changeController.SetComponentData(
+            data: (DemoChange.GetDemoChemicalReactionTable(),
+            DemoChange.GetDemoChemicalEnergyResistTable()));
+
         chemicalReactionTable = new List<ChemicalReaction>();
         chemicalReactionTable = GetComponent<ChemicalReactionDemoData>().chemicalReactions;
     }

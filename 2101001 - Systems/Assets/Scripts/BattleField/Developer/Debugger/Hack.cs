@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,23 +10,33 @@ using UnityEngine;
 public class Hack : MonoBehaviour
 {
     // 변수
+    public static bool isMustReceiveErrorMessage = true;
+    // System.Common
+    public static bool isDebugBaseComponent = false;
     // Unit.Common.Standard
     public static bool isDebugUnitBase = true;
-    public static bool isDebugUnitPartBase = false;
+    public static bool isDebugUnitPartBase = true;
     public static bool isDebugUnitSightController = false;
+    // unit.common.addable
+    public static bool isDebugUnitItemPack = true;
     // Unit.Biological
     // Unit.Biological.Human
-    public static bool isDebugHumanUnitBase = false;
+    public static bool isDebugHumanUnitBase = true;
+    #region isDebugHumanUnitBase
+    public static bool isDebugHumanUnitBase_Nerv = true;
+    #endregion
 
     // Developer.Demo.Unit
     public static bool isDebugDemoBiologyPart = false;
 
     // others
-
+    public static bool isDebugChangeController = true;
     public static bool isDebugChemicalReactionDemoData = false;
     public static bool isDebugUnitSight = false;
     public static bool isDebugBeacon = false;
     // gamemamager
+    public static bool isDebugGameManager_Awake = true;
+    public static bool isDebugGameManager_Start = true;
     public static bool isDebugGameManager_SetCurrentUnitRoleToFieldData = false;
 
     /// <summary>
@@ -41,8 +52,36 @@ public class Hack : MonoBehaviour
         /// 자신의 메서드가 오류가 있다고 표시합니다.
         /// </summary>
         error = 1,
+        /// <summary>
+        /// 함수에 대한 정보를 알려주고 싶을때 표시합니다.
+        /// </summary>
+        info = 2,
     }
-
+    public static void Say(bool isNotIgnore, check _mode, Type type, [CallerMemberName] string member = "알 수 없는 멤버 이름")
+    {
+        if (isNotIgnore)
+        {
+            switch (_mode)
+            {
+                case check.method:
+                    Debug.Log($"DEBUG_{type.Name}.{member}() : 함수가 호출되었습니다.");
+                    break;
+                case check.info:
+                    Debug.Log($"DEBUG_{type.Name}.{member}() : 지정한 부분을 실행했습니다.");
+                    break;
+                case check.error:
+                    Debug.Log($"<!> ERROR_{type.Name}.{member}() : 의도지 않은 실행입니다.");
+                    break;
+                default:
+                    Debug.LogError($"알 수 없는 mode 이름");
+                    break;
+            }
+        }
+        else if(isMustReceiveErrorMessage && _mode == check.error)
+        {
+            Debug.Log($"<!> ERROR_{type.Name}.{member}() : 의도지 않은 실행입니다.");
+        }
+    }
     public static void Say(bool isNotIgnore, check _mode, object callerClass, [CallerMemberName] string member = "알 수 없는 멤버 이름")
     {
         if (isNotIgnore)
@@ -51,6 +90,9 @@ public class Hack : MonoBehaviour
             {
                 case check.method:
                     Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : 함수가 호출되었습니다.");
+                    break;
+                case check.info:
+                    Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : 지정한 부분을 실행했습니다.");
                     break;
                 case check.error:
                     Debug.Log($"<!> ERROR_{callerClass.GetType().Name}.{member}() : 의도지 않은 실행입니다.");
@@ -69,6 +111,9 @@ public class Hack : MonoBehaviour
             {
                 case check.method:
                     Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : 함수가 호출되었습니다.\n{message}");
+                    break;
+                case check.info:
+                    Debug.Log($"DEBUG_{callerClass.GetType().Name}.{member}() : {message}");
                     break;
                 case check.error:
                     Debug.Log($"<!> ERROR_{callerClass.GetType().Name}.{member}() : {message}");

@@ -5,44 +5,44 @@ using UnityEngine;
 
 #warning 오늘 할 거 : ChemicalHelper 옮기기 -> ChemicalReaction 이사하기 / EnergyResist 이사하기
 
-public class ChangeController : ChangeHelper
+public class ChangeController : 
+    ChangeHelper,
+    BaseComponent.IDataGetableComponent<(ChangeHelper.ChemicalReactionTable _reactions, ChangeHelper.ChemicalEnergyResistTable _energyResists)>,
+    BaseComponent.IDataSetableComponent<(ChangeHelper.ChemicalReactionTable _reactions, ChangeHelper.ChemicalEnergyResistTable _energyResists)>
 {
 #warning ChemicalReactionArray를 ChemicalHelper가 아니라 ChangeHelper로 이사시킵시다. 에너지도 있는데 화학 반응일 필요가 없겠지
-    public ChemicalReactionTable reactions
+    static bool isInited = false;
+
+    private ChemicalReactionTable reactions;
+    public ChemicalReactionTable Reactions
     {
         get { return reactions; }
         private set { reactions = value; }
     }
-    public ChemicalEnergyResistTable energyResists
+
+    private ChemicalEnergyResistTable energyResists;
+    public ChemicalEnergyResistTable EnergyResists
     {
         get { return energyResists; }
         private set { energyResists = value; }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public (ChemicalReactionTable _reactions, ChemicalEnergyResistTable _energyResists) GetComponentData()
     {
-        
+        return (this.reactions, this.energyResists);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetComponentData((ChemicalReactionTable _reactions, ChemicalEnergyResistTable _energyResists) data)
     {
-        
-    }
-
-#warning hardcoding
-    public void setData_demo()
-    {
-        // reactions와 energyResists을 인스턴스화합니다.`
-        // 이런 하드 코딩은 정말 미친 짓이야. 하지만 파일 입출력이 완성될때까지 좀 참아야겠어.
-
-        energyResists = new ChemicalEnergyResistTable();
-        ChemicalEnergyResist chemicalResist_TEST_ATP = new ChemicalEnergyResist();
-        #region init about chemicalResist_TEST_ATP
-        chemicalResist_TEST_ATP.ChemicalName = "TEST_ATP";
-        chemicalResist_TEST_ATP.Add(new EnergyResist() { energyType = "A", resistanceDefense = 0.0f, resistanceRatio = 3.0f });
-        #endregion
-        energyResists.Add(chemicalResist_TEST_ATP);
+        if(isInited == false)
+        {
+            isInited = true;
+            reactions = data._reactions;
+            energyResists = data._energyResists;
+        }
+        else
+        {
+            Hack.Say(Hack.isDebugChangeController, Hack.check.error, this, message: $"이미 초기화가 된 {this.GetType().Name}에 초가화를 시도했습니다.");
+        }
     }
 }

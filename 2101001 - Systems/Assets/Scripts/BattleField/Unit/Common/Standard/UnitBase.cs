@@ -430,7 +430,7 @@ public class UnitBase :
             switch (unitBaseData.unitType)
             {
                 //case "creature":
-                case "human":
+                case BiologicalPartBase.Species.HUMAN:
                     // <!> ERROR HUNTER <!>
                     if (m_myHumanUnitBase == null)
                     {
@@ -445,8 +445,8 @@ public class UnitBase :
 
                     if(m_myHumanUnitBase != null)
                     {
-                        m_myUnitMovable.Move(Direction, m_myHumanUnitBase.individual.organParts[5].wholeness);
-                        Debug.Log($"DEBUG_UnitBase.Walk : wholeness = {m_myHumanUnitBase.individual.organParts[5].wholeness}");
+                        m_myUnitMovable.Move(Direction, m_myHumanUnitBase.individual.organParts[5].chemicalWholeness.Wholeness);
+                        Debug.Log($"DEBUG_UnitBase.Walk : wholeness = {m_myHumanUnitBase.individual.organParts[5].chemicalWholeness.Wholeness}");
                     }
 
 

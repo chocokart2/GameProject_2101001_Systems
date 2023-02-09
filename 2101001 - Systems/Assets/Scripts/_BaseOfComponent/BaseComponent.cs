@@ -147,8 +147,7 @@ public class BaseComponent : MonoBehaviour
             where ArrayClass : IArray<ElementClass>
             where ElementClass : INameKey
         {
-            Debug.Log($"DEBUG_BaseComponent.Find() : sample.Length = {sample.Length}");
-
+            Hack.Say(Hack.isDebugBaseComponent, $"DEBUG_BaseComponent.Find() : sample.Length = {sample.Length}");
 
             // 일단 모든 존재를 찾지 못했다고 가정합니다.
             int[] result = Enumerable.Repeat(NOT_FOUND, sample.Length).ToArray();

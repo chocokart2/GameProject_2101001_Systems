@@ -74,6 +74,8 @@ public class UnitPartBase : BaseComponent
         ///     unitpart를 강화히기 위해 존재하는 화학물질도 포함합니다. 화학 반응을 먼저 발생시키기 위해 추가된 것도 있습니다.
         /// </remarks>
         public ChemicalHelper.Chemicals others;
+#warning ChemicalWholeness는 wholeness 값이 0으로 나옵니다! 이를 어떻게 해결해야 하죠?
+#warning 일반적인 wholeness가 이것을 가리키도록 만들자!
         /// <summary>
         ///     Tagged chemical에 대한 온전도를 나타냅니다.
         /// </summary>
@@ -171,8 +173,8 @@ public class UnitPartBase : BaseComponent
         /// <param name="angle">
         ///     이 UnitPart가 어디에 공격을 받았는지에 대한 각도 값입니다.
         ///     값 범위 :
-        ///         0.0f ~ 1.0f
-        ///         0.0f : 0도
+        ///         0.0f ~ 1.0f,
+        ///         0.0f : 0도,
         ///         1.0f : 360도
         /// </param>
         public virtual void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
@@ -244,23 +246,23 @@ public class UnitPartBase : BaseComponent
             do
             {
                 // 화학 반응 체크
-                int reactionIndex = changeController.reactions.GetIndex(chemicalsForReaction, energiesForReaction);
+                int reactionIndex = changeController.Reactions.GetIndex(chemicalsForReaction, energiesForReaction);
                 if (reactionIndex == -1) break;
                 // 반응 비율 획득
                 float reactionRatioChemical =
                     NamedQuantityArrayHelper.Divide
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
-                    (chemicalsForReaction, changeController.reactions[reactionIndex].reactants);
+                    (chemicalsForReaction, changeController.Reactions[reactionIndex].reactants);
                 float reactionRatioEnergy =
                     NamedQuantityArrayHelper.Divide
                     <EnergyHelper.Energies, EnergyHelper.Energy>
-                    (energiesForReaction, changeController.reactions[reactionIndex].ActivationEnergy);
+                    (energiesForReaction, changeController.Reactions[reactionIndex].ActivationEnergy);
                 float reactionRatio = MathF.Min(reactionRatioChemical, reactionRatioEnergy);
 
                 // 반응 적용
                 // 캐미컬 빼기
                 // 계산용 값 제거
-                ChemicalHelper.Chemicals reactants = changeController.reactions[reactionIndex].reactants;
+                ChemicalHelper.Chemicals reactants = changeController.Reactions[reactionIndex].reactants;
                 NamedQuantityArrayHelper.Multiply
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
                     (ref reactants, reactionRatio);
@@ -281,7 +283,7 @@ public class UnitPartBase : BaseComponent
 
                 // 캐미컬 더하기
                 // 계산용 값 추가
-                ChemicalHelper.Chemicals products = changeController.reactions[reactionIndex].products;
+                ChemicalHelper.Chemicals products = changeController.Reactions[reactionIndex].products;
                 NamedQuantityArrayHelper.Multiply
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
                     (ref products, reactionRatio);
@@ -295,7 +297,7 @@ public class UnitPartBase : BaseComponent
                     (ref others, products);
 
                 // 에너지 빼기
-                EnergyHelper.Energies activation = changeController.reactions[reactionIndex].ActivationEnergy;
+                EnergyHelper.Energies activation = changeController.Reactions[reactionIndex].ActivationEnergy;
 
                 NamedQuantityArrayHelper.Multiply
                     <EnergyHelper.Energies, EnergyHelper.Energy>
@@ -308,7 +310,7 @@ public class UnitPartBase : BaseComponent
                     (ref attack.energies, activation);
 
                 // 에너지 더하기]
-                EnergyHelper.Energies generatedEnergy = changeController.reactions[reactionIndex].EnergyReaction;
+                EnergyHelper.Energies generatedEnergy = changeController.Reactions[reactionIndex].EnergyReaction;
                 NamedQuantityArrayHelper.Multiply
                     <EnergyHelper.Energies, EnergyHelper.Energy>
                     (ref generatedEnergy, reactionRatio);
@@ -416,9 +418,7 @@ public class UnitPartBase : BaseComponent
             if (isTaggedExist == false) return false;
 
             // 모든 chemicalWholeness를 체크합니다.
-#warning chemicalWholeness 값이 null 입니다!
-#warning DEBUG
-            Debug.Log($"DEBUG_UnitPart.IsPassing(float) chemicalWholeness 값이 Null 여부 {chemicalWholeness == null}");
+            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: $"chemicalWholeness 값이 Null 여부 {chemicalWholeness == null}");
             for(int index = 0; index < chemicalWholeness.Length; ++index)
             {
                 if (chemicalWholeness[index].GetAngleWholeness(angle) <= 0)
@@ -452,7 +452,8 @@ public class UnitPartBase : BaseComponent
             for(int indexEnergy = 0; indexEnergy < energies.Length; ++indexEnergy)
             {
                 // 너무 길어서 끊었어요.
-                ChangeHelper.EnergyResist energyResist = changeController.energyResists[targetChemical.Name][energies[indexEnergy].Name];
+#warning ERROR NullReferenceException. 나는 changeController의 객체도 없고, energyResists의 내용도 만들지 않았습니다.
+                ChangeHelper.EnergyResist energyResist = changeController.EnergyResists[targetChemical.Name][energies[indexEnergy].Name];
 
                 // 임계 피해량보다 센지 체크합니다.
                 if (energyResist.resistanceDefense < energies[indexEnergy].Quantity)
@@ -503,6 +504,9 @@ public class UnitPartBase : BaseComponent
     /// <summary>
     /// 어떤 대상의 내부에 존재하는 캐미컬 다수가 얼마나 온전한지를 나타냅니다.
     /// </summary>
+    /// <remarks>
+    ///     반드시 tagged Chemical과 1대1로 대응하도록 넣어야 합니다!
+    /// </remarks>
     [System.Serializable]
     public class ChemicalsWholeness : IArray<SingleChemicalWholeness>
     {
@@ -514,9 +518,11 @@ public class UnitPartBase : BaseComponent
         {
             get
             {
+                Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this);
                 float result = 0.0f;
                 for(int index = 0; index < m_self.Length; index++)
                 {
+                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message:$"m_self[index].Wholeness = {m_self[index].Wholeness}");
                     result += m_self[index].Wholeness;
                 }
                 if (m_self.Length <= 0) return 0.0f;
@@ -542,6 +548,13 @@ public class UnitPartBase : BaseComponent
                     return false;
             }
             return true;
+        }
+        public void Update()
+        {
+            for(int index = 0; index < m_self.Length; index++)
+            {
+                m_self[index].IntegrateWholeness();
+            }
         }
     }
     /// <summary>
@@ -595,10 +608,11 @@ public class UnitPartBase : BaseComponent
             get => lazyWholeness;
         }
         public int layer; // 에너지 공격을 받을 때, 적용 우선순위입니다. 장갑 등를 위해 존재합니다.
+        public string name;
         /// <summary>
         /// 캐미컬의 이름입니다.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get => name; set => name = value; }
         public Penetration[] damages; // chemical에 입힌 피해입니다.
 
         private float lazyWholeness = 0.0f;
@@ -781,6 +795,7 @@ public class UnitPartBase : BaseComponent
                 // 두 점이 양수가 아니므로 계산하지 않습니다.
             }
 
+            lazyWholeness = result;
             return result;
         }
         /// <summary>

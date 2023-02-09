@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DemoBiologyPart : BiologicalPartBase
 {
-
+    public const string DEFAULT_ORGAN_NAME = "Default_Organ";
 
     /// <summary>
     ///     모든 생물 유닛의 Organ에 들어갈 수 있는 객체를 리턴합니다 </summary>
@@ -66,10 +66,23 @@ public class DemoBiologyPart : BiologicalPartBase
                 quantity = 10.0f
             }
         };
+        organPart.chemicalWholeness = new ChemicalsWholeness()
+        {
+            m_self = new SingleChemicalWholeness[]
+            {
+                new SingleChemicalWholeness()
+                {
+                    damages = new Penetration[0],
+                    layer = 0,
+                    name = DemoChemical.Beta
+                }
+            }
+        };
+        organPart.chemicalWholeness.Update();
         // derivedValue
         organPart.maxHP = 100.0f;
         organPart.HP = 100.0f;
         organPart.RecoveryRate = 0.4f;
-        organPart.Name = "Default_Organ";
+        organPart.Name = DEFAULT_ORGAN_NAME;
     }
 }

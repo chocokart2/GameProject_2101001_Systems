@@ -41,6 +41,20 @@ public class ChangeHelper : BaseComponent
         public EnergyHelper.Energies EnergyReaction { get; private set; }
 
         public ChemicalReaction() { }
+        public ChemicalReaction(
+            float _priority,
+            ChemicalHelper.Chemicals _reactants,
+            ChemicalHelper.Chemicals _products,
+            EnergyHelper.Energies _activationEnergy,
+            EnergyHelper.Energies _energyReaction
+            )
+        {
+            this.priority = _priority;
+            this.reactants = _reactants;
+            this.products = _products;
+            this.ActivationEnergy = _activationEnergy;
+            this.EnergyReaction = _energyReaction;
+        }
     }
 
     [System.Serializable]
@@ -71,7 +85,7 @@ public class ChangeHelper : BaseComponent
         /// <remarks>
         ///     [정렬됨] : priority가 높을수록 낮은 값의 인덱스를 가지고 있습니다.
         /// </remarks>
-        ChemicalReaction[] reactions;
+        public ChemicalReaction[] reactions;
 
 #warning 이진 탐색으로 업그레이드 할 수 있습니다.
 #warning 함수 구현 중입니다.
@@ -117,6 +131,8 @@ public class ChangeHelper : BaseComponent
 
         
     }
+
+    // EnergyResist < ChemicalEnergyResist < ChemicalEnergyResistTable
 
     /// <summary>
     /// 대상이 가지는 단일 에너지에 대한 저항값
@@ -184,7 +200,10 @@ public class ChangeHelper : BaseComponent
             }
         }
 
-        private EnergyResist[] m_self;
+        /// <summary>
+        ///     수정하지 마세요. 프
+        /// </summary>
+        public EnergyResist[] m_self;
 
         public void Add(EnergyResist element)
         {
@@ -224,7 +243,7 @@ public class ChangeHelper : BaseComponent
             }
         }
 
-        private ChemicalEnergyResist[] m_self;
+        public ChemicalEnergyResist[] m_self;
 
         public void Add(ChemicalEnergyResist element)
         {

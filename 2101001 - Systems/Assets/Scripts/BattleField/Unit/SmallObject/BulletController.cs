@@ -79,7 +79,7 @@ public class BulletController : MonoBehaviour
             Debug.Log("Unit Hit.");
 
 
-            if (other.gameObject.GetComponent<UnitBase>().unitBaseData.unitType == "human")
+            if (other.gameObject.GetComponent<UnitBase>().unitBaseData.unitType == BiologicalPartBase.Species.HUMAN)
             {
                 GetComponent<AttackObject>().Attack(other);
                 //GameManager.AttackClass attackClass = GetComponent<AttackObject>().myAttackClass;

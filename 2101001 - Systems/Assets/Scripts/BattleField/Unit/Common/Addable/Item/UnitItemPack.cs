@@ -918,7 +918,7 @@ public class UnitItemPack :
     {
         
         if (Cooldown > 0.0f) return;
-        Debug.Log("아이템 사용됨");
+        Hack.Say(Hack.isDebugUnitItemPack, Hack.check.info, this, message: "아이템 사용됨");
 
         if (inventory == null) return;
 

@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+///     생명체 유닛의 기관계를 정의힙니다.
+/// </summary>
 public class BiologicalPartBase : UnitPartBase
 {
+
+
     /// <summary>
     ///     모든 생명체 유닛의 기관을 정의한 클래스입니다.
     /// </summary>
@@ -208,4 +213,6 @@ public class BiologicalPartBase : UnitPartBase
         public const string DEFAULT = "creature";
         public const string HUMAN = "human";
     }
+
+    
 }

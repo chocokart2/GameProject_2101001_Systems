@@ -224,7 +224,7 @@ public class HumanUnitBase :
         public HumanUnitBaseData() { }
         public HumanUnitBaseData(BioUnit _inputBioUnit) // baseOrganSystems -> organList
         {
-            bioUnit.species = "human";
+            bioUnit.species = Species.HUMAN;
             bioUnit.organParts.CopyTo(_inputBioUnit.organParts, 0);
         }
     }
@@ -568,6 +568,12 @@ public class HumanUnitBase :
                 new Sphere() { position = new Vector3(0.0f, 0.0f, 1.0f), radius = 0.4f },
                 new Sphere() { position = new Vector3(0.0f, -0.4f, 1.0f), radius = 0.4f }
                 );
+        }
+
+        public override void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
+        {
+            base.BeingAttacked(ref attack, angle);
+            Hack.Say(Hack.isDebugHumanUnitBase_Nerv, Hack.check.info, this, message: $" 신경계 Wholeness : {chemicalWholeness.Wholeness}");
         }
     }
     /// <summary> 운동계 OrganPart입니다. </summary>
