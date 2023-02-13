@@ -266,7 +266,13 @@ public class GameObjectList : MonoBehaviour
 #warning 함수 구현 작업중
     public static void UnitSightScale(GameObject unit, float radius)
     {
-        unit.transform.Find("UnitSight(Clone)").localScale = new Vector3(radius * 2, 2, radius * 2);
+        Transform targetTransform = unit.transform.Find("UnitSight(Clone)");
+        if(targetTransform == null)
+        {
+            Hack.Error("GameObjectList", "targetTransform이 Null 값입니다.");
+            return;
+        }
+        targetTransform.localScale = new Vector3(radius * 2, 2, radius * 2);
 #warning 여기에 UnitSightRadius = radius; 관련 작업이 있어야 합니다.
     }
     /// <summary>

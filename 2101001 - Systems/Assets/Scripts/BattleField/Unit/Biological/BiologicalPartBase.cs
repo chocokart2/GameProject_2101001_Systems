@@ -22,8 +22,10 @@ public class BiologicalPartBase : UnitPartBase
     ///     </para>
     /// </remarks>
     [System.Serializable]
-    public class OrganPart : UnitPart
+    public class OrganPart : UnitPart, BaseComponent.INameKey
     {
+        public GameObject unit;
+
         public override float wholeness
         {
             get => hp / maxHP;
@@ -38,15 +40,20 @@ public class BiologicalPartBase : UnitPartBase
             set => hp = Mathf.Clamp(value, 0, maxHP);
         }
 
+        public float maxHP;
+        public float RecoveryRate;
+
         /// <summary>
         /// 이 기관의 이름입니다.
         /// </summary>
-        public string Name;
-
-        public float maxHP;
-        public float RecoveryRate;
-        
-
+        public virtual string Name
+        {
+            get => "Unknown_Organ";
+            set
+            {
+                Debug.LogError("이 대상은 이름을 바꿀 수 없습니다.");
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -54,14 +61,12 @@ public class BiologicalPartBase : UnitPartBase
 
         public OrganPart() : base()
         {
-            Name = "No Name";
             maxHP = 100;
             HP = 100;
             RecoveryRate = 0.1f;
         }
         public OrganPart(OrganPart data) : base(data)
         {
-            Name = data.Name;
             maxHP = data.maxHP;
             HP = data.HP;
             RecoveryRate = data.RecoveryRate;
@@ -89,6 +94,26 @@ public class BiologicalPartBase : UnitPartBase
         /// 이 유닛의 기관계 목록입니다.
         /// </summary>
         public OrganPart[] organParts;
+
+        /// <summary>
+        ///     이름을 통해 기관계에 접근합니다.
+        /// </summary>
+        /// <param name="OrganName"></param>
+        /// <returns></returns>
+        public (OrganPart organPart, bool isAccessed) this[string OrganName]
+        {
+            get
+            {
+                for(int index = 0; index < organParts.Length; index++)
+                {
+                    if(OrganName == organParts[index].Name)
+                    {
+                        return (organParts[index], true);
+                    }
+                }
+                return (null, false);
+            }
+        }
 
         public BioUnit()
         {

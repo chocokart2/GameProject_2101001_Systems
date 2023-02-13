@@ -30,6 +30,8 @@ using UnityEngine;
 /// <summary>
 /// 생물의 기관계중 인간의 기관계를 정의하고 상태를 저장합니다.
 /// </summary>
+/// <remarks>
+///     데이터 쿨래스: BioUnit</remarks>
 public class HumanUnitBase :
     BiologicalPartBase, 
     BaseComponent.IDataGetableComponent<BiologicalPartBase.BioUnit>,
@@ -265,10 +267,10 @@ public class HumanUnitBase :
     /// <summary> 소화계 OrganPart입니다. </summary>
     public class DigestiveSystem : OrganPart
     {
+        public override string Name { get => "DigestiveSystem"; set => base.Name = value; }
+
         public DigestiveSystem() : base()
         {
-            Name = "DigestiveSystem";
-
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(-0.2f, 0.4f, -1.0f), radius = 0.3f },
                 new Sphere() { position = new Vector3(0.2f, 0.4f, -1.0f), radius = 0.3f }
@@ -276,8 +278,6 @@ public class HumanUnitBase :
         }
         public DigestiveSystem(OrganPart data) : base(data)
         {
-            Name = "DigestiveSystem";
-
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(-0.2f, 0.4f, -1.0f), radius = 0.3f },
                 new Sphere() { position = new Vector3(0.2f, 0.4f, -1.0f), radius = 0.3f }
@@ -287,10 +287,10 @@ public class HumanUnitBase :
     /// <summary> 순환계 OrganPart입니다. </summary>
     public class CirculatorySystem : OrganPart
     {
+        public override string Name { get => "CirculatorySystem"; set => base.Name = value; }
+
         public CirculatorySystem() : base()
         {
-            Name = "CirculatorySystem";
-
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
         }
@@ -302,8 +302,6 @@ public class HumanUnitBase :
         }
         public CirculatorySystem(OrganPart data) : base(data)
         {
-            Name = "CirculatorySystem";
-
             // 모세혈관이 곳곳에 퍼져 있기 때문에 어디를 맞아도 데미지를 받습니다.
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
@@ -449,10 +447,10 @@ public class HumanUnitBase :
     /// <summary> 배출계 OrganPart입니다. </summary>
     public class ExcretorySystem : OrganPart
     {
+        public override string Name { get => "excretorySystem"; set => base.Name = value; }
 
         public ExcretorySystem()
         {
-            Name = "excretorySystem";
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(-0.2f, -0.2f, -1.0f), radius = 0.3f },
                 new Sphere() { position = new Vector3(0.2f, -0.2f, -1.0f), radius = 0.3f }
@@ -479,6 +477,8 @@ public class HumanUnitBase :
         public float UnitSightRange;
         //false면 감각을 받아들일 수 없게 됩니다.
         //
+
+        public override string Name { get => "SensorySystem"; set => base.Name = value; }
 
         public SensorySystem() : base()
         {

@@ -36,9 +36,8 @@ public class AttackTurret : MonoBehaviour
         //fakeItemData.inventory[0].isRealItem = false;
         //UnitItemPack.UnitItemPackData fakeItemPackData = new UnitItemPack.UnitItemPackData();
         //fakeItemPackData = UnitItemPack.NewUnitItemPackData(new UnitItemPack.ItemData[] { UnitItemPack.NewItemData("Pistol") });
-        UnitItemPack.UnitItemPackData fakeItemPackData = UnitItemPack.NewUnitItemPackData(new UnitItemPack.ItemData[] { UnitItemPack.NewItemData("Turret") });
 
-        myUnitItemPack.InventorySet(fakeItemPackData);
+        myUnitItemPack.inventory = DemoItem.GetDemoInventoryCustom(DemoItem.Name.TURRET);
         time = 0.0f;
         angle = 0.0f;
         #endregion
@@ -74,14 +73,9 @@ public class AttackTurret : MonoBehaviour
     }
     public void ShotBullet()
     {
-        //UnitDirection의 방향대로 공격 아이템 발사
-        if(myUnitItemPack != null)
-        {
-            if(myUnitItemPack.inventory != null)
-            {
-                myUnitItemPack.ItemUse(myUnitBase.unitBaseData.direction);
-            }
-        }
+        if (myUnitItemPack == null) Hack.Say(Hack.isDebugAttackTurret, Hack.check.error, this, message: "myUnitItemPack는 null 값입니다.");
+
+        myUnitItemPack?.inventory?.Use(gameObject, myUnitBase.unitBaseData.direction);
     }
     #endregion
 

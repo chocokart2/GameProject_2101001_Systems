@@ -69,6 +69,7 @@ public class UnitBase :
     public Vector3 Direction { get => m_direction; }
 
     // private field
+    private bool m_isReadyToInteract = false; // 초기화가 완료되었는지 여부를 가집니다. 초기값은 false이며 완료되면 true로 바뀝니다.
     /// <summary>
     ///     유닛이 바라보는 방향입니다.
     /// </summary>
@@ -82,6 +83,12 @@ public class UnitBase :
     private UnitAppearance m_myUnitAppearance;
     private BiologicalPartBase m_myBiologicalPartBase;
     private HumanUnitBase m_myHumanUnitBase;
+    // 프라이빗 대리자
+    private (DelegateLightEnter, int) m_DelegateLightEnter = (delegate (int a) {
+        // Nothing~ But Do not let it die!
+    }, 0);
+    private List<int> m_LazyArguments_SightEnter = new List<int>();
+    private List<int> m_LazyArguments_LightEnter = new List<int>();
     #region moving member
     #region 애니메이터로 옮겨야 할 부분 (먼 훗날에 할 것)
     public Material MaterialNull; // 기본형
@@ -114,13 +121,16 @@ public class UnitBase :
         EventSetup();
 
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        Hack.TrapNull(gameManager, Hack.isDebugUnitBase);
+
         unitBaseData = new UnitBaseData();
         ForceSetup();
 
 
         //GameManager의 팀 값을 가져옵니다.
 
-
+        m_isReadyToInteract = true;
+        LazyFunctions();
     }
     // Update is called once per frame
     void Update()
@@ -173,105 +183,119 @@ public class UnitBase :
     //public void beingAttacked(Vector3 attackerPosition, Vector3 attackerDirection, GameManager.AttackClass attackClass)
     public void BeingAttacked(Vector3 attackerPosition, Vector3 attackerDirection, AttackClassHelper.AttackInfo attackClass)
     {
-        Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this);
-
-        
-
-        // 하위 컴포넌트가 해야 할 일.
-        // 한 Unit으로 Attack이 들어옴
-        // 
-
-
-
-        // 공격을 적용하는 함수입니다.
-        // 사람인 경우 -> 공격부위에 가장 가까운 기관계에 작용.
-        // 공격을 받은 후, 휴먼 유닛이라면 자신이 죽었는지 체크합니다
-        // 자신이 사망했는지 여부를 판단해주는 함수를 만듭니다.
-        // 유닛이 사망했으면 UIController에서 SelectedUnit이 사망했던건지 체크하게 되고, 만약 그렇게 되면 모든 UI를 제거하고, isGuiOpenedAtField와 openedGuiName을 기본값으로 바꿉니다.
-        
-
-
-        switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
+        if (m_isReadyToInteract)
         {
+            Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this);
+
+
+
+            // 하위 컴포넌트가 해야 할 일.
+            // 한 Unit으로 Attack이 들어옴
+            // 
+
+
+
+            // 공격을 적용하는 함수입니다.
+            // 사람인 경우 -> 공격부위에 가장 가까운 기관계에 작용.
+            // 공격을 받은 후, 휴먼 유닛이라면 자신이 죽었는지 체크합니다
+            // 자신이 사망했는지 여부를 판단해주는 함수를 만듭니다.
+            // 유닛이 사망했으면 UIController에서 SelectedUnit이 사망했던건지 체크하게 되고, 만약 그렇게 되면 모든 UI를 제거하고, isGuiOpenedAtField와 openedGuiName을 기본값으로 바꿉니다.
+
+
+
+            switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
+            {
 #warning 머신 유닛도 this.unitBaseData.unitType이 human으로 입력된 것으로 추론됩니다. 버그 같습니다.
-            case BiologicalPartBase.Species.HUMAN: // 인간인 경우
-                //Debug.Log("human 반응 잡힘");
-                Debug.Log("DEBUG_UnitBase.BeingAttacked: 공격을 받은 유닛의 이름 - " + gameObject.name + ", 유닛의 인스턴스 아이디 - " + GetInstanceID());
+                case BiologicalPartBase.Species.HUMAN: // 인간인 경우
+                    Hack.Say(Hack.isDebugUnitBase, Hack.check.info, this, message: $"공격을 받은 유닛의 이름 - {gameObject.name}, 유닛의 인스턴스 아이디 - {GetInstanceID()}");
 #warning 새로운 버전
-                // HumanUnitBase 값이 있을 것입니다.
-                m_myHumanUnitBase.individual.DamagePart(attackerPosition, attackerDirection, attackClass);
+                    // HumanUnitBase 값이 있을 것입니다.
+#warning 널 레퍼런스 : m_myHumanUnitBase,individual, attackerPosition, attackerDirection, attackClass 중 하나 이상이 Null값입니다.
+#warning m_myHumanUnitBase 이녀석 Null. => 누가 이 녀석을 소환했지?
+
+                    if (Hack.TrapNull(m_myHumanUnitBase, true) == false)
+                    {
+                        Hack.TrapNull(m_myHumanUnitBase.individual, true);
+                    }
+
+                    Hack.TrapNull(attackerPosition, true);
+                    Hack.TrapNull(attackerDirection, true);
+                    Hack.TrapNull(attackClass, true);
+
+                    m_myHumanUnitBase.individual.DamagePart(attackerPosition, attackerDirection, attackClass);
 
 
 
 #warning 올드 버전
-//                // 방향 잡기(attackerpos, 일반화)
-//                // 어디를 맞았는지 일일히 체크합니다
-//                // 걸렸다면 그곳에 화학물질을 부여합니다.
+                    //                // 방향 잡기(attackerpos, 일반화)
+                    //                // 어디를 맞았는지 일일히 체크합니다
+                    //                // 걸렸다면 그곳에 화학물질을 부여합니다.
 
-//                // 1. 방향잡기
-//                Vector3 AttackDirection = new Vector3(0, 0, 0);
-//                AttackDirection = attackerPosition - transform.position;
-//                AttackDirection.Normalize(); // 공격 지점과 자신의 거리가 1인 벡터로 만듭니다.
+                    //                // 1. 방향잡기
+                    //                Vector3 AttackDirection = new Vector3(0, 0, 0);
+                    //                AttackDirection = attackerPosition - transform.position;
+                    //                AttackDirection.Normalize(); // 공격 지점과 자신의 거리가 1인 벡터로 만듭니다.
 
-//                // 2. 어디에 맞았는지 체크
-//                List<int> reachedOrganIndex = new List<int>(); // 닿은 OrganSystems의 Index를 기록합니다. (사실 순서는 상관없는 값입니다.)
-//                for(int organIndex = 0; organIndex < m_myHumanUnitBase.individual.organParts.Length; organIndex++) // 각 기관계마다 체크합니다.
-//                {
-//                    // 정상적인 루트
-//                    for (int posIndex = 0; posIndex < m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere.Length; posIndex++) // 이 기관계의 위치값마다 체크합니다.
-//                    {
-//                        Vector3 DeltaVector = m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].position - AttackDirection;
-//                        if(DeltaVector.sqrMagnitude < Mathf.Pow(m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].radius, 2)) // 위치로 인해 기관계가 닿는 경우
-//                        {
-//                            reachedOrganIndex.Add(organIndex); // 피해를 입은 기관계 목록에 등록
-//                            Debug.Log("DEBUG_UnitBase.beingAttacked: 한 기관계에 닿았습니다!"); // 디버그로 알림은 덤.
-//                            continue; // 중복되지 않도록 다음 기관계로 넘어갑니다.
-//                        }
-//                    }
-//                }
+                    //                // 2. 어디에 맞았는지 체크
+                    //                List<int> reachedOrganIndex = new List<int>(); // 닿은 OrganSystems의 Index를 기록합니다. (사실 순서는 상관없는 값입니다.)
+                    //                for(int organIndex = 0; organIndex < m_myHumanUnitBase.individual.organParts.Length; organIndex++) // 각 기관계마다 체크합니다.
+                    //                {
+                    //                    // 정상적인 루트
+                    //                    for (int posIndex = 0; posIndex < m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere.Length; posIndex++) // 이 기관계의 위치값마다 체크합니다.
+                    //                    {
+                    //                        Vector3 DeltaVector = m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].position - AttackDirection;
+                    //                        if(DeltaVector.sqrMagnitude < Mathf.Pow(m_myHumanUnitBase.individual.organParts[organIndex].collisionRangeSphere[posIndex].radius, 2)) // 위치로 인해 기관계가 닿는 경우
+                    //                        {
+                    //                            reachedOrganIndex.Add(organIndex); // 피해를 입은 기관계 목록에 등록
+                    //                            Debug.Log("DEBUG_UnitBase.beingAttacked: 한 기관계에 닿았습니다!"); // 디버그로 알림은 덤.
+                    //                            continue; // 중복되지 않도록 다음 기관계로 넘어갑니다.
+                    //                        }
+                    //                    }
+                    //                }
 
-//                // 3. 화학물질 적용
-//                for(int organIndex = 0; organIndex < reachedOrganIndex.Count; organIndex++)
-//                {
-//                    // 0. 재료 준비
-//                    int tempValue = reachedOrganIndex[organIndex]; // 기관계 인덱스 번호
-//                    List<GameManager.chemical> tempChemicals = new List<GameManager.chemical>(); // 집어넣을 캐미컬
-//                    tempChemicals = gameManager.chemicalsMultiply(ref attackClass.chemicals, (1 / reachedOrganIndex.Count));
+                    //                // 3. 화학물질 적용
+                    //                for(int organIndex = 0; organIndex < reachedOrganIndex.Count; organIndex++)
+                    //                {
+                    //                    // 0. 재료 준비
+                    //                    int tempValue = reachedOrganIndex[organIndex]; // 기관계 인덱스 번호
+                    //                    List<GameManager.chemical> tempChemicals = new List<GameManager.chemical>(); // 집어넣을 캐미컬
+                    //                    tempChemicals = gameManager.chemicalsMultiply(ref attackClass.chemicals, (1 / reachedOrganIndex.Count));
 
-//                    // 1. 물질을 넣고 화학반응을 체크합니다.
-//                    //m_myHumanUnitBase.OrganSystems[tempValue].chemicals = gameManager.MixChemical(m_myHumanUnitBase.OrganSystems[tempValue].chemicals, tempChemicals);
-//#warning 아래 코드를 대체할 것을 입력하세요.
-//                    //m_myHumanUnitBase.OrganSystems[tempValue].ChemicalReactionCheck(tempChemicals.ToArray());
-
-
-
-//                    // 2. 물리 데미지를 체크합니다.
-//#warning 아래 줄은 고치려고 했던 줄입니다.
-//#warning 이 코드 고치기 <- 각 UnitPart마다 충돌할때 생기는 데미지 처리 함수를 만들기
-//                    //m_myHumanUnitBase.OrganSystems[tempValue].PhysicalEnergyAttack(attackClass.mass * attackClass.speed, attackClass.volume);
-//                    //m_myHumanUnitBase.individual.organParts[tempValue].(attackClass.mass * attackClass.speed, attackClass.volume);
+                    //                    // 1. 물질을 넣고 화학반응을 체크합니다.
+                    //                    //m_myHumanUnitBase.OrganSystems[tempValue].chemicals = gameManager.MixChemical(m_myHumanUnitBase.OrganSystems[tempValue].chemicals, tempChemicals);
+                    //#warning 아래 코드를 대체할 것을 입력하세요.
+                    //                    //m_myHumanUnitBase.OrganSystems[tempValue].ChemicalReactionCheck(tempChemicals.ToArray());
 
 
-//                    // Debug. 데미지 상태 출력
-//                    Debug.Log(" DEBUG_UnitBase.beingAttacked: " + HumanUnitBase.HumanOrganNameList[tempValue + 1] + "의 작동비율 : " + m_myHumanUnitBase.individual.organParts[tempValue].HP);
-//                }
 
-//                Debug.Log("맞췄습니다!");
-                
-
-
-                break;
-            case "machine":
-                Debug.Log("준비 중");
+                    //                    // 2. 물리 데미지를 체크합니다.
+                    //#warning 아래 줄은 고치려고 했던 줄입니다.
+                    //#warning 이 코드 고치기 <- 각 UnitPart마다 충돌할때 생기는 데미지 처리 함수를 만들기
+                    //                    //m_myHumanUnitBase.OrganSystems[tempValue].PhysicalEnergyAttack(attackClass.mass * attackClass.speed, attackClass.volume);
+                    //                    //m_myHumanUnitBase.individual.organParts[tempValue].(attackClass.mass * attackClass.speed, attackClass.volume);
 
 
-                
+                    //                    // Debug. 데미지 상태 출력
+                    //                    Debug.Log(" DEBUG_UnitBase.beingAttacked: " + HumanUnitBase.HumanOrganNameList[tempValue + 1] + "의 작동비율 : " + m_myHumanUnitBase.individual.organParts[tempValue].HP);
+                    //                }
+
+                    //                Debug.Log("맞췄습니다!");
 
 
-                break;
-            default:
-                throw new NotImplementedException($"알 수 없는 UnitType입니다. 입력된 유닛 타입은 \"{unitBaseData.unitType}\" 입니다.");
-                //break;
+
+                    break;
+                case "machine":
+                    Debug.Log("준비 중");
+
+
+
+
+
+                    break;
+                default:
+                    throw new NotImplementedException($"알 수 없는 UnitType입니다. 입력된 유닛 타입은 \"{unitBaseData.unitType}\" 입니다.");
+                    //break;
+            }
         }
     }
     /// <summary>
@@ -290,6 +314,7 @@ public class UnitBase :
     }
     #endregion
     #region private function
+#warning 이 함수 호출되기전에 공격 함수가 호출된걸까?
     void ComponentSetup()
     {
         m_myMeshRenderer = transform.Find("Quad").GetComponent<MeshRenderer>();
@@ -308,6 +333,17 @@ public class UnitBase :
         if(gameObject.name == "Player")
         {
             unitBaseData.teamName = "Player";
+        }
+    }
+    void LazyFunctions()
+    {
+        foreach(int one in m_LazyArguments_SightEnter)
+        {
+            SightEnter(one);
+        }
+        foreach(int one in m_LazyArguments_LightEnter)
+        {
+            LightEnter(one);
         }
     }
     #endregion
@@ -608,7 +644,11 @@ public class UnitBase :
         // 결과 : 이 유닛을 발견한 팀 X의 멤버수()가 증가합니다.
 
         #endregion
-
+        if(m_isReadyToInteract == false)
+        {
+            m_LazyArguments_SightEnter.Add(teamID);
+            return;
+        }
         if (sightCount == null)
         {
             sightCount = new Dictionary<int, int>();
@@ -636,10 +676,16 @@ public class UnitBase :
     }
     public void LightEnter(int lightNumber)
     {
+        if (m_isReadyToInteract == false)
+        {
+            m_LazyArguments_LightEnter.Add(lightNumber);
+            return;
+        }
         if (sightCount == null)
         {
+            Hack.TrapNull(gameManager, Hack.isDebugUnitBase);
             sightCount = new Dictionary<int, int>();
-            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1);
+            sightCount.Add(gameManager.currentFieldData.GetPlayerTeamID(), 1); // 자신 스스로가 시야의 내부에 있습니다.
         }
         if(lightCount == null)
         {
@@ -663,5 +709,18 @@ public class UnitBase :
 
     #endregion
 
+    #region NestedClass
 
+    #region Delegate
+    private delegate void DelegateLightEnter(int lightNumber);
+
+
+
+
+    #endregion
+
+
+
+
+    #endregion
 }

@@ -8,6 +8,10 @@ using UnityEngine;
 public class DemoHumanPart : HumanUnitBase
 {
     // 개체 인스턴스
+    public static BioUnit GetDemoHuman()
+    {
+        return GetDemoHuman(null);
+    }
     public static BioUnit GetDemoHuman(GameObject unit)
     {
         BioUnit result = new BioUnit();
@@ -17,14 +21,27 @@ public class DemoHumanPart : HumanUnitBase
             GetDemoDigestiveSystem(),
             GetDemoCirculatorySystem(),
             GetDemoExcretorySystem(),
-            GetDemoSensorySystem(unit),
+            GetDemoSensorySystem(),
             GetDemoNervousSystem(),
             GetDemoMotorSystem(),
             GetDemoImmuneSystem(),
             GetDemoSynthesisSystem(),
             GetDemoIntegumentarySystem()
         };
+        foreach(OrganPart one in result.organParts)
+        {
+            one.unit = unit;
+        }
         return result;
+    }
+    // 대상 BioUnit의 OrganPart들에 각각 인스턴스한 게임오브젝트를 넣습니다.
+    public static BioUnit AssignGameObject(BioUnit bioUnit, GameObject unit)
+    {
+        foreach (OrganPart one in bioUnit.organParts)
+        {
+            one.unit = unit;
+        }
+        return bioUnit;
     }
 
     // 기관계 인스턴스    
@@ -37,16 +54,34 @@ public class DemoHumanPart : HumanUnitBase
         DigestiveSystem result = DemoBiologyPart.GetDemoOrganPart<DigestiveSystem>();
         return result;
     }
+    public static DigestiveSystem GetDemoDigestiveSystem(GameObject unit)
+    {
+        DigestiveSystem result = DemoBiologyPart.GetDemoOrganPart<DigestiveSystem>();
+        result.unit = unit;
+        return result;
+    }
 
     public static CirculatorySystem GetDemoCirculatorySystem()
     {
         CirculatorySystem result = DemoBiologyPart.GetDemoOrganPart<CirculatorySystem>();
         return result;
     }
+    public static CirculatorySystem GetDemoCirculatorySystem(GameObject unit)
+    {
+        CirculatorySystem result = DemoBiologyPart.GetDemoOrganPart<CirculatorySystem>();
+        result.unit = unit;
+        return result;
+    }
 
     public static ExcretorySystem GetDemoExcretorySystem()
     {
         ExcretorySystem result = DemoBiologyPart.GetDemoOrganPart<ExcretorySystem>();
+        return result;
+    }
+    public static ExcretorySystem GetDemoExcretorySystem(GameObject unit)
+    {
+        ExcretorySystem result = DemoBiologyPart.GetDemoOrganPart<ExcretorySystem>();
+        result.unit = unit;
         return result;
     }
 
@@ -69,10 +104,22 @@ public class DemoHumanPart : HumanUnitBase
         NervousSystem result = DemoBiologyPart.GetDemoOrganPart<NervousSystem>();
         return result;
     }
+    public static NervousSystem GetDemoNervousSystem(GameObject unit)
+    {
+        NervousSystem result = DemoBiologyPart.GetDemoOrganPart<NervousSystem>();
+        result.unit = unit;
+        return result;
+    }
 
     public static MotorSystem GetDemoMotorSystem()
     {
         MotorSystem result = DemoBiologyPart.GetDemoOrganPart<MotorSystem>();
+        return result;
+    }
+    public static MotorSystem GetDemoMotorSystem(GameObject unit)
+    {
+        MotorSystem result = DemoBiologyPart.GetDemoOrganPart<MotorSystem>();
+        result.unit = unit;
         return result;
     }
 
@@ -81,16 +128,34 @@ public class DemoHumanPart : HumanUnitBase
         ImmuneSystem result = DemoBiologyPart.GetDemoOrganPart<ImmuneSystem>();
         return result;
     }
+    public static ImmuneSystem GetDemoImmuneSystem(GameObject unit)
+    {
+        ImmuneSystem result = DemoBiologyPart.GetDemoOrganPart<ImmuneSystem>();
+        result.unit = unit;
+        return result;
+    }
 
     public static SynthesisSystem GetDemoSynthesisSystem()
     {
         SynthesisSystem result = DemoBiologyPart.GetDemoOrganPart<SynthesisSystem>();
         return result;
     }
+    public static SynthesisSystem GetDemoSynthesisSystem(GameObject unit)
+    {
+        SynthesisSystem result = DemoBiologyPart.GetDemoOrganPart<SynthesisSystem>();
+        result.unit = unit;
+        return result;
+    }
 
     public static IntegumentarySystem GetDemoIntegumentarySystem()
     {
         IntegumentarySystem result = DemoBiologyPart.GetDemoOrganPart<IntegumentarySystem>();
+        return result;
+    }
+    public static IntegumentarySystem GetDemoIntegumentarySystem(GameObject unit)
+    {
+        IntegumentarySystem result = DemoBiologyPart.GetDemoOrganPart<IntegumentarySystem>();
+        result.unit = unit;
         return result;
     }
 }

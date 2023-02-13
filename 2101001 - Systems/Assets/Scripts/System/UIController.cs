@@ -23,6 +23,7 @@ public class UIController : MonoBehaviour
     public bool isGuiOpenedAtField; // GUI가 켜져 있는 동안에는 다른 작동이 허용되지 않습니다.
 
     #region 키 바인딩
+    KeyCode Select = KeyCode.Space;
 
     // 플레이어 움직임
     KeyCode MoveNorth = KeyCode.W;
@@ -242,7 +243,7 @@ public class UIController : MonoBehaviour
     #region 유닛 선택 관련
     void SelectUnit()
     {
-        if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0) && Input.GetKey(Select))
         {
             Debug.Log("DEBUG_UIController.SelectUnit: Input Get");
 
@@ -255,7 +256,7 @@ public class UIController : MonoBehaviour
                 {
                     Debug.Log("DEBUG_UIController.SelectUnit: Unit Hit");
 
-                    if (hit.collider.gameObject.GetComponent<UnitBase>().unitBaseData.unitType == "human")
+                    if (hit.collider.gameObject.GetComponent<UnitBase>().unitBaseData.unitType == BiologicalPartBase.Species.HUMAN)
                     {
                         Debug.Log($"DEBUG_UIController.SelectUnit: humanUnit Hit : {GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName}, {hit.collider.gameObject.GetComponent<UnitRole>().roleForEditMode.teamName}, " +
                             $"{GameObject.Find("GameManager").GetComponent<GameManager>().currentFieldData.playerTeamName.Equals(hit.collider.gameObject.GetComponent<UnitRole>().roleForEditMode.teamName)}");
@@ -312,13 +313,13 @@ public class UIController : MonoBehaviour
     {
         if (selectedUnit != null)
         {
-            if (Input.GetKey(KeyCode.W) ||
+            if (Input.GetKey(MoveNorth) ||
                 Input.GetKey(KeyCode.A) ||
-                Input.GetKey(KeyCode.S) ||
+                Input.GetKey(MoveSouth) ||
                 Input.GetKey(KeyCode.D))
             {
                 Vector3 WalkDirection = new Vector3(0, 0, 0);
-                if (Input.GetKey(KeyCode.W))
+                if (Input.GetKey(MoveNorth))
                 {
                     WalkDirection += new Vector3(0, 0, 1);
                 }
@@ -326,7 +327,7 @@ public class UIController : MonoBehaviour
                 {
                     WalkDirection += new Vector3(-1, 0, 0);
                 }
-                if (Input.GetKey(KeyCode.S))
+                if (Input.GetKey(MoveSouth))
                 {
                     WalkDirection += new Vector3(0, 0, -1);
                 }
@@ -471,7 +472,7 @@ public class UIController : MonoBehaviour
         bool isMouseClickedUnit = false; // false면 공격방향은 y축과 평행하게, 그렇지 않으면 클릭해 부딛힌 방향대로 날아갑니다.
         Vector3 AttackDirection; // 카메라 위치에서 클릭한 지점까지를 날로 표현한 벡터입니다.
         if (selectedUnit == null) return;
-        if (Input.GetKey(KeyCode.Space)) return; // Space는 유닛 선택용 키입니다.
+        if (Input.GetKey(Select)) return; // Space는 유닛 선택용 키입니다.
 
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
         {
@@ -515,7 +516,7 @@ public class UIController : MonoBehaviour
                 //Debug.Log("2" + selectedUnit.transform.position);
             }
             Debug.DrawRay(selectedUnit.transform.position, AttackDirection, Color.cyan, 1.0f);
-            if (Input.GetMouseButtonDown(0) && (!Input.GetKey(KeyCode.LeftShift)) && (!Input.GetKey(KeyCode.Space)))
+            if (Input.GetMouseButtonDown(0) && (!Input.GetKey(KeyCode.LeftShift)) && (!Input.GetKey(Select)))
             {
                 Debug.DrawRay(FieldCameraGo.transform.position, (RayToMousePointHit.point - FieldCameraGo.transform.position), Color.red, 1.0f);
 
@@ -524,17 +525,17 @@ public class UIController : MonoBehaviour
                 Debug.Log("ItemUse");
 
             }
-            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.E)) && (!Input.GetKey(KeyCode.Space)))
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.E)) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSkillE(AttackDirection);
                 Debug.Log("ItemSkill");
             }
-            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.F)) && (!Input.GetKey(KeyCode.Space)))
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.F)) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSkillF(AttackDirection);
                 Debug.Log("ItemSkill");
             }
-            else if (Input.GetKeyDown(KeyCode.R) && (!Input.GetKey(KeyCode.Space)))
+            else if (Input.GetKeyDown(KeyCode.R) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSupply(AttackDirection);
                 Debug.Log("ItemSupply");
@@ -725,9 +726,9 @@ public class UIController : MonoBehaviour
     {
         if (selectedUnit == null) return;
 
-        if (Input.GetKey(KeyCode.Space) && Input.GetMouseButtonDown(0))
+        if (Input.GetKey(Select) && Input.GetMouseButtonDown(0))
             ishasBeenClicked = true;
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(Select))
         {
             if (ishasBeenClicked == false)
             {

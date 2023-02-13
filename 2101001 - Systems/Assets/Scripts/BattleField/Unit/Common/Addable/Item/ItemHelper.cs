@@ -87,7 +87,7 @@ public class ItemHelper : BaseComponent
         public int amount;
         public AttackClassHelper.AttackInfo attackInfo; // 이 아이템이 공격에 해당하는경우입니다.
 
-        public string Name { get; set; }
+        public string Name { get => name; set => name = value; }
     }
     /// <summary>
     ///     아이템 내부의 아이템들을 정의합니다.
@@ -129,6 +129,12 @@ public class ItemHelper : BaseComponent
         {
             get
             {
+                if(nameIndexPairs == null)
+                {
+                    nameIndexPairs = new Dictionary<string, int>();
+                    UpdateIndex();
+                }
+
                 if (self[nameIndexPairs[name]].name != name)
                 {
                     UpdateIndex();
@@ -164,6 +170,9 @@ public class ItemHelper : BaseComponent
 
             for(int index = 0; index < self.Length; index++)
             {
+                Hack.Say(Hack.isDebugItemHelper, Hack.check.info, this, message: $"self Null 여부 = {self == null}");
+                Hack.Say(Hack.isDebugItemHelper, Hack.check.info, this, message: $"self[index] Null 여부 = {self[index] == null}");
+                Hack.Say(Hack.isDebugItemHelper, Hack.check.info, this, message: $"self[index].name Null 여부 = {self[index].name == null}");
                 if (nameIndexPairs.ContainsKey(self[index].name)) continue;
                 nameIndexPairs.Add(self[index].name, index);
             }
@@ -218,6 +227,35 @@ public class ItemHelper : BaseComponent
     [System.Serializable]
     public class Blank : Item
     {
+        public override float ESkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float FSkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Supply(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Update(GameObject user, float deltaTime)
+        {
+            return 0.0f;
+        }
+        public override float Use(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+    }
+    /// <summary>
+    /// 여러가지 이유로 아이템을 사용할 수 없을때입니다.
+    /// </summary>
+    [System.Serializable]
+    public class Missing : Item
+    {
+        public override string ItemType { get => "MISSING_ITEM"; }
+
         public override float ESkill(GameObject user, Vector3 vector3)
         {
             return 0.0f;
@@ -405,6 +443,11 @@ public class ItemHelper : BaseComponent
         }
         public override float Use(GameObject user, Vector3 vector3)
         {
+            if(subItems == null)
+            {
+                Hack.Say(Hack.isDebugItemHelper, Hack.check.error, this, message: "subItems이 Null입니다.");
+                return 0;
+            }
             Debug.Log("Turret 아이템이 사용됨");
             if (subItems["ammo"].isAccessed == false)
             {

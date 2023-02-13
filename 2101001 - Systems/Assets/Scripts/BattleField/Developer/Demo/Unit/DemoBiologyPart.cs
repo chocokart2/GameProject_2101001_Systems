@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DemoBiologyPart : BiologicalPartBase
 {
-    public const string DEFAULT_ORGAN_NAME = "Default_Organ";
+    //public const string DEFAULT_ORGAN_NAME = "Default_Organ";
 
     /// <summary>
     ///     모든 생물 유닛의 Organ에 들어갈 수 있는 객체를 리턴합니다 </summary>
@@ -83,6 +83,6 @@ public class DemoBiologyPart : BiologicalPartBase
         organPart.maxHP = 100.0f;
         organPart.HP = 100.0f;
         organPart.RecoveryRate = 0.4f;
-        organPart.Name = DEFAULT_ORGAN_NAME;
+        //organPart.Name = DEFAULT_ORGAN_NAME;
     }
 }

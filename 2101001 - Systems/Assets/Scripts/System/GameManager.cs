@@ -20,26 +20,25 @@ using UnityEngine;
 #warning 제발 GameManager 리펙토링하자..
 
 /// <summary>
-/// 
+///     게임의 전반적인 통제자
 /// </summary>
+/// UiManager UI 통제 기능 (타 컴포넌트)
+/// FieldManager 플레이어 데이터 통제
+/// 게임이 끝났는지 판정하는 GoalManager
+/// UI 통제 기능
+/// 키보드 입력 / 마우스 입력을 받아들여 그에 맞는 함수를 실행시켜준다.
+/// [배경화면 및 버튼] [생성 및 제거] / 마우스 입력 감지
+///
+/// 플레이어 데이터 통제
+/// 플레이어 데이터 [파일로부터 읽어오기] / [업데이트] / [파일로 저장]
+/// 각 팀의 상황들, 정보를 전부 저장한다.
 public class GameManager : MonoBehaviour
 {
-    #region 어디에 쓰이는 클래슨고?
-    // 게임의 전반적인 통제자
-    // UiManager UI 통제 기능 (타 컴포넌트)
-    // FieldManager 플레이어 데이터 통제
-    // 게임이 끝났는지 판정하는 GoalManager
-
-    // UI 통제 기능
-    // 키보드 입력 / 마우스 입력을 받아들여 그에 맞는 함수를 실행시켜준다.
-    // [배경화면 및 버튼] [생성 및 제거] / 마우스 입력 감지
-    //
-    // 플레이어 데이터 통제
-    // 플레이어 데이터 [파일로부터 읽어오기] / [업데이트] / [파일로 저장]
-    // 각 팀의 상황들, 정보를 전부 저장한다.
 
 
-    #endregion
+
+    #region UnityFunction
+
 
     void Awake()
     {
@@ -51,17 +50,19 @@ public class GameManager : MonoBehaviour
 
         // 게임 모드에 따라 달라지는 행동
         GameMode gameMode = GetGameMode();
-        if (gameMode == GameMode.GamePlay)
+        switch (gameMode)
         {
-            ReadyPlayMode();
-        }
-        else if (gameMode == GameMode.EditAndTest)
-        {
-            ReadyTestMode();
-        }
-        else
-        {
-            Hack.Say(Hack.isDebugGameManager_Start, Hack.check.error, this, message: "알 수 없는 게임모드입니다.");
+            case GameMode.GamePlay:
+                ReadyPlayMode();
+                break;
+            case GameMode.EditAndTest:
+                ReadyTestMode();
+                break;
+            case GameMode.Demo:
+                break;
+            default:
+                Hack.Say(Hack.isDebugGameManager_Start, Hack.check.error, this, message: "알 수 없는 게임모드입니다.");
+                break;
         }
 
 
@@ -97,8 +98,10 @@ public class GameManager : MonoBehaviour
 
 
     }
+    #endregion
 
-    #region Class
+
+    #region NestedClass
     public class GameManagerData
     {
         // 모든 매니저의 핵심 데이터를 저장합니다.
@@ -185,7 +188,8 @@ public class GameManager : MonoBehaviour
     enum GameMode
     {
         GamePlay,
-        EditAndTest
+        EditAndTest,
+        Demo
     }
     enum SceneMode
     {
@@ -1017,6 +1021,14 @@ public class GameManager : MonoBehaviour
 
             #endregion
 
+            for(int index = 0; index < teamDatas.Length; ++index)
+            {
+                if (teamDatas[index].name == playerTeamName)
+                {
+                    return teamDatas[index].ID;
+                }
+            }
+
             return -1;
         }
 
@@ -1487,8 +1499,9 @@ public class GameManager : MonoBehaviour
         #region 필드 : 컴포넌트 정보
         // 유닛의 종류에 따라서 Null인 값이 존재할 수도 있습니다.
         public UnitBase.UnitBaseData unitBaseData;
-        public HumanUnitBase.HumanUnitBaseData organListData;
-        public UnitItemPack.UnitItemPackData unitItemPackData;
+        public HumanUnitBase.BioUnit bioUnit;
+        //public HumanUnitBase.HumanUnitBaseData organListData;
+        public UnitItemPack.Inventory unitItemPackData;
         public UnitRole.UnitRoleData unitRoleData;
         #endregion
         // 이 유닛을 설명하는 데이터들
@@ -2610,8 +2623,8 @@ public class GameManager : MonoBehaviour
 
         Dictionary<Type, int> typeIntPairs = new Dictionary<Type, int>();
         typeIntPairs.Add(typeof(UnitBase.UnitBaseData), 100);
-        typeIntPairs.Add(typeof(HumanUnitBase.HumanUnitBaseData), 201);
-        typeIntPairs.Add(typeof(UnitItemPack.UnitItemPackData), 202);
+        typeIntPairs.Add(typeof(HumanUnitBase.BioUnit), 201);
+        typeIntPairs.Add(typeof(UnitItemPack.Inventory), 202);
 
 
         // Switch문을 이용하면 중괄호가 하나로 뭉쳐지는 점으로 인해 제네릭 함수를 사용하기 곤란한 이유입니다.
@@ -2633,7 +2646,7 @@ public class GameManager : MonoBehaviour
                 break;
             case 202:
                 {
-                    if (componentData.GetType() == typeof(UnitItemPack.UnitItemPackData))
+                    if (componentData.GetType() == typeof(UnitItemPack.Inventory))
                     {
                         //AddComponentDataHelper<UnitItemPack.UnitItemPackData>(ref targetFieldData.unitItemPackComponentData, ref baseUnitData, componentData, "UnitItemPack"); // ERROR
 
@@ -2829,33 +2842,33 @@ public class GameManager : MonoBehaviour
                             {
                                 new()
                                 {
-                                    unitBaseData = new("human")
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
                                     {
                                         direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("Radios", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
                                 }, // 감시자
                                 new()
                                 {
-                                    unitBaseData = new("human")
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
                                     {
                                         direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("BuildTool", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("BuildTool", "Pistol", "Knife")
                                 }, // 엔지니어
                                 new()
                                 {
-                                    unitBaseData = new("human")
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
                                     {
                                         direction = new Vector3(0, 0, -1),
                                         teamName = PlayerTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("BuildTool", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("BuildTool", "Pistol", "Knife")
                                 } // 엔지니어
                             }
                         },
@@ -2871,10 +2884,46 @@ public class GameManager : MonoBehaviour
 
                             units = new UnitInSquadData[4]
                             {
-                                new(),
-                                new(),
-                                new(),
                                 new()
+                                {
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
+                                },
+                                new()
+                                {
+                                    unitBaseData = new(BiologicalPartBase.Species.HUMAN)
+                                    {
+                                        direction = new Vector3(0,0,-1),
+                                        teamName = PlayerTeam
+                                    },
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
+                                }
                             }
                         } // 공격대
                     },
@@ -2906,8 +2955,8 @@ public class GameManager : MonoBehaviour
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("Radios", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Radios", "Pistol", "Knife")
                                 },
                                 new()
                                 {
@@ -2916,8 +2965,8 @@ public class GameManager : MonoBehaviour
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Pistol", "Pistol", "Knife")
                                 },
                                 new()
                                 {
@@ -2926,8 +2975,8 @@ public class GameManager : MonoBehaviour
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Pistol", "Pistol", "Knife")
                                 },
                                 new()
                                 {
@@ -2936,8 +2985,8 @@ public class GameManager : MonoBehaviour
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
-                                    organListData = new(),
-                                    unitItemPackData = new("Pistol", "Pistol", "Knife")
+                                    bioUnit = DemoHumanPart.GetDemoHuman(),
+                                    unitItemPackData = DemoItem.GetDemoInventoryCustom("Pistol", "Pistol", "Knife")
                                 }
                             }
                         } // 적 공격팀
@@ -3182,11 +3231,12 @@ public class GameManager : MonoBehaviour
 
                             switch (unit.unitBaseData.unitType)
                             {
-                                case "human":
+                                case BiologicalPartBase.Species.HUMAN:
                                     prefab = HumanPrefabDefaultSkin;
                                     break;
                                 default:
-                                    Debug.Log("DEBUG_GameManager.UnitInstantiate: 이 유닛의 타입(" + unit.unitBaseData.unitType + ")을 통해 프리펩을 결정할 수 없습니다.");
+                                    Hack.Say(Hack.isDebugGameManager_UnitInstantiate, Hack.check.error, this, 
+                                        $"이 유닛의 타입 {unit.unitBaseData.unitType} 을 통해 프리펩을 결정할 수 없습니다.");
                                     continue;
                             }
 
@@ -3203,7 +3253,11 @@ public class GameManager : MonoBehaviour
                     GameObject InstantiatedObject = Instantiate(prefab);
                     #endregion
                     #region 2. 인스턴스화 한 대상들 컴포넌트 데이터 집어넣기
-
+#warning 이거 마저 하기.
+                    InstantiatedObject.GetComponent<HumanUnitBase>().SetComponentData(
+                        DemoHumanPart.AssignGameObject(
+                            data.teamDatas[teamIndex].squads[squadIndex].units[unitIndex].bioUnit,
+                            InstantiatedObject));
                     #endregion
                 }
             }
@@ -3401,10 +3455,17 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
+    /// <summary>
+    ///     플레이어 팀 이름을 결정합니다. Player로 결정합니다.
+    /// </summary>
     void PlayerSetup()
     {
         playerTeam = "Player";
     }
+    /// <summary>
+    ///     플레이어 팀 이름을 결정합니다.
+    /// </summary>
+    /// <param name="Value">플레이어 팀의 이름입니다.</param>
     void PlayerSetup(string Value)
     {
         playerTeam = Value;
@@ -3452,17 +3513,17 @@ public class GameManager : MonoBehaviour
 
         // HumanUnitBase 컴포넌트 집어넣기.
         HumanUnitBase humanUnitBase = instantiatedGameObject.GetComponent<HumanUnitBase>();
-        if (humanUnitBase == null && unit.organListData != null)
+        if (humanUnitBase == null && unit.bioUnit != null)
         {
             Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: fieldData 속에 이 게임오브젝트를 위한 Human Unit Base 컴포넌트가 존재하지 않습니다.");
         }
-        else if (humanUnitBase != null && unit.organListData == null)
+        else if (humanUnitBase != null && unit.bioUnit == null)
         {
             Debug.Log("DEBUG_GameManager.SetGameObjectComponentData: 이 게임오브젝트는 Human Unit Base 라는 컴포넌트를 가지고 있지 않습니다. 위치 : " + instantiatedGameObject.transform.position);
         }
-        else if (humanUnitBase != null && unit.organListData == null)
+        else if (humanUnitBase != null && unit.bioUnit == null)
         {
-            humanUnitBase.initiateIndividual(unit.organListData);
+            humanUnitBase.SetComponentData(fieldData.teamDatas[teamIndex].squads[squadIndex].units[unitIndex].bioUnit);
         }
 
         // UnitItemPack 컴포넌트 집어넣기.
@@ -3477,7 +3538,7 @@ public class GameManager : MonoBehaviour
         }
         else if (unitItemPack != null && unit.unitItemPackData == null)
         {
-            unitItemPack.InventorySet(unit.unitItemPackData);
+            unitItemPack.SetComponentData(unit.unitItemPackData);
         }
     }
     #endregion

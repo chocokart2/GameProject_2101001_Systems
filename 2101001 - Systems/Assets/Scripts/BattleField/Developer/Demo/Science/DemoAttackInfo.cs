@@ -34,4 +34,23 @@ public class DemoAttackInfo : AttackClassHelper
             );
         return result;
     }
+    public static AttackInfo GetDemoAttackInfoData(float attackStat)
+    {
+        AttackInfo result = new AttackInfo();
+        result.energies = new EnergyHelper.Energies(
+            new EnergyHelper.Energy()
+            {
+                type = DemoEnergy.Default,
+                amount = attackStat
+            }
+            );
+        result.chemicals = new ChemicalHelper.Chemicals(
+            new ChemicalHelper.Chemical()
+            {
+                matter = DemoChemical.Default,
+                quantity = 100.0f
+            }
+            );
+        return result;
+    }
 }

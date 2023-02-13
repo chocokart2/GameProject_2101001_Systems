@@ -18,6 +18,7 @@ public class Hack : MonoBehaviour
     public static bool isDebugUnitPartBase = true;
     public static bool isDebugUnitSightController = false;
     // unit.common.addable
+    public static bool isDebugItemHelper = true;
     public static bool isDebugUnitItemPack = true;
     // Unit.Biological
     // Unit.Biological.Human
@@ -30,6 +31,8 @@ public class Hack : MonoBehaviour
     public static bool isDebugDemoBiologyPart = false;
 
     // others
+    public static bool isDebugGameObjectList = true;
+    public static bool isDebugAttackTurret = true;
     public static bool isDebugChangeController = true;
     public static bool isDebugChemicalReactionDemoData = false;
     public static bool isDebugUnitSight = false;
@@ -38,6 +41,7 @@ public class Hack : MonoBehaviour
     public static bool isDebugGameManager_Awake = true;
     public static bool isDebugGameManager_Start = true;
     public static bool isDebugGameManager_SetCurrentUnitRoleToFieldData = false;
+    public static bool isDebugGameManager_UnitInstantiate = true;
 
     /// <summary>
     ///     Say메서드를 빠르게 설정합니다. 어떤걸 체크할지 확인합니다.
@@ -125,6 +129,11 @@ public class Hack : MonoBehaviour
         }
     }
 
+    public static void Error(string callerClassName, object message, [CallerMemberName] string member = "알 수 없는 멤버 이름")
+    {
+        Debug.Log($"<!> ERROR_{callerClassName}.{member}() : {message}");
+    }
+
     /// <summary>
     ///     Debug.Log와 역할이 동일합니다. 대신 앞에 있는 매개변수는 이 메시지를 호출할지 여부를 판단합니다.
     /// </summary>
@@ -137,4 +146,20 @@ public class Hack : MonoBehaviour
             Debug.Log(message);
         }
     }
+
+#nullable enable
+    public static bool TrapNull(object? target, bool isNotIgnore = false)
+    {
+        if(target == null)
+        {
+            Say(isNotIgnore, $"<!> WARNING_NullCatch: 객체가 Null입니다.");
+            //Say(isNotIgnore, $"<!> WARNING_NullCatch: {target.GetType().Name} 형식의 객체 혹은 NullAble {nameof(target)}은 Null입니다.");
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+#nullable disable
 }
