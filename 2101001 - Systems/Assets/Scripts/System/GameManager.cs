@@ -102,6 +102,14 @@ public class GameManager : MonoBehaviour
 
 
     #region NestedClass
+    /// <summary>
+    ///     특정 구간을 실행해도 되는지 여부를 담습니다.
+    /// </summary>
+    public static class Permission
+    {
+        public static bool isUnitSightActive = false;
+    }
+    
     public class GameManagerData
     {
         // 모든 매니저의 핵심 데이터를 저장합니다.
@@ -110,7 +118,7 @@ public class GameManager : MonoBehaviour
 
         FieldData fieldData;
     }
-
+    
 
     #endregion
 
@@ -178,7 +186,7 @@ public class GameManager : MonoBehaviour
         RealTileMap = new Dictionary<Vector3, int>();
         ReadyRealTileMap(ref RealTileMap);
 
-
+        //=== isUnitSightActive = true
         ActiveUnitSight();
     }
 
@@ -2573,11 +2581,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void ActiveUnitSight()
     {
+
         GameObject[] _humans = GetHumanUnitArrayInEditorMode();
         for(int index = 0; index < _humans.Length; index++)
         {
             _humans[index].GetComponent<GameObjectList>().UnitSightMake();
         }
+        Permission.isUnitSightActive = true;
     }
     #endregion
 

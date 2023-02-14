@@ -12,7 +12,9 @@ using UnityEngine;
 ///     <para>
 ///         게임에 사용되는 다양한 프리펩을 static 변수로 소유하고 있으며, 프리펩들을 인스턴스화하는데 도움을 주기도 합니다. </para>
 ///     <para>
-///         만약 어떤 클래스의 메서드가 Instantiate를 요구하는경우, 이 클래스를 사용할 수 있습니다. </para></remarks>
+///         만약 어떤 클래스의 메서드가 Instantiate를 요구하는경우, 이 클래스를 사용할 수 있습니다. </para>
+///     <para>
+///         [!] 이젠 Load 함수를 이용해서 로딩을 합니다.</para></remarks>
 public class GameObjectList : MonoBehaviour
 {
     int unitLayerMaskIndex = 1;
@@ -266,7 +268,10 @@ public class GameObjectList : MonoBehaviour
 #warning 함수 구현 작업중
     public static void UnitSightScale(GameObject unit, float radius)
     {
-        Transform targetTransform = unit.transform.Find("UnitSight(Clone)");
+        Hack.TrapNull(unit, Hack.isDebugGameObjectList);
+        Hack.TrapNull(unit.GetComponent<Transform>(), Hack.isDebugGameObjectList);
+        Hack.TrapNull(unit.GetComponent<Transform>().Find("UnitSight(Clone)"), Hack.isDebugGameObjectList);
+        Transform targetTransform = unit.GetComponent<Transform>().Find("UnitSight(Clone)");
         if(targetTransform == null)
         {
             Hack.Error("GameObjectList", "targetTransform이 Null 값입니다.");
@@ -290,7 +295,7 @@ public class GameObjectList : MonoBehaviour
         }
     }
     #endregion
-
+#warning ==== 여기까지가 유닛사이트 ====
 
     #region Knife: 사용, 스킬(미완)
     public static void KnifeBladeStab(GameObject attacker, AttackClassHelper.AttackInfo attackType, Vector3 direction)

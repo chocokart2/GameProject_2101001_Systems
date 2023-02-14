@@ -472,7 +472,6 @@ public class HumanUnitBase :
     /// <summary> 감각계 OrganPart입니다. </summary> <remarks> [인간 : 4번] 시각을 담당하는 유닛 파트입니다.</remarks>
     public class SensorySystem : OrganPart
     {
-        public GameObject unit;
         public GameObjectList gameObjectList;
         public float UnitSightRange;
         //false면 감각을 받아들일 수 없게 됩니다.

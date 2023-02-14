@@ -70,6 +70,8 @@ public class UnitBase :
 
     // private field
     private bool m_isReadyToInteract = false; // 초기화가 완료되었는지 여부를 가집니다. 초기값은 false이며 완료되면 true로 바뀝니다.
+    private List<int> m_LazyArguments_SightEnter = new List<int>();
+    private List<int> m_LazyArguments_LightEnter = new List<int>();
     /// <summary>
     ///     유닛이 바라보는 방향입니다.
     /// </summary>
@@ -83,12 +85,7 @@ public class UnitBase :
     private UnitAppearance m_myUnitAppearance;
     private BiologicalPartBase m_myBiologicalPartBase;
     private HumanUnitBase m_myHumanUnitBase;
-    // 프라이빗 대리자
-    private (DelegateLightEnter, int) m_DelegateLightEnter = (delegate (int a) {
-        // Nothing~ But Do not let it die!
-    }, 0);
-    private List<int> m_LazyArguments_SightEnter = new List<int>();
-    private List<int> m_LazyArguments_LightEnter = new List<int>();
+
     #region moving member
     #region 애니메이터로 옮겨야 할 부분 (먼 훗날에 할 것)
     public Material MaterialNull; // 기본형
@@ -123,7 +120,7 @@ public class UnitBase :
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         Hack.TrapNull(gameManager, Hack.isDebugUnitBase);
 
-        unitBaseData = new UnitBaseData();
+        SetupUnitBase();
         ForceSetup();
 
 
@@ -201,7 +198,7 @@ public class UnitBase :
             // 자신이 사망했는지 여부를 판단해주는 함수를 만듭니다.
             // 유닛이 사망했으면 UIController에서 SelectedUnit이 사망했던건지 체크하게 되고, 만약 그렇게 되면 모든 UI를 제거하고, isGuiOpenedAtField와 openedGuiName을 기본값으로 바꿉니다.
 
-
+            Hack.Say(Hack.isDebugHumanUnitBase, Hack.check.info, this, message:$"unitBaseData.unitType = {unitBaseData.unitType}, Name = {transform.name}");
 
             switch (this.unitBaseData.unitType) // 유닛 타입에 따라 유닛의 기관계 유형을 구분짓습니다.
             {
@@ -284,13 +281,8 @@ public class UnitBase :
 
 
                     break;
-                case "machine":
-                    Debug.Log("준비 중");
-
-
-
-
-
+                case MechanicPartBase.MechanicType.DEFAULT:
+                    Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this, message: "준비 중입니다.");
                     break;
                 default:
                     throw new NotImplementedException($"알 수 없는 UnitType입니다. 입력된 유닛 타입은 \"{unitBaseData.unitType}\" 입니다.");
@@ -314,7 +306,6 @@ public class UnitBase :
     }
     #endregion
     #region private function
-#warning 이 함수 호출되기전에 공격 함수가 호출된걸까?
     void ComponentSetup()
     {
         m_myMeshRenderer = transform.Find("Quad").GetComponent<MeshRenderer>();
@@ -345,6 +336,27 @@ public class UnitBase :
         {
             LightEnter(one);
         }
+    }
+    void SetupUnitBase()
+    {
+        unitBaseData = new UnitBaseData();
+        unitBaseData.unitType = GetUnitType();
+
+
+
+
+    }
+    string GetUnitType()
+    {
+        string result = "TYPE_FAIL";
+
+        HumanUnitBase m_humanComponent = GetComponent<HumanUnitBase>();
+        MachineUnitBase m_machineComponent = GetComponent<MachineUnitBase>();
+
+        if (m_humanComponent != null) result = BiologicalPartBase.Species.HUMAN;
+        if (m_machineComponent != null) result = MechanicPartBase.MechanicType.DEFAULT;
+
+        return result;
     }
     #endregion
     #endregion
@@ -706,21 +718,6 @@ public class UnitBase :
     }
 
     #endregion
-
-    #endregion
-
-    #region NestedClass
-
-    #region Delegate
-    private delegate void DelegateLightEnter(int lightNumber);
-
-
-
-
-    #endregion
-
-
-
 
     #endregion
 }

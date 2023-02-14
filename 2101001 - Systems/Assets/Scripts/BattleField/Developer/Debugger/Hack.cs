@@ -86,6 +86,15 @@ public class Hack : MonoBehaviour
             Debug.Log($"<!> ERROR_{type.Name}.{member}() : 의도지 않은 실행입니다.");
         }
     }
+    /// <summary>
+    ///     정보를 출력하는 메소드입니다.
+    /// </summary>
+    /// <remarks>
+    ///     만약 함수가 출력되지 않는다면 우선 가장 첫번째 매개변수 값이 fasle인지 확인하십시오.</remarks>
+    /// <param name="isNotIgnore"></param>
+    /// <param name="_mode"></param>
+    /// <param name="callerClass"></param>
+    /// <param name="member"></param>
     public static void Say(bool isNotIgnore, check _mode, object callerClass, [CallerMemberName] string member = "알 수 없는 멤버 이름")
     {
         if (isNotIgnore)
@@ -148,6 +157,12 @@ public class Hack : MonoBehaviour
     }
 
 #nullable enable
+    /// <summary>
+    ///     대상이 Null인지 체크합니다.
+    /// </summary>
+    /// <param name="target">Null인지 체크할 대상입니다.</param>
+    /// <param name="isNotIgnore">Null일때 메시지를 출력하는지 여부를 출력합니다.</param>
+    /// <returns></returns>
     public static bool TrapNull(object? target, bool isNotIgnore = false)
     {
         if(target == null)

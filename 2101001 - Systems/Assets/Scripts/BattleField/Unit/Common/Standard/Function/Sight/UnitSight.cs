@@ -1,87 +1,39 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+///     ÀÌ À¯´ÖÀº ½Ã°¢À» »ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù.
+/// </summary>
+/// <remarks>
+///     µğÀÚÀÎÆĞÅÏ ÆÁ : UnitBase¸¦ ÀÌ¿ëÇÏ¿© ¼ÒÅëÇÏ½Ê½Ã¿À. ÀÇÁ¸¼º¿¡ ÀÇÇÑ À§ÇèÀ» ³·Ãâ ¼ö ÀÖ½À´Ï´Ù.
+///     »óÈ²¿¡ µû¶ó ½Ã¾ß°¡ Á¼¾ÆÁı´Ï´Ù.
+/// </remarks>
 public class UnitSight : MonoBehaviour
 {
-    /// <summary>
-    /// 11
-    /// </summary>
+    #region ÇÊµå
+    public int[] recvLightNums;
 
-    int UnitId;
-    //PlayerController playerController;
-    HumanUnitBase myHumanUnitBase;
-    //Transform playerTf;
-    GameObject memoryBlockPrefab;
-    MemoryBlock memoryBlockComponent; // ì´ ë³€ìˆ˜ë¥¼ ê°€ì§€ê³  ìˆëŠ” ì´ìœ ëŠ” ìœ ë‹›ì„ ë‚©ì¹˜í–ˆì„ë•Œ ì§€ì—­ ì •ë³´ë„ ì–»ì„ ìˆ˜ ìˆê¸° ë•Œë¬¸ì…ë‹ˆë‹¤.
-    bool isInitCalled = false;
-    bool isReady;
-
-    public GameObject FollowingObject = null;
-
-    void OnTriggerEnter(Collider other)
+    private const string M_SIGHT_FOLDER = "Prefabs/BattleField/GameUnit/Original/Supporter";
+    private const string M_PREFAB_NAME = "UnitSight";
+    #endregion
+    #region À¯´ÏÆ¼ ¸Ş¼­µå
+    // Start is called before the first frame update
+    void Start()
     {
-        #region í•¨ìˆ˜ ì„¤ëª…
-
-        // íƒ€ì¼ ë¸”ëŸ­ì´ ì¶©ëŒí•¨
-        // ì´ë²¤íŠ¸ ë°œìƒ?
-
-        #endregion
-
-
-
-        //Debug.Log("Ouch");
-        //if(other.gameObject.layer == 8)
-        if (other.gameObject.layer == 8)
-        {
-            // ì¶©ëŒí•œ ë¬¼ì²´ì˜ íƒ€ì¼ì„ ì €ì¥.
-            TileBlock tileBlock = other.GetComponent<TileBlock>();
-            Transform transform = other.GetComponent<Transform>();
-            Vector3 locate = new Vector3();
-            locate.x = transform.position.x;
-            locate.y = transform.position.y + tileBlock.deltaYForCloneGO;
-            locate.z = transform.position.z;
-
         
-        // GetComponent?
-        //Transform other.GameOb
-
-        //Instantiate(/*ì½œë¼ì´ë”ì˜ ë©”ëª¨ë¦¬ GO*/, /*ì½œë¼ì´ë”ì˜ ìœ„ì¹˜ ê°’*/, Quaternion.identity) ;
-            //ì €ì¥í•œ ê°’ì„ í† ëŒ€ë¡œ í”„ë¦¬í© ìƒì„±
-            memoryBlockPrefab = Instantiate(tileBlock.cloneGO, locate, Quaternion.identity);
-            memoryBlockComponent = memoryBlockPrefab.GetComponent<MemoryBlock>();
-            memoryBlockComponent.blockTypeID = tileBlock.blockTypeID;
-        }
-        if(other.gameObject.GetComponent<UnitBase>() != null)
-        {
-            UnitBase recvUnitBase = other.gameObject.GetComponent<UnitBase>();
-            if(recvUnitBase != null)
-            {
-                Hack.Say(Hack.isDebugUnitSight, $"DEBUG_UnitSight.OnTriggerEnter : ê²Œì„ì˜¤ë¸Œì íŠ¸ ì´ë¦„ [{other.gameObject.name}]\n ìœ ë‹› ì´ë¦„ [{recvUnitBase.name}]");
-            }
-            else
-            {
-                Hack.Say(Hack.isDebugUnitSight, $"DEBUG_UnitSight.OnTriggerEnter : ê²Œì„ì˜¤ë¸Œì íŠ¸ ì´ë¦„ [{other.gameObject.name}]");
-            }
-
-
-
-
-            //other.gameObject.GetComponent<UnitBase>().
-            recvUnitBase.
-                SightEnter(
-                transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
-        }
-
-
     }
 
-    void OnTriggerExit(Collider other)
+    // Update is called once per frame
+    void Update()
     {
-        if (other.gameObject.GetComponent<UnitBase>() != null)
-        {
-            other.gameObject.GetComponent<UnitBase>().SightExit(transform.parent.gameObject.GetComponent<UnitRole>().GetData().teamID);
-        }
+        
     }
+    #endregion
+    #region ¸Ş¼Òµå
+    //public static void UnitSightScale()
+    #endregion
+    #region Nested Class
 
+    #endregion
 }

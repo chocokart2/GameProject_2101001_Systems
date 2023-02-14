@@ -223,6 +223,20 @@ MonoBehaviour:
   debugSetting:
     DEBUG_InventorySetFuncSayItemType: 0
     DEBUG_InventoryUseSayName: 0
+--- !u!114 &2382805190879139279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3516928186645611712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89f407b42fd3ab4e8cc03ad2d6e4e5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  self:
+    isLiving: 0
 --- !u!114 &4676115240507480235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,12 +268,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitNeedDefaultData: 1
   hierarchyGameObjectNameForRendering: []
-  MaterialNull: {fileID: 0}
-  MachineMaterialNull: {fileID: 0}
-  MaterialPositiveX: {fileID: 0}
-  MaterialPositiveY: {fileID: 0}
-  MaterialNegativeX: {fileID: 0}
-  MaterialNegativeY: {fileID: 0}
   unitBaseData:
     prefabName: 
     unitType: human
@@ -268,6 +276,12 @@ MonoBehaviour:
     instanceId: -1
     gameManagerID: 0
   myUnitAI: {fileID: 0}
+  MaterialNull: {fileID: 0}
+  MachineMaterialNull: {fileID: 0}
+  MaterialPositiveX: {fileID: 0}
+  MaterialPositiveY: {fileID: 0}
+  MaterialNegativeX: {fileID: 0}
+  MaterialNegativeY: {fileID: 0}
 --- !u!114 &6773924792430052788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,7 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9aaf64a2e1300d4c9207f457cd7b167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2382805190879139279
+--- !u!114 &5975148494969042716
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -349,8 +363,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 3516928186645611712}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d89f407b42fd3ab4e8cc03ad2d6e4e5d, type: 3}
+  m_Script: {fileID: 11500000, guid: 5dce99e52615ea0418f9d408ce757bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  self:
-    isLiving: 0
