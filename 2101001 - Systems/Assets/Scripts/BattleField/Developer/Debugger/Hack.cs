@@ -7,8 +7,101 @@ using UnityEngine;
 /// <summary>
 ///     디버거 역할을 맡습니다. 다만 클래스명중 Debug는 이미 다른사람에게 빼앗겼군요. 짧고 간단한 클래스명이 필요했습니다. 이해해주세요.
 /// </summary>
-public class Hack : MonoBehaviour
+public class Hack : BaseComponent
 {
+    /// <summary>
+    ///     중립의 의미를 가질 수 있는 불리언 타입입니다.
+    /// </summary>
+    public enum EStat
+    {
+        neutral = 0,
+        disable,
+        enable
+    }
+
+    /// <summary>
+    ///     디버그할 범위입니다.
+    /// </summary>
+    public static class Scope
+    {
+        /// <summary>
+        ///     모든 메시지 무조건 출력 / 무조건 침묵을 결정합니다. 일반적으로는 null 값입니다.
+        /// </summary>
+        private static bool? all = null;
+
+        #region System.Common
+        public static class BaseComponent
+        {
+            private static bool? _all = null;
+
+            public static class NamedQuantityArrayHelper
+            {
+                private static bool? __all = null;
+
+                private static bool add = false;
+
+                public static bool Add
+                {
+                    get => ((all ?? _all) ?? __all) ?? add;
+                    set => add = value;
+                }
+            }
+        }
+
+        #endregion
+        #region Units.Common.Standard
+        public static class UnitBase
+        {
+            private static bool? _all = null;
+
+            private static bool walk = false;
+
+            public static bool Walk
+            {
+                get => (all ?? _all) ?? walk;
+                set => walk = value;
+            }
+        }
+        public static class UnitPartBase
+        {
+            private static bool? _all = null;
+
+            public static class UnitPart
+            {
+                private static bool? __all = null;
+
+                private static bool constructor = false;
+                private static bool isPassing = false;
+
+                public static bool Constructor
+                {
+                    get => ((all ?? _all) ?? __all) ?? constructor;
+                    set => constructor = value;
+                }
+                public static bool IsPassing
+                {
+                    get => ((all ?? _all) ?? __all) ?? isPassing;
+                    set => isPassing = value;
+                }
+            }
+            public static class SingleChemicalWholeness
+            {
+                private static bool? __all = null;
+
+                private static bool getAngleWholeness = true;
+
+                public static bool GetAngleWholeness
+                {
+                    get => ((all ?? _all) ?? __all) ?? getAngleWholeness;
+                }
+            }
+        }
+        #endregion
+
+
+
+    }
+
     // 변수
     public static bool isMustReceiveErrorMessage = true;
     // System.Common
@@ -155,7 +248,6 @@ public class Hack : MonoBehaviour
             Debug.Log(message);
         }
     }
-
 #nullable enable
     /// <summary>
     ///     대상이 Null인지 체크합니다.

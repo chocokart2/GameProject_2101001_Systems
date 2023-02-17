@@ -472,7 +472,7 @@ public class UnitBase :
     // 4. 각 이벤트를 실행시키는 public 함수를 만듭니다.
     public void Walk(Vector3 Direction)
     {
-        Hack.Say(Hack.isDebugUnitBase, Hack.check.method, this);
+        Hack.Say(Hack.Scope.UnitBase.Walk, Hack.check.method, this);
         if(m_myUnitMovable != null)
         {
             switch (unitBaseData.unitType)

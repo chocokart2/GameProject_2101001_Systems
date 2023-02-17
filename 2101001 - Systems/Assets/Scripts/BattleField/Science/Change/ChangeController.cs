@@ -13,14 +13,14 @@ public class ChangeController :
 #warning ChemicalReactionArray를 ChemicalHelper가 아니라 ChangeHelper로 이사시킵시다. 에너지도 있는데 화학 반응일 필요가 없겠지
     static bool isInited = false;
 
-    private ChemicalReactionTable reactions;
+    static private ChemicalReactionTable reactions;
     public ChemicalReactionTable Reactions
     {
         get { return reactions; }
         private set { reactions = value; }
     }
 
-    private ChemicalEnergyResistTable energyResists;
+    static private ChemicalEnergyResistTable energyResists;
     public ChemicalEnergyResistTable EnergyResists
     {
         get { return energyResists; }
@@ -29,13 +29,15 @@ public class ChangeController :
 
     public (ChemicalReactionTable _reactions, ChemicalEnergyResistTable _energyResists) GetComponentData()
     {
-        return (this.reactions, this.energyResists);
+        return (reactions, energyResists);
     }
 
     public void SetComponentData((ChemicalReactionTable _reactions, ChemicalEnergyResistTable _energyResists) data)
     {
         if(isInited == false)
         {
+            Hack.Say(Hack.isDebugChangeController, Hack.check.info, this, message: "정상적인 초기화가 진행됩니다!");
+
             isInited = true;
             reactions = data._reactions;
             energyResists = data._energyResists;

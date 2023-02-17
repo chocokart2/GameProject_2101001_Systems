@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#warning 버그 있음. 데미지를 입어야 하는데 오히려 회복되는 사태. 심지어 1을 넘어섭니다.
 /// <summary>
 /// '모든 유닛들의 ~~~Part 컴포넌트'는 이 클래스를 상속합니다.
 /// </summary>
@@ -103,11 +104,17 @@ public class UnitPartBase : BaseComponent
         ///         값 : 0 ~ 1
         ///     </para>
         /// </remarks>
-        public abstract float wholeness { get; set; }
+        public virtual float Wholeness
+        {
+            get => chemicalWholeness.Wholeness;
+        }
+
+
 
         public UnitPart()
         {
-            Hack.Say(Hack.isDebugUnitPartBase, "DEBUG_UnitPart.UnitPart() : 생성자가 호출되었습니다.");
+            Hack.Say(Hack.Scope.UnitPartBase.UnitPart.Constructor, Hack.check.method, this, 
+                message: "DEBUG_UnitPart.UnitPart() : 생성자가 호출되었습니다.");
 
             chemicalController = GameObject.Find("GameManager").GetComponent<ChemicalController>();
             changeController = GameObject.Find("GameManager").GetComponent<ChangeController>();
@@ -179,6 +186,10 @@ public class UnitPartBase : BaseComponent
         /// </param>
         public virtual void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
         {
+#warning DEBUG_CODE
+            chemicalWholeness[0].Add(new Penetration() { angle = angle, amount = 1.0f });
+
+
             // 대상 캐미컬의 양 / 전체 캐미컬의 양을 가지고 있는 배열 생성
             // 비율에 따라 각 에너지를 나눠준다. 에너지의 양 * 몫
             // 포인트를 가지고 있음
@@ -186,8 +197,9 @@ public class UnitPartBase : BaseComponent
             // 각 에너지를 각 캐미컬의 양만큼 나눔, tagged 캐미컬만 한정함.
 
             // 1. 상태 확인하기. 완전 망가진거에 쏴서 관통된건지, 아니면 멀쩡한데다 맞아서 피해연산을 할지 체크합니다.
-            if(IsPassing(angle))
+            if (IsPassing(angle))
             {
+                Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: "공격이 관통됩니다.");
                 return;
             }
 
@@ -418,7 +430,8 @@ public class UnitPartBase : BaseComponent
             if (isTaggedExist == false) return false;
 
             // 모든 chemicalWholeness를 체크합니다.
-            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: $"chemicalWholeness 값이 Null 여부 {chemicalWholeness == null}");
+            Hack.Say(Hack.Scope.UnitPartBase.UnitPart.IsPassing, Hack.check.info, this,
+                message: $"chemicalWholeness 값이 Null 여부 {chemicalWholeness == null}");
             for(int index = 0; index < chemicalWholeness.Length; ++index)
             {
                 if (chemicalWholeness[index].GetAngleWholeness(angle) <= 0)
@@ -430,6 +443,8 @@ public class UnitPartBase : BaseComponent
             return false;
         }
 
+
+#warning 작업중
         /// <summary>
         ///     wholeness를 가지고 있는 캐미컬에 대해 에너지를 관통시키고 이를 적용합니다.
         ///     초반 에너지 공격을 반영할때도 이 함수를 사용합니다
@@ -442,6 +457,7 @@ public class UnitPartBase : BaseComponent
         /// </returns>
         private void pierceOneChemical(ref SingleChemicalWholeness targetChemical, ref EnergyHelper.Energies energies, float angle)
         {
+            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this); // 이 함수는 호출됩니다.
             // 한 대상에 대한 피해량을 계산합니다.
             // 각온전성(angle) / 피해합 = k을 구합니다.
             // k가 1.0 이하이면 각온전성을 0으로 만들도록 하고 energies중 하나의 값 (원래 값) = (원래 값) * (1 - k) 값
@@ -461,6 +477,7 @@ public class UnitPartBase : BaseComponent
                     expectedDamages +=
                         (energies[indexEnergy].Quantity - energyResist.resistanceDefense) /
                         (energyResist.resistanceRatio * tagged[targetChemical.Name].Quantity);
+                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this, message: $"유효 피해를 입었습니다!\n 피해량 : {(energies[indexEnergy].Quantity - energyResist.resistanceDefense) / (energyResist.resistanceRatio * tagged[targetChemical.Name].Quantity)}");
                 }
             }
 
@@ -479,6 +496,7 @@ public class UnitPartBase : BaseComponent
             // 분기를 가집니다.
             if (energyRatio <= 1.0) // 에너지가 너무 강력해서 관통될 것 같습니다.
             {
+                Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this, message: $"공격이 관통됩니다.");
                 // 각온전성 0으로 만들기
                 targetChemical.Add(
                     new Penetration() { amount = angleWholeness, angle = angle }); // amount는 expectedDamages * energyRatio 인데 angleWholeness 값과 동일
@@ -489,6 +507,7 @@ public class UnitPartBase : BaseComponent
             }
             else // 공격 에너지를 전부 흡수 할 수 있습니다.
             {
+                Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this, message: $"공격이 흡수됩니다.");
                 targetChemical.Add(
                     new Penetration() { amount = expectedDamages, angle = angle });
 
@@ -519,10 +538,12 @@ public class UnitPartBase : BaseComponent
             get
             {
                 Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this);
+#warning 여기서 wholeness 업데이트 해보자
+                Update();
                 float result = 0.0f;
                 for(int index = 0; index < m_self.Length; index++)
                 {
-                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message:$"m_self[index].Wholeness = {m_self[index].Wholeness}");
+                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message:$"m_self[{index}].Wholeness = {m_self[index].Wholeness}");
                     result += m_self[index].Wholeness;
                 }
                 if (m_self.Length <= 0) return 0.0f;
@@ -634,6 +655,7 @@ public class UnitPartBase : BaseComponent
         /// </returns>
         public float Add(Penetration penetration)
         {
+            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this);
             // 리턴할 값입니다.
             float result = 0.0f;
 
@@ -679,15 +701,20 @@ public class UnitPartBase : BaseComponent
         /// <returns> 해당하는 각도의 온전성입니다. </returns>
         public float GetAngleWholeness(float angle)
         {
+            Hack.Say(Hack.Scope.UnitPartBase.SingleChemicalWholeness.GetAngleWholeness, Hack.check.method, this);
             // 근처일수록 값을 깎는다.
             float result = 1.0f;
 
-            for(int value = 1; value <= -1; value--)
+            for(int value = 1; value >= -1; value--) // value 값은 각도가 0과 1에 비슷한 위치에 걸려 있어 건너편 각도로 각도의 영향력을 제공하는 경우입니다.
             {
                 for (int index = 0; index < damages.Length; index++) // 
                 {
                     // 수학식은 이미지 참고하세요.
+                    Hack.Say(Hack.Scope.UnitPartBase.SingleChemicalWholeness.GetAngleWholeness, Hack.check.info, this,
+                        message: $"damages[index].amount = {damages[index].amount},\tvalue : {value},\tangle : {angle}");
+
                     result -= MathF.Max(0, damages[index].amount - (damages[index].amount / EFFECT_RANGE) * MathF.Abs(angle + value - damages[index].angle));
+
                 }
             }
 
@@ -718,8 +745,11 @@ public class UnitPartBase : BaseComponent
 
             // 각도 범위를 넘어가는 점이 있는지 확인합니다.
             Penetration[] realDamages = new Penetration[0]{ };
+            // 피해 저장 배열 realDamages에 damages값을 붙여넣기 합니다.
             foreach (Penetration one in damages) AddElementArray(ref realDamages, one);
 
+#warning DEBUG_CODE
+            foreach (Penetration one in damages) Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: $"position : x = {one.angle}, y = {one.Quantity}");
 
             for(int index = 0; index < damages.Length; index++)
             {
@@ -745,7 +775,7 @@ public class UnitPartBase : BaseComponent
             }
 
             // 각 포인트를 구한다.
-            float[] pointKey = new float[1] { 0.0f };
+            float[] pointKey = new float[1] { 0.0f }; // 각도의 wholeness를 계산할 각도값입니다. 그래프가 꺾이는 구간입니다.
             for(int index = 0; index < realDamages.Length; index++)
             {
                 float[] angleValue = new float[3]
@@ -761,11 +791,17 @@ public class UnitPartBase : BaseComponent
                     if (angleValue[angleIndex] >= 0.0f &&
                         angleValue[angleIndex] < 1.0f)
                     {
-                        AddElementArray(ref pointKey, angleValue[index]);
+#warning IndexOutOfRangeException
+                        // pointKey가 범위를 벗어날까?
+                        // 아니면 angleValue의 범위를 벗어나는 index가 문제일까?
+                        // angleValue는 뭘까?
+                        AddElementArray(ref pointKey, angleValue[angleIndex]);
                     }
                 }
             }
             AddElementArray(ref pointKey, 1.0f);
+            // 정렬
+            Array.Sort(pointKey);
 
             // 머지를 진행할까?
             // pointKey를 변경하세요.
@@ -783,17 +819,25 @@ public class UnitPartBase : BaseComponent
                 // 두 점이 y좌표가 양수일 때
                 if (y1 > 0.0f && y2 > 0.0f)
                 {
-                    result += getTrapezoid(x1, x2, y1, y2);
+                    float addValue = getTrapezoid(x1, x2, y1, y2);
+                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this,
+                        message: $"wholeness 값 : [{index} of {pointKey.Length - 1}] {result},\t추가 값 : {addValue}\n가로 : {x2-x1},\t세로 {y1}, {y2}\t{x1}, {x2}\t{y1}, {y2}");
+                    result += addValue;
                     continue;
                 }
                 // 두 점중 하나의 y좌표가 양수이고 하나는 음수일 때
                 else if (y1 > 0.0f || y2 > 0.0f)
                 {
-                    result += getTriangle(x1, x2, y1, y2);
+                    float addValue = getTriangle(x1, x2, y1, y2);
+                    Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this,
+                        message: $"wholeness 값 : [{index} of {pointKey.Length - 1}] {result},\t추가 값 : {addValue}\n가로 : {x2 - x1},\t 세로 {MathF.Abs(y2 - y1)}\t{x1}, {x2}\t{y1}, {y2}");
+                    result += addValue;
                     continue;
                 }
                 // 두 점이 양수가 아니므로 계산하지 않습니다.
             }
+            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this,
+                message: $"wholeness 값 : {result}");
 
             lazyWholeness = result;
             return result;

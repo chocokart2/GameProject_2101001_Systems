@@ -22,7 +22,8 @@ public class DemoAttackInfo : AttackClassHelper
             new EnergyHelper.Energy()
             {
                 type = DemoEnergy.Default,
-                amount = 10.0f
+                //amount = 10.0f
+                amount = 10000.0f
             }
             );
         result.chemicals = new ChemicalHelper.Chemicals(

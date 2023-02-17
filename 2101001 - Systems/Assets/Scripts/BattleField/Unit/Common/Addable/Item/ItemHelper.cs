@@ -5,6 +5,9 @@ using UnityEngine;
 /// <summary>
 /// 모든 아이템의 부모 클래스를 가지고 있습니다.
 /// </summary>
+/// <remarks>?
+///     이 클래스를 직접 게임오브젝트에 넣으면 안 됩니다. 이 클래스를 상속하는 클래스를 사용해주세요.
+/// </remarks>
 public class ItemHelper : BaseComponent
 {
     #region Interface

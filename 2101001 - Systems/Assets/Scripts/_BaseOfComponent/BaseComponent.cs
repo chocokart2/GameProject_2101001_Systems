@@ -228,8 +228,10 @@ public class BaseComponent : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log($"DEBUG_NamedQuantityArrayHelper.Add() : indexArray[{index}] = {indexArray[index]}");
-                    Debug.Log($"DEBUG_NamedQuantityArrayHelper.Add() : target의 길이 = {target.Length}");
+                    Hack.Say(Hack.Scope.BaseComponent.NamedQuantityArrayHelper.Add,
+                        $"DEBUG_NamedQuantityArrayHelper.Add() : indexArray[{index}] = {indexArray[index]}");
+                    Hack.Say(Hack.Scope.BaseComponent.NamedQuantityArrayHelper.Add,
+                        $"DEBUG_NamedQuantityArrayHelper.Add() : target의 길이 = {target.Length}");
 
                     target[indexArray[index]].Quantity += addend[index].Quantity;
                 }
@@ -376,6 +378,14 @@ public class BaseComponent : MonoBehaviour
 
             return result;
         }
+    }
+
+    /// <summary>
+    /// 긍정, 중립, 부정의 값을 가질 수 있는 자료형입니다.
+    /// </summary>
+    public class myBool
+    {
+
     }
 
     public static int AddElementArray<ElementType>(ref ElementType[] array, ElementType element)

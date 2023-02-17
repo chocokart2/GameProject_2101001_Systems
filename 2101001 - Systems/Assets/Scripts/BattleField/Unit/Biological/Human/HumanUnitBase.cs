@@ -507,7 +507,7 @@ public class HumanUnitBase :
         public override void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
         {
             base.BeingAttacked(ref attack, angle);
-            GameObjectList.UnitSightScale(unit, wholeness * UnitSightRange);
+            GameObjectList.UnitSightScale(unit, Wholeness * UnitSightRange);
         }
 
         //[System.Obsolete("이 함수는 사용되지 않습니다.")]
@@ -572,7 +572,7 @@ public class HumanUnitBase :
         public override void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
         {
             base.BeingAttacked(ref attack, angle);
-            Hack.Say(Hack.isDebugHumanUnitBase_Nerv, Hack.check.info, this, message: $" 신경계 Wholeness : {chemicalWholeness.Wholeness}");
+            Hack.Say(Hack.isDebugHumanUnitBase_Nerv, Hack.check.info, this, message: $" 신경계 Wholeness : {chemicalWholeness.Wholeness}, angle : {angle}");
         }
     }
     /// <summary> 운동계 OrganPart입니다. </summary>

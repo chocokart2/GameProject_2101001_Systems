@@ -6,10 +6,12 @@ using UnityEngine;
 /// <summary>
 ///     생명체 유닛의 기관계를 정의힙니다.
 /// </summary>
+/// <remarks>
+///     <para>Q: 이 클래스를 사용해도 되나요?</para>
+///     <para>A: 이 컴포넌트를 직접적으로 유닛의 인스펙터에 넣으면 안 됩니다! 이 클래스를 상속하는 컴포넌트를 사용해주세요.</para>
+/// </remarks>
 public class BiologicalPartBase : UnitPartBase
 {
-
-
     /// <summary>
     ///     모든 생명체 유닛의 기관을 정의한 클래스입니다.
     /// </summary>
@@ -26,11 +28,6 @@ public class BiologicalPartBase : UnitPartBase
     {
         public GameObject unit;
 
-        public override float wholeness
-        {
-            get => hp / maxHP;
-            set => hp = value * maxHP;
-        }
         /// <summary>
         ///     maxHP값을 먼저 제공해야 합니다.
         /// </summary>
@@ -57,7 +54,7 @@ public class BiologicalPartBase : UnitPartBase
         /// <summary>
         /// 
         /// </summary>
-        float hp;
+        public float hp;
 
         public OrganPart() : base()
         {

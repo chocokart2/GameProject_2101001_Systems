@@ -2788,19 +2788,21 @@ public class GameManager : MonoBehaviour
         // 필드데이터에 값을 넣기
         currentFieldData = fieldData;
     }
+    /// <summary>
+    ///     객체를 생성하는 펙토리 메소드입니다. 임시 데이터가 들어있는 fieldData 객체를 리턴해줍니다.
+    /// </summary>
+    /// <returns>
+    /// Team PlayerTeam
+    /// -자신의 스쿼드 2부대: 엔지니어, 공격대
+    /// --엔지니어: 감시자, 공병2
+    /// --공격대: 사수 4명
+    /// Team EnemyTeam
+    /// -자신의 스쿼드 1부대: 공격대
+    /// Team Neutral
+    /// </returns>
     FieldData DemoFieldLoader()
     {
         #region help
-        // 펙토리 메서드입니다.
-        // fieldData에 임시 데이터를 집어넣습니다.
-
-        // Team PlayerTeam
-        // -자신의 스쿼드 2부대: 엔지니어, 공격대
-        // --엔지니어: 감시자, 공병2
-        // --공격대: 사수 4명
-        // Team EnemyTeam
-        // -자신의 스쿼드 1부대: 공격대
-        // Team Neutral
 
         // 어떻게 만들 것인가
         // 팀을 만든다
@@ -2962,6 +2964,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
+                                        position = new Vector3(-4,0,-1),
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
@@ -2972,6 +2975,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
+                                        position = new Vector3(-3,0,-1),
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
@@ -2982,6 +2986,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
+                                        position = new Vector3(-2,0,-1),
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
@@ -2992,6 +2997,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     unitBaseData = new()
                                     {
+                                        position = new Vector3(-1,0,-1),
                                         direction = new Vector3(0, 0, -1),
                                         teamName = EnemyTeam
                                     },
@@ -3259,8 +3265,15 @@ public class GameManager : MonoBehaviour
                     #region 1.2. 인스턴스화 - 위치 결정
 
                     #endregion
-                    #region 1.3. 인스턴스화 - 함수 호출/
-                    GameObject InstantiatedObject = Instantiate(prefab);
+                    #region 1.3. 인스턴스화 - 함수 호출
+#warning Instantiate 함수 호출할때 위치를 지정하지 않았습니다.
+
+                    Vector3 m_position = new Vector3(0, 0, -1);
+                    if (data.teamDatas[teamIndex].squads[squadIndex].units[unitIndex]?.unitBaseData?.position != null)
+                    {
+                        m_position = data.teamDatas[teamIndex].squads[squadIndex].units[unitIndex].unitBaseData.position;
+                    }
+                    GameObject InstantiatedObject = Instantiate(prefab, m_position ,Quaternion.identity);
                     #endregion
                     #region 2. 인스턴스화 한 대상들 컴포넌트 데이터 집어넣기
 #warning 이거 마저 하기.

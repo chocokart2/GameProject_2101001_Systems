@@ -8,6 +8,8 @@ using UnityEngine;
 /// </summary>
 /// <remarks>
 ///     데이터 : Inventory
+///     <para>
+///         추가 업무 : 데모 유닛의 정보도 들어 있습니다.</para> 역시 클래스는 한개당 업무 하나만 있는게 최고인 것 같습니다..
 /// </remarks>
 public class UnitItemPack : 
     ItemHelper,
@@ -45,44 +47,58 @@ public class UnitItemPack :
     //[SerializeField] 
     #endregion
 
-
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         inventoryIndex = 0;
 
         Cooldown = 0.0f;
         CooldownKnifeSkill = 0.0f;
-        #region 아이템 구체화
 
-
-
-        #endregion
-        #region 인벤토리 조작
-
-        if(gameObject.name == "HumanPlayer")
+#warning 여기 Demo Code 있어요!!
+        #region 유닛의 DemoCode
+        switch (gameObject.name)
         {
-            inventory = new Inventory()
-            {
-                self = new ItemHelper.Item[3]
+            case "HumanPlayer":
+                inventory = new Inventory()
                 {
-                    DemoItem.GetDemoKnife(),
-                    DemoItem.GetDemoPistol(),
-                    DemoItem.GetDemoBuildTool()
-                }
-            };
-
-
-            //inventory = new Item[3];
-            //inventory[0] = new Radios(GetComponent<GameObjectList>());
-            //inventory[1] = new Pistol(GetComponent<GameObjectList>());
-            //inventory[2] = new Knife(GetComponent<GameObjectList>());
-            //inventory[2] = new BuildTool(GetComponent<GameObjectList>());
+                    self = new ItemHelper.Item[3]
+                    {
+                        DemoItem.GetDemoKnife(),
+                        DemoItem.GetDemoPistol(),
+                        DemoItem.GetDemoBuildTool()
+                    }
+                };
+                break;
+            case "HumanPlayer (2)":
+                inventory = new Inventory()
+                {
+                    self = new ItemHelper.Item[3]
+                    {
+                        DemoItem.GetDemoKnife(),
+                        DemoItem.GetDemoPistol(),
+                        DemoItem.GetDemoBuildTool()
+                    }
+                };
+                break;
+            case "HumanPlayer (3)":
+                inventory = new Inventory()
+                {
+                    self = new ItemHelper.Item[3]
+                    {
+                        DemoItem.GetDemoKnife(),
+                        DemoItem.GetDemoPistol(),
+                        DemoItem.GetDemoBuildTool()
+                    }
+                };
+                break;
+            default:
+                break;
         }
-
-
-
         #endregion
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
 
     }
 
@@ -96,8 +112,6 @@ public class UnitItemPack :
         {
             inventory.Update(gameObject, Time.deltaTime);
         }
-
-        
     }
 
 
@@ -336,6 +350,12 @@ public class UnitItemPack :
         Debug.Log("<!> ERROR_UnitItemPack.InventoryIndexSet : UnitItemPack.InventoryIndexSet에 전달된 매개변수가 옳지 않습니다.");
     }
     #endregion
+    #region private Methods
+
+    #endregion
+    #region Public Nested Class
+
+    #endregion
 
     #region UnitItemPackData 클래스
     //// 유닛 프리펩을 인스턴스화할때 데이터를 넣기 위한 장치입니다.
@@ -384,5 +404,5 @@ public class UnitItemPack :
 
     #endregion
 
- 
+
 }

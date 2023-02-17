@@ -7,10 +7,9 @@ public class MechanicPartBase : UnitPartBase
     //nested class
     public class MechanicalPart: UnitPart
     {
-        public override float wholeness
+        public override float Wholeness
         {
-            get => throw new System.NotImplementedException(); 
-            set => throw new System.NotImplementedException();
+            get => throw new System.NotImplementedException();
         }
     }
     #region 정적 클래스

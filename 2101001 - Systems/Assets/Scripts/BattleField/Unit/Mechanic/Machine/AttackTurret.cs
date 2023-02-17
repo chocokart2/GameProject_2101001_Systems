@@ -30,14 +30,8 @@ public class AttackTurret : MonoBehaviour
 
 
         #region 아이템 조작 부분, 데이터로 로딩되는 경우 이 부분은 제거해주셔야 합니다.
-        //UnitItemPack.UnitItemPackData fakeItemData = new UnitItemPack.UnitItemPackData();
-        //fakeItemData.inventory = new UnitItemPack.ItemData[] { new UnitItemPack.ItemData() };
-        //fakeItemData.inventory[0].itemType = "Pistol";
-        //fakeItemData.inventory[0].isRealItem = false;
-        //UnitItemPack.UnitItemPackData fakeItemPackData = new UnitItemPack.UnitItemPackData();
-        //fakeItemPackData = UnitItemPack.NewUnitItemPackData(new UnitItemPack.ItemData[] { UnitItemPack.NewItemData("Pistol") });
-
         myUnitItemPack.inventory = DemoItem.GetDemoInventoryCustom(DemoItem.Name.TURRET);
+        myUnitItemPack.inventory[0].subItems[0].attackInfo = DemoAttackInfo.GetDemoAttackInfoData(10000);
         time = 0.0f;
         angle = 0.0f;
         #endregion
@@ -49,12 +43,12 @@ public class AttackTurret : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
-        angle += Time.deltaTime;
-        if (time > 0.1f)
+        //angle += Time.deltaTime;
+        if (time > 1.0f)
         {
             time = 0.0f;
             ShotBullet();
-            SetAngleFromRight(angle);
+            //SetAngleFromRight(angle);
         }
         if(angle > 360.0f)
         {
