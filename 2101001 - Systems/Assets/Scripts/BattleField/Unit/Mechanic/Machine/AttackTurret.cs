@@ -44,11 +44,12 @@ public class AttackTurret : MonoBehaviour
     {
         time += Time.deltaTime;
         //angle += Time.deltaTime;
-        if (time > 1.0f)
+        if (time > 0.2f)
         {
             time = 0.0f;
             ShotBullet();
             //SetAngleFromRight(angle);
+            SetAngleFromRight(Random.Range(0, 360));
         }
         if(angle > 360.0f)
         {

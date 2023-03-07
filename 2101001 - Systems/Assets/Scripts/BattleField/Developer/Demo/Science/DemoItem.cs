@@ -30,11 +30,11 @@ public class DemoItem : ItemHelper
     #region item - weapon - knife
     static public Knife GetDemoKnife()
     {
-        Knife result = new Knife()
+        Knife result = new()
         {
             Name = "[Demo] melee",
-            subItems = new SubItemArray(
-                new SubItem()
+            subItems = new ItemArray(
+                new Other()
                 {
                     name = "blade",
                     amount = 1,
@@ -51,8 +51,8 @@ public class DemoItem : ItemHelper
         Pistol result = new Pistol(7)
         {
             Name = "[Demo] pistol",
-            subItems = new SubItemArray(
-                new SubItem()
+            subItems = new ItemArray(
+                new Other()
                 {
                     Name = "bullet",
                     amount = 7,
@@ -73,43 +73,43 @@ public class DemoItem : ItemHelper
         BuildTool result = new BuildTool()
         {
             Name = "[Demo] hammer",
-            subItems = new SubItemArray(
-                new SubItem()
+            subItems = new ItemArray(
+                new Other()
                 {
                     name = "MachineUnit101",
                     amount = 3
                 }, // 101
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit102",
                     amount = 3
                 }, // 102
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit103",
                     amount = 3
                 }, // 103
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit201",
                     amount = 3
                 }, // 201
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit301",
                     amount = 3
                 }, // 301
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit502",
                     amount = 3
                 }, // 502
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit702",
                     amount = 3
                 }, // 702
-                new SubItem()
+                new Other()
                 {
                     name = "MachineUnit803",
                     amount = 3
@@ -126,8 +126,8 @@ public class DemoItem : ItemHelper
         Turret result = new Turret()
         {
             Name = "[Demo] turret",
-            subItems = new SubItemArray(
-                new SubItem()
+            subItems = new ItemArray(
+                new Other()
                 {
                     Name = "ammo",
                     amount = 2000,
@@ -215,28 +215,16 @@ public class DemoItem : ItemHelper
 
         for (int inventoryIndex = 0; inventoryIndex < items.Length; ++inventoryIndex)
         {
-            switch (items[inventoryIndex])
+            result[inventoryIndex] = items[inventoryIndex] switch
             {
-                case "Radios":
-                    result[inventoryIndex] = new Radio();
-                    break;
-                case "Knife":
-                    result[inventoryIndex] = GetDemoKnife();
-                    break;
-                case "Pistol":
-                    result[inventoryIndex] = GetDemoPistol();
-                    break;
-                case "BuildTool":
-                    result[inventoryIndex] = GetDemoBuildTool();
-                    break;
-                case Name.TURRET:
-                    result[inventoryIndex] = GetDemoTurret();
-                    break;
-                case "Blank":
-                default:
-                    result[inventoryIndex] = new Blank();
-                    break;
-            }
+                Name.RADIOS => new Radio(),
+                Name.KNIFE => GetDemoKnife(),
+                Name.PISTOL => GetDemoPistol(),
+                Name.BUILD_TOOL => GetDemoBuildTool(),
+                Name.TURRET => GetDemoTurret(),
+                Name.BLANK => new Blank(),
+                _ => new Blank(),
+            };
         }
         return result;
     }

@@ -86,7 +86,6 @@ public class HumanUnitBase :
 
         //unitSightGo.GetComponent<PlayerSightController>
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -108,7 +107,7 @@ public class HumanUnitBase :
 
     #region 필드
     #region 파일 입출력용 데이터
-    HumanUnitBaseData humanUnitBaseData;
+    //HumanUnitBaseData humanUnitBaseData;
 
 
     #endregion
@@ -265,6 +264,7 @@ public class HumanUnitBase :
 
     #region NestedClass
     /// <summary> 소화계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class DigestiveSystem : OrganPart
     {
         public override string Name { get => "DigestiveSystem"; set => base.Name = value; }
@@ -285,6 +285,7 @@ public class HumanUnitBase :
         }
     }
     /// <summary> 순환계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class CirculatorySystem : OrganPart
     {
         public override string Name { get => "CirculatorySystem"; set => base.Name = value; }
@@ -306,6 +307,13 @@ public class HumanUnitBase :
             collisionRangeSphere.Add(
                 new Sphere() { position = new Vector3(0.0f, 0.0f, 0.0f), radius = 10.0f });
         }
+
+        public override void BeingAttacked(ref AttackClassHelper.AttackInfo attack, float angle)
+        {
+            base.BeingAttacked(ref attack, angle);
+            Hack.Say(Hack.Scope.HumanPartBase.CirculatorySystem.BeingAttacked, Hack.check.info, this, message: $"순환계 Wholeness 값 : {chemicalWholeness.Wholeness}");
+        }
+
         public void bloodCirculation(params OrganPart[] organs) // 자신 기관계도 포함하세요. // baseOrganSystems이 매개변수였음.
         {
             /// 함수 설명 : 순환계의 고유 능력인 물질 교환을 실행하는 함수입니다.
@@ -442,9 +450,9 @@ public class HumanUnitBase :
                 _organ.CheckChemicalReaction();
             }
         }
-
     }
     /// <summary> 배출계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class ExcretorySystem : OrganPart
     {
         public override string Name { get => "excretorySystem"; set => base.Name = value; }
@@ -470,6 +478,7 @@ public class HumanUnitBase :
     }
 #warning 작업중 : UnitSightScale 함수가 호출될 시점에는 UnitSightRange의 값도 따라 변해야 합니다
     /// <summary> 감각계 OrganPart입니다. </summary> <remarks> [인간 : 4번] 시각을 담당하는 유닛 파트입니다.</remarks>
+    [System.Serializable]
     public class SensorySystem : OrganPart
     {
         public GameObjectList gameObjectList;
@@ -526,9 +535,16 @@ public class HumanUnitBase :
         // OrganSystemOperatingRate가 작아질수록 EyeSight의 크기도 작아진다
 
     }
+
     /// <summary> 신경계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class NervousSystem : OrganPart
     {
+        /// <summary>
+        ///     사망하기까지 견딜수 있는 피해량입니다.
+        /// </summary>
+        private static float DEATH_LIMIT = 0.95f;
+
         //false면 통제를 할 수 없게 됩니다
         public NervousSystem() : base()
         {
@@ -573,9 +589,18 @@ public class HumanUnitBase :
         {
             base.BeingAttacked(ref attack, angle);
             Hack.Say(Hack.isDebugHumanUnitBase_Nerv, Hack.check.info, this, message: $" 신경계 Wholeness : {chemicalWholeness.Wholeness}, angle : {angle}");
+
+            if(chemicalWholeness.Wholeness < DEATH_LIMIT)
+            {
+                unit.GetComponent<UnitBase>().P_unitLife?.Kill();
+                //Hack.Say(Hack.Scope.HumanPartBase.NervousSystem.BeingAttacked, Hack.check.info, this,
+                //    message: $"사망 처리 되었습니다! : {unit.GetComponent<UnitBase>().P_unitLife?.self.isLiving}");
+                //unit.GetComponent<UnitBase>().
+            }
         }
     }
     /// <summary> 운동계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class MotorSystem : OrganPart
     {
         public MotorSystem() : base()
@@ -611,6 +636,7 @@ public class HumanUnitBase :
         // 활동량이0.1 이하로 떨어지면 활동을 못하게 막습니다.
     }
     /// <summary> 면역계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class ImmuneSystem : OrganPart
     {
         public ImmuneSystem() : base()
@@ -625,6 +651,7 @@ public class HumanUnitBase :
         }
     }
     /// <summary> 합성계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class SynthesisSystem : OrganPart
     {
         public SynthesisSystem() : base()
@@ -645,6 +672,7 @@ public class HumanUnitBase :
         }
     }
     /// <summary> 각질계 OrganPart입니다. </summary>
+    [System.Serializable]
     public class IntegumentarySystem : OrganPart
     {
         public IntegumentarySystem() : base()

@@ -23,32 +23,42 @@ public class UIController : MonoBehaviour
     public bool isGuiOpenedAtField; // GUI가 켜져 있는 동안에는 다른 작동이 허용되지 않습니다.
 
     #region 키 바인딩
-    KeyCode Select = KeyCode.Space;
+    readonly KeyCode Select = KeyCode.Space;
 
     // 플레이어 움직임
-    KeyCode MoveNorth = KeyCode.W;
-    KeyCode MoveSouth = KeyCode.S;
-    KeyCode MoveEast = KeyCode.D;
-    KeyCode MoveWest = KeyCode.A;
+    readonly KeyCode MoveNorth = KeyCode.W;
+    readonly KeyCode MoveSouth = KeyCode.S;
+    readonly KeyCode MoveEast = KeyCode.D;
+    readonly KeyCode MoveWest = KeyCode.A;
 
     // 아이템 선택하기
-    KeyCode ItemSelect1 = KeyCode.Alpha1;
-    KeyCode ItemSelect2 = KeyCode.Alpha2;
-    KeyCode ItemSelect3 = KeyCode.Alpha3;
+    readonly KeyCode ItemSelect1 = KeyCode.Alpha1;
+    readonly KeyCode ItemSelect2 = KeyCode.Alpha2;
+    readonly KeyCode ItemSelect3 = KeyCode.Alpha3;
 
     // 아이템 사용하기
-    KeyCode ItemSkill1 = KeyCode.E;
-    KeyCode ItemSkill2 = KeyCode.F;
-    KeyCode ItemReload = KeyCode.R;
+    readonly KeyCode ItemSkill1 = KeyCode.E;
+    readonly KeyCode ItemSkill2 = KeyCode.F;
+    readonly KeyCode ItemReload = KeyCode.R;
 
     // 유닛 선택하기
-    KeyCode UnitSelect = KeyCode.LeftShift;
+    readonly KeyCode UnitSelect = KeyCode.LeftShift;
+    readonly KeyCode UnitSelect1 = KeyCode.Alpha1;
+    readonly KeyCode UnitSelect2 = KeyCode.Alpha2;
+    readonly KeyCode UnitSelect3 = KeyCode.Alpha3;
+    readonly KeyCode UnitSelect4 = KeyCode.Alpha4;
+    readonly KeyCode UnitSelect5 = KeyCode.Alpha5;
+    readonly KeyCode UnitSelect6 = KeyCode.Alpha6;
+    readonly KeyCode UnitSelect7 = KeyCode.Alpha7;
+    readonly KeyCode UnitSelect8 = KeyCode.Alpha8;
+    readonly KeyCode UnitSelect9 = KeyCode.Alpha9;
+    readonly KeyCode UnitSelect10 = KeyCode.Alpha0;
 
     // 유닛 명령하기
-    KeyCode UnitCommand = KeyCode.Q;
+    readonly KeyCode UnitCommand = KeyCode.Q;
 
     // 봇 유닛 메뉴
-    KeyCode BotMenu = KeyCode.Tab;
+    readonly KeyCode BotMenu = KeyCode.Tab;
 
     #endregion
 
@@ -314,16 +324,16 @@ public class UIController : MonoBehaviour
         if (selectedUnit != null)
         {
             if (Input.GetKey(MoveNorth) ||
-                Input.GetKey(KeyCode.A) ||
+                Input.GetKey(MoveWest) ||
                 Input.GetKey(MoveSouth) ||
-                Input.GetKey(KeyCode.D))
+                Input.GetKey(MoveEast))
             {
                 Vector3 WalkDirection = new Vector3(0, 0, 0);
                 if (Input.GetKey(MoveNorth))
                 {
                     WalkDirection += new Vector3(0, 0, 1);
                 }
-                if (Input.GetKey(KeyCode.A))
+                if (Input.GetKey(MoveWest))
                 {
                     WalkDirection += new Vector3(-1, 0, 0);
                 }
@@ -331,7 +341,7 @@ public class UIController : MonoBehaviour
                 {
                     WalkDirection += new Vector3(0, 0, -1);
                 }
-                if (Input.GetKey(KeyCode.D))
+                if (Input.GetKey(MoveEast))
                 {
                     WalkDirection += new Vector3(1, 0, 0);
                 }
@@ -474,7 +484,7 @@ public class UIController : MonoBehaviour
         if (selectedUnit == null) return;
         if (Input.GetKey(Select)) return; // Space는 유닛 선택용 키입니다.
 
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.R))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(ItemReload))
         {
             // 함수 내 지역변수 RayToMousePoint
             Ray RayToMousePoint = FieldCamera.ScreenPointToRay(Input.mousePosition);
@@ -525,17 +535,17 @@ public class UIController : MonoBehaviour
                 Debug.Log("ItemUse");
 
             }
-            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.E)) && (!Input.GetKey(Select)))
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(ItemSkill1)) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSkillE(AttackDirection);
                 Debug.Log("ItemSkill");
             }
-            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(KeyCode.F)) && (!Input.GetKey(Select)))
+            else if (Input.GetMouseButtonDown(0) && (Input.GetKey(ItemSkill2)) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSkillF(AttackDirection);
                 Debug.Log("ItemSkill");
             }
-            else if (Input.GetKeyDown(KeyCode.R) && (!Input.GetKey(Select)))
+            else if (Input.GetKeyDown(ItemReload) && (!Input.GetKey(Select)))
             {
                 selectedUnit.GetComponent<UnitBase>().ItemSupply(AttackDirection);
                 Debug.Log("ItemSupply");
@@ -583,53 +593,53 @@ public class UIController : MonoBehaviour
         if (selectedUnit == null) return;
         if (Input.GetKey(KeyCode.BackQuote)) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) selectedUnit.GetComponent<UnitBase>().ItemSelect(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) selectedUnit.GetComponent<UnitBase>().ItemSelect(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) selectedUnit.GetComponent<UnitBase>().ItemSelect(2);
+        if (Input.GetKeyDown(ItemSelect1)) selectedUnit.GetComponent<UnitBase>().ItemSelect(0);
+        if (Input.GetKeyDown(ItemSelect2)) selectedUnit.GetComponent<UnitBase>().ItemSelect(1);
+        if (Input.GetKeyDown(ItemSelect3)) selectedUnit.GetComponent<UnitBase>().ItemSelect(2);
     }
     void UnitSelectByKey()
     {
         if (selectedUnit == null) return;
         if (!Input.GetKey(KeyCode.BackQuote)) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(UnitSelect1))
         {
             selectedUnit.GetComponent<UnitBase>().Select(1);
             // 외부에서 SetSelectUnit 함수를 호출할 것.
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(UnitSelect2))
         {
             selectedUnit.GetComponent<UnitBase>().Select(2);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Input.GetKeyDown(UnitSelect3))
         {
             selectedUnit.GetComponent<UnitBase>().Select(3);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        if (Input.GetKeyDown(UnitSelect4))
         {
             selectedUnit.GetComponent<UnitBase>().Select(4);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
+        if (Input.GetKeyDown(UnitSelect5))
         {
             selectedUnit.GetComponent<UnitBase>().Select(5);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha6))
+        if (Input.GetKeyDown(UnitSelect6))
         {
             selectedUnit.GetComponent<UnitBase>().Select(6);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
+        if (Input.GetKeyDown(UnitSelect7))
         {
             selectedUnit.GetComponent<UnitBase>().Select(7);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha8))
+        if (Input.GetKeyDown(UnitSelect8))
         {
             selectedUnit.GetComponent<UnitBase>().Select(8);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        if (Input.GetKeyDown(UnitSelect9))
         {
             selectedUnit.GetComponent<UnitBase>().Select(9);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(UnitSelect10))
         {
             selectedUnit.GetComponent<UnitBase>().Select(10);
         }

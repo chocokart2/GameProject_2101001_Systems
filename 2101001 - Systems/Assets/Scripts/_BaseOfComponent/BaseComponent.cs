@@ -13,6 +13,13 @@ public class BaseComponent : MonoBehaviour
 
     #region 컴포넌트에 사용되는 인터페이스
     /// <summary>
+    ///     직렬화가 
+    /// </summary>
+    public interface ISerializableClass
+    {
+        
+    }
+    /// <summary>
     ///     이 인터페이스를 상속하는 컴포넌트는 직렬화 가능한 클래스의 객체를 받을 수 있습니다. </summary>
     /// <typeparam name="T">
     ///     데이터 출력을 위한 클래스입니다. </typeparam>

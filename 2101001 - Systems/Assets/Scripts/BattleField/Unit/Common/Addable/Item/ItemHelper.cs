@@ -43,6 +43,9 @@ public class ItemHelper : BaseComponent
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         멤버 : 이름, 갯수, 서브아이템, 공격정보.
+    ///     </para>
+    ///     <para>
     ///         서브 아이템: 이 아이템을 구성하는 아이템을 나타냅니다.
     ///     </para>
     ///     <para>
@@ -51,22 +54,29 @@ public class ItemHelper : BaseComponent
     /// 
     /// </remarks>
     [System.Serializable]
-    public abstract class Item : ITool
+    public abstract class Item : ITool, INameKey
     {
 #warning 개선안 : 서브 아이템 목록에서는 번호 인덱스로 접근하는데, 딕셔너리를 이용해 이름으로 바로 접근하는 방법을 추가한다. 딕셔너리 : 이름 -> 인덱스
         [System.NonSerialized] public static GameObjectList gameObjectList;
-        public string Name;
+        public int amount;
+        public string name;
         /// <summary>
-        ///     아이템의 설정을 나타냅니다
+        ///     "분리 가능"한 이 아이템의 부품들입니다.
         /// </summary>
-        public SubItemArray subItems;
+        public ItemArray subItems = null;
+        public AttackClassHelper.AttackInfo attackInfo; // 이 아이템을 공격에 사용할 경우입니다.
 
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        }
         public virtual string ItemType { get => "UNDEFINED_TYPE"; }
 
-        public abstract float Use(GameObject user, Vector3 vector3); // 아이템을 사용할 시 호출됩니다.
-        public abstract float ESkill(GameObject user, Vector3 vector3); // 아이템 스킬을 사용할 시 호출됩니다.
-        public abstract float FSkill(GameObject user, Vector3 vector3);
-        public abstract float Supply(GameObject user, Vector3 vector3); // 아이템 보충용 스킬을 사용할 시 호출됩니다.
+        public virtual float Use(GameObject user, Vector3 vector3) => 0.0f; // 아이템을 사용할 시 호출됩니다.
+        public virtual float ESkill(GameObject user, Vector3 vector3) => 0.0f; // 아이템 스킬을 사용할 시 호출됩니다.
+        public virtual float FSkill(GameObject user, Vector3 vector3) => 0.0f;
+        public virtual float Supply(GameObject user, Vector3 vector3) => 0.0f; // 아이템 보충용 스킬을 사용할 시 호출됩니다.
         /// <summary>
         ///     매 프레임마다 호출되는 함수입니다.
         /// </summary>
@@ -75,7 +85,7 @@ public class ItemHelper : BaseComponent
         /// </remarks>
         /// <param name="deltaTime"></param>
         /// <returns></returns>
-        public abstract float Update(GameObject user, float deltaTime); // 매 프레임마다 호출되는 함수입니다.
+        public virtual float Update(GameObject user, float deltaTime) => 0.0f; // 매 프레임마다 호출되는 함수입니다.
     }
     /// <summary>
     /// 아이템 내부의 아이템 하나를 정의합니다.
@@ -83,28 +93,32 @@ public class ItemHelper : BaseComponent
     /// 아이템 내부에 들어가는 물품들을 정의할 수 있습니다.
     /// 좋은 예시로, 권총에 들어가는 탄알이 이에 해당합니다. 권총은 공격을 할때 탄알을 소모하기 때문입니다.
     /// 
-    [System.Serializable]
-    public class SubItem : INameKey
-    {
-        public string name;
-        public int amount;
-        public AttackClassHelper.AttackInfo attackInfo; // 이 아이템이 공격에 해당하는경우입니다.
+    //[System.Serializable]
+    //public class ====== : INameKey
+    //{
+    //    public string name;
+    //    public int amount;
+    //    public AttackClassHelper.AttackInfo attackInfo; // 이 아이템이 공격에 해당하는경우입니다.
 
-        public string Name { get => name; set => name = value; }
-    }
+    //    public string Name { get => name; set => name = value; }
+    //}
     /// <summary>
-    ///     아이템 내부의 아이템들을 정의합니다.
+    ///     아이템 내부의 여러 종류의 아이템들을 정의합니다.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         만약 단일 아이템에 접근하고 싶다면 SubItem을 참고하십시오.
+    ///         만약 단일 아이템에 접근하고 싶다면 Item을 참고하십시오.
     ///     </para>
     /// </remarks>
     [System.Serializable]
-    public class SubItemArray : IArray<SubItem>
+    public class ItemArray : IArray<Item>
     {
-        public SubItem[] self;
+        public Item[] self;
+#warning 내부 아이템이 변경되었을때, 업데이트를 하지 않았을때, 이를 나타내주는 불리언 변수가 있으면 좋을듯!
 #warning 이거 로딩했을때 키벨류 초기화해주는 함수 만들어야겠는데.
+        /// <summary>
+        ///     아이템의 이름을 넣으면 배열속 해당하는 아이템의 인덱스를 리턴해주는 딕셔너리입니다.
+        /// </summary>
         [System.NonSerialized] public Dictionary<string, int> nameIndexPairs;
 
         public int Length
@@ -128,7 +142,7 @@ public class ItemHelper : BaseComponent
         ///         isAccessed : 접근 성공했는지를 나타내는 불리언 값입니다.
         ///     </para>
         /// </returns>
-        public (SubItem result, bool isAccessed) this[string name]
+        public (Item result, bool isAccessed) this[string _name]
         {
             get
             {
@@ -138,26 +152,26 @@ public class ItemHelper : BaseComponent
                     UpdateIndex();
                 }
 
-                if (self[nameIndexPairs[name]].name != name)
+                if (self[nameIndexPairs[_name]].name != _name)
                 {
                     UpdateIndex();
-                    if (self[nameIndexPairs[name]].name != name)
+                    if (self[nameIndexPairs[_name]].name != _name)
                     {
                         Debug.LogWarning("<!>ERROR_SubItemArray.this[string] : 존재하지 않는 이름에 대해 접근하였습니다.");
-                        return (new SubItem(), false);
+                        return (null, false);
                     }
                 }
-                return (self[nameIndexPairs[name]], true);
+                return (self[nameIndexPairs[_name]], true);
             }
         }
-        public SubItem this[int index]
+        public Item this[int index]
         {
             get => self[index];
             set => self[index] = value;
         }
 
-        public SubItemArray() { }
-        public SubItemArray(params SubItem[] subItems) { self = subItems; }
+        public ItemArray() { }
+        public ItemArray(params Item[] items) { self = items; }
 
 #warning lv 1 func 이 함수 테스트 안함.
         /// <summary>
@@ -224,6 +238,7 @@ public class ItemHelper : BaseComponent
         }
 
     }
+
     #endregion
     #region ItemList
     #region item - Nothing
@@ -280,6 +295,33 @@ public class ItemHelper : BaseComponent
             return 0.0f;
         }
     }
+    #endregion
+    #region item - Others
+    public class Other : Item
+    {
+        public override float ESkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float FSkill(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Supply(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+        public override float Update(GameObject user, float deltaTime)
+        {
+            return 0.0f;
+        }
+        public override float Use(GameObject user, Vector3 vector3)
+        {
+            return 0.0f;
+        }
+    }
+
+
     #endregion
 
     #region item - watcher

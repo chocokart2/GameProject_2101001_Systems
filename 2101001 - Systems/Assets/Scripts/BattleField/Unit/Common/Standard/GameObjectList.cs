@@ -35,6 +35,9 @@ public class GameObjectList : MonoBehaviour
     /// <summary>
     ///     AttackObject 프리펩이 존재하는 폴더의 위치입니다. </summary>
     private const string M_ATTACK_OBJECT_FOLDER = "Prefabs/BattleField/AttackObject";
+    /// <summary>
+    ///     Particles 프리펩이 존재하는 폴더의 위치입니다.</summary>
+    private const string M_3D_ICON_FOLDER = "Prefabs/BattleField/Particles";
 #warning todo : 여기에 게임오브젝트 옮겨담기.
     // 변수 묶음
     /// <summary>
@@ -179,6 +182,23 @@ public class GameObjectList : MonoBehaviour
         private static GameObject m_knifeBlade;
     }
     
+    public static class ParticlesPrefabs
+    {
+        public static GameObject DeadIcon
+        {
+            get
+            {
+                if (m_deadIcon == null)
+                {
+                    m_deadIcon = Resources.Load<GameObject>($"{M_3D_ICON_FOLDER}/DeadIcon");
+                }
+                return m_deadIcon;
+            }
+        }
+
+        private static GameObject m_deadIcon;
+    }
+
     //LayerMask UnitLayerMask;
     // 뭔지 모르겠으면 awake를 보세요.
     void Awake()

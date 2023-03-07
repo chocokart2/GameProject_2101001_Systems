@@ -41,12 +41,27 @@ public class UnitLife : MonoBehaviour,
 
     }
     // function
+#warning DemoFunction;
+    public static Life GetDemoLife()
+    {
+        return new Life() { isLiving = true };
+    }
     // interface
     public Life GetComponentData() { return self; }
     public void SetComponentData(Life data) { self = data; }
     // just public
     public void Kill()
     {
+        if (self.isLiving)
+        {
+            Hack.Say(Hack.Scope.UnitLife.Kill, Hack.check.info, this,
+                message: $"사망 처리 되었습니다. 객체 이름 : {name}");
+
+            if (Hack.TrapNull(transform)) Debug.Log("AAA!");
+            GameObject instantiatedObject = Instantiate(GameObjectList.ParticlesPrefabs.DeadIcon, transform.position + new Vector3(0,1,0), Quaternion.identity, transform);
+        }
+
+
         self.isLiving = false;
         // 여기에 이미지 바꾸기.
         UnitAppearance temp_Appearance = GetComponent<UnitAppearance>();

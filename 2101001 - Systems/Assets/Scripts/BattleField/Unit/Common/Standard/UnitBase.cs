@@ -22,7 +22,10 @@ using UnityEngine;
 ///     <para>
 ///         빛과 시야를 담당하는 함수들도 존재합니다. 이들은 다른 컴포넌트에 담도록 합니다.</para></remarks>
 public class UnitBase : 
-    BaseComponent, GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
+    BaseComponent,
+    BaseComponent.IDataGetableComponent<UnitBase.UnitBaseData>,
+    BaseComponent.IDataSetableComponent<UnitBase.UnitBaseData>,
+    GameManager.IComponentDataIOAble<UnitBase.UnitBaseData>
     //BaseComponent.IDataGetableComponent<>
 {
     #region UnitBase member
@@ -80,7 +83,40 @@ public class UnitBase :
     // 이 게임오브젝트의 컴포넌트
     private MeshRenderer m_myMeshRenderer;
     private UnitItemPack m_myUnitItemPack;
-    private UnitLife m_myUnitLife;
+    private UnitLife m_myUnitLife; private bool hasTryGet_m_myUnitLife = false;
+    public UnitLife P_unitLife
+    {
+        get
+        {
+            if (hasTryGet_m_myUnitLife == false)
+            {
+                m_myUnitLife = GetComponent<UnitLife>();
+                hasTryGet_m_myUnitLife = true;
+            }
+
+            if (m_myUnitLife == null)
+            {
+                Hack.Error(GetType().Name, $"UnitLife 변수가 널 값입니다! : {name}");
+                return null;
+            }
+            return m_myUnitLife;
+        }
+        set
+        {
+            if (hasTryGet_m_myUnitLife == false)
+            {
+                m_myUnitLife = GetComponent<UnitLife>();
+                hasTryGet_m_myUnitLife = true;
+            }
+
+            if (m_myUnitLife == null)
+            {
+                Hack.Error(GetType().Name, $"UnitLife 변수가 널 값입니다! : {name}");
+                return;
+            }
+            m_myUnitLife = value;
+        }
+    }
     private UnitMovable m_myUnitMovable;
     private UnitAppearance m_myUnitAppearance;
     private BiologicalPartBase m_myBiologicalPartBase;
@@ -156,6 +192,14 @@ public class UnitBase :
         unitBaseData = inputData;
     }
     public UnitBaseData GetData()
+    {
+        return unitBaseData;
+    }
+    public void SetComponentData(UnitBaseData inputData)
+    {
+        unitBaseData = inputData;
+    }
+    public UnitBaseData GetComponentData()
     {
         return unitBaseData;
     }

@@ -2,14 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole.UnitRoleData>
+/// <summary>
+///     이 유닛의 역할 및 스쿼드속 역할에 대해서 다룹니다.
+/// </summary>
+/// <remarks>
+///     속해있는 유닛, 스쿼드, 팀을 특정할 수 있는 정보를 가지고 있습니다. 인간 유형이 아니더라도, 특정한 역할을 맡을 수 있다면 이 컴포넌트를 주입하세요.
+/// </remarks>
+public class UnitRole : 
+    MonoBehaviour, 
+    BaseComponent.IDataGetableComponent<UnitRole.UnitRoleData>,
+    BaseComponent.IDataSetableComponent<UnitRole.UnitRoleData>,
+    GameManager.IComponentDataIOAble<UnitRole.UnitRoleData>
 {
-    #region 어디에 쓰이는 클래슨고?
-    // 이 유닛의 직업에 대해서 다룹니다.
-    // 속해있는 유닛, 스쿼드, 팀을 특정할 수 있는 정보를 가지고 있습니다.
-    // 인간 유형이 아니더라도, 특정한 역할을 맡을 수 있다면 이 컴포넌트를 주입하세요.
-    #endregion
-
+    #region Class Member
     #region 필드
     //public:
     public EditorField roleForEditMode;
@@ -20,7 +25,59 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
     
     
     #endregion
-    #region 구조체
+    #region Method
+    #region 생성자 역할
+    // Start is called before the first frame update
+    void Start()
+    {
+        if(mRoleData == null)
+        {
+
+        }
+
+
+    }
+    #endregion
+    #region 메인 함수 역할
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    #endregion
+    #region 인터페이스 함수들
+    #region IComponentDataIOAble
+    public void SetData(UnitRoleData input)
+    {
+        mRoleData = input;
+    }
+    public UnitRoleData GetData()
+    {
+        if(mRoleData == null)
+        {
+            // 데이터 묶음에 접근하여 아이디 값을 얻습니다.
+            //bmRoleData.
+        }
+        
+        return mRoleData;
+    }
+
+    public void SetComponentData(UnitRoleData data)
+    {
+        mRoleData = data;
+    }
+    public UnitRoleData GetComponentData()
+    {
+        return mRoleData;
+    }
+    #endregion
+
+
+    #endregion
+    #endregion
+    #endregion
+    #region Nested Class
+    #region Structure
     [System.Serializable]
     public struct EditorField
     {
@@ -52,9 +109,8 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
 
         public int unitID;
     }
-
     #endregion
-    #region 클래스
+    #region Class
     [System.Serializable]
     public class UnitRoleData
     {
@@ -85,8 +141,26 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
         // WorldManager 수준에서 각 팀 / 스쿼드 / 유닛을 특정하는 정보는 따로 만들어야 합니다.
         MemberInfo memberInfo;
 
+        /// <summary>
+        ///     자신의 팀의 번호.
+        /// </summary>
+        /// <remarks>
+        ///     배열의 인덱스 값이 아닙니다.    
+        /// </remarks>
         public int teamID; // TeamID는 인덱스 값이 아닙니다!
+        /// <summary>
+        ///     자신의 스쿼드의 번호.
+        /// </summary>
+        /// <remarks>
+        ///     배열의 인덱스 값이 아닙니다.    
+        /// </remarks>
         public int squadID; // 자신이 소속한 스쿼드 아이디 (!인덱스가 아님!)
+        /// <summary>
+        ///     자신의 유닛의 번호.
+        /// </summary>
+        /// <remarks>
+        ///     배열의 인덱스 값이 아닙니다.    
+        /// </remarks>
         public int unitID; //UnitID는 인덱스 값이 아닙니다!
 
 
@@ -95,54 +169,6 @@ public class UnitRole : MonoBehaviour, GameManager.IComponentDataIOAble<UnitRole
 
         #endregion
     }
-
-
-
-
-    #endregion
-    #region 생성자 역할
-    // Start is called before the first frame update
-    void Start()
-    {
-        if(mRoleData == null)
-        {
-
-        }
-
-
-    }
-    #endregion
-    #region 메인 함수 역할
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    #endregion
-    #region 함수들
-    #region 인터페이스 함수들
-    #region IComponentDataIOAble
-    public void SetData(UnitRoleData input)
-    {
-        mRoleData = input;
-    }
-    public UnitRoleData GetData()
-    {
-        if(mRoleData == null)
-        {
-            // 데이터 묶음에 접근하여 아이디 값을 얻습니다.
-            //bmRoleData.
-        }
-        
-        return mRoleData;
-    }
-
-
-
-    #endregion
-
-
     #endregion
     #endregion
-
 }

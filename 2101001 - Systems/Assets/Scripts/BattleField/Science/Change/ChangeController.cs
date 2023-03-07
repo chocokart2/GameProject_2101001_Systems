@@ -14,14 +14,14 @@ public class ChangeController :
     static bool isInited = false;
 
     static private ChemicalReactionTable reactions;
-    public ChemicalReactionTable Reactions
+    static public ChemicalReactionTable Reactions
     {
         get { return reactions; }
         private set { reactions = value; }
     }
 
     static private ChemicalEnergyResistTable energyResists;
-    public ChemicalEnergyResistTable EnergyResists
+    static public ChemicalEnergyResistTable EnergyResists
     {
         get { return energyResists; }
         private set { energyResists = value; }

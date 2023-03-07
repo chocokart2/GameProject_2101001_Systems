@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.Search;
 
 #warning 해야 할 일 : 화학 반응 실행하는거 => 이후 HumanUnitBase 손보기
 /// <summary>
@@ -71,10 +72,14 @@ public class ChemicalHelper : BaseComponent
     /// <summary>
     /// 여러개의 화학 물질을 표현하는 클래스입니다.
     /// </summary>
-    public class Chemicals : IEnumerable, IEnumerator, IArray<Chemical>, IExpandable<Chemical>
+    [System.Serializable]
+    public class Chemicals : ICollection, IEnumerable, IEnumerator, IArray<Chemical>, IExpandable<Chemical>
     {
         public Chemical[] self;
 
+        public object SyncRoot { get => self.SyncRoot; }// 잘 모르겠어요
+        public bool IsSynchronized { get => self.IsSynchronized; } // 잘 모르겠어요.
+        public int Count { get => self.Length; }
         public int Length { get => self.Length; }
         public float Quantity
         {
@@ -328,6 +333,10 @@ public class ChemicalHelper : BaseComponent
                     self[indexArray[index]].Quantity = newChemicals[index].Quantity;
                 }
             }
+        }
+        public void CopyTo(Array array, int index)
+        {
+            self.CopyTo(array, index);
         }
         /// <summary>
         /// IEnumerable의 인터페이스 함수

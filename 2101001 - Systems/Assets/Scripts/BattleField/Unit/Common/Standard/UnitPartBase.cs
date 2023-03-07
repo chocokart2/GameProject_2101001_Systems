@@ -35,7 +35,6 @@ public class UnitPartBase : BaseComponent
         // 작동하는 것
         // 충돌 범위
 
-
         protected ChangeController changeController; // 화학 반응시 참고
 #warning chemicalController의 역할은 changeController로 옮겨갈 예정입니다.
         ChemicalController chemicalController;
@@ -116,9 +115,6 @@ public class UnitPartBase : BaseComponent
             Hack.Say(Hack.Scope.UnitPartBase.UnitPart.Constructor, Hack.check.method, this, 
                 message: "DEBUG_UnitPart.UnitPart() : 생성자가 호출되었습니다.");
 
-            chemicalController = GameObject.Find("GameManager").GetComponent<ChemicalController>();
-            changeController = GameObject.Find("GameManager").GetComponent<ChangeController>();
-
             tagged = new ChemicalHelper.Chemicals();
             demand = new ChemicalHelper.Chemicals();
             collisionRangeSphere = new Spheres();
@@ -127,6 +123,7 @@ public class UnitPartBase : BaseComponent
         }
         public UnitPart(UnitPart data)
         {
+#warning 여기에 에러 뜰 것 같은데
             chemicalController = GameObject.Find("GameManager").GetComponent<ChemicalController>();
             changeController = GameObject.Find("GameManager").GetComponent<ChangeController>();
 
@@ -157,7 +154,7 @@ public class UnitPartBase : BaseComponent
             NamedQuantityArrayHelper.Add<EnergyHelper.Energies, EnergyHelper.Energy>
                 (ref generatedEnergies, attackEnergy);
 
-            chemicalController.reactions.ActivateReaction(ref tagged, ref generatedEnergies);
+            ChemicalController.reactions.ActivateReaction(ref tagged, ref generatedEnergies);
         }
         /// <summary>
         ///     외부에서 공격하는 대상이 호출하는 함수입니다.
@@ -258,23 +255,23 @@ public class UnitPartBase : BaseComponent
             do
             {
                 // 화학 반응 체크
-                int reactionIndex = changeController.Reactions.GetIndex(chemicalsForReaction, energiesForReaction);
+                int reactionIndex = ChangeController.Reactions.GetIndex(chemicalsForReaction, energiesForReaction);
                 if (reactionIndex == -1) break;
                 // 반응 비율 획득
                 float reactionRatioChemical =
                     NamedQuantityArrayHelper.Divide
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
-                    (chemicalsForReaction, changeController.Reactions[reactionIndex].reactants);
+                    (chemicalsForReaction, ChangeController.Reactions[reactionIndex].reactants);
                 float reactionRatioEnergy =
                     NamedQuantityArrayHelper.Divide
                     <EnergyHelper.Energies, EnergyHelper.Energy>
-                    (energiesForReaction, changeController.Reactions[reactionIndex].ActivationEnergy);
+                    (energiesForReaction, ChangeController.Reactions[reactionIndex].ActivationEnergy);
                 float reactionRatio = MathF.Min(reactionRatioChemical, reactionRatioEnergy);
 
                 // 반응 적용
                 // 캐미컬 빼기
                 // 계산용 값 제거
-                ChemicalHelper.Chemicals reactants = changeController.Reactions[reactionIndex].reactants;
+                ChemicalHelper.Chemicals reactants = ChangeController.Reactions[reactionIndex].reactants;
                 NamedQuantityArrayHelper.Multiply
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
                     (ref reactants, reactionRatio);
@@ -295,7 +292,7 @@ public class UnitPartBase : BaseComponent
 
                 // 캐미컬 더하기
                 // 계산용 값 추가
-                ChemicalHelper.Chemicals products = changeController.Reactions[reactionIndex].products;
+                ChemicalHelper.Chemicals products = ChangeController.Reactions[reactionIndex].products;
                 NamedQuantityArrayHelper.Multiply
                     <ChemicalHelper.Chemicals, ChemicalHelper.Chemical>
                     (ref products, reactionRatio);
@@ -309,7 +306,7 @@ public class UnitPartBase : BaseComponent
                     (ref others, products);
 
                 // 에너지 빼기
-                EnergyHelper.Energies activation = changeController.Reactions[reactionIndex].ActivationEnergy;
+                EnergyHelper.Energies activation = ChangeController.Reactions[reactionIndex].ActivationEnergy;
 
                 NamedQuantityArrayHelper.Multiply
                     <EnergyHelper.Energies, EnergyHelper.Energy>
@@ -321,8 +318,8 @@ public class UnitPartBase : BaseComponent
                     <EnergyHelper.Energies, EnergyHelper.Energy>
                     (ref attack.energies, activation);
 
-                // 에너지 더하기]
-                EnergyHelper.Energies generatedEnergy = changeController.Reactions[reactionIndex].EnergyReaction;
+                // 에너지 더하기
+                EnergyHelper.Energies generatedEnergy = ChangeController.Reactions[reactionIndex].EnergyReaction;
                 NamedQuantityArrayHelper.Multiply
                     <EnergyHelper.Energies, EnergyHelper.Energy>
                     (ref generatedEnergy, reactionRatio);
@@ -468,8 +465,7 @@ public class UnitPartBase : BaseComponent
             for(int indexEnergy = 0; indexEnergy < energies.Length; ++indexEnergy)
             {
                 // 너무 길어서 끊었어요.
-#warning ERROR NullReferenceException. 나는 changeController의 객체도 없고, energyResists의 내용도 만들지 않았습니다.
-                ChangeHelper.EnergyResist energyResist = changeController.EnergyResists[targetChemical.Name][energies[indexEnergy].Name];
+                ChangeHelper.EnergyResist energyResist = ChangeController.EnergyResists[targetChemical.Name][energies[indexEnergy].Name];
 
                 // 임계 피해량보다 센지 체크합니다.
                 if (energyResist.resistanceDefense < energies[indexEnergy].Quantity)
@@ -584,6 +580,7 @@ public class UnitPartBase : BaseComponent
     /// <remarks>
     ///     주로 어떤 각도에서 얼만큼 피해를 입었는지를 표기할 수 있습니다.
     /// </remarks>
+    [System.Serializable]
     public class SingleChemicalWholeness : INameKey
     {
         /// <summary>
@@ -655,7 +652,7 @@ public class UnitPartBase : BaseComponent
         /// </returns>
         public float Add(Penetration penetration)
         {
-            Hack.Say(Hack.isDebugUnitPartBase, Hack.check.method, this);
+            Hack.Say(Hack.Scope.UnitPartBase.SingleChemicalWholeness.Add, Hack.check.method, this);
             // 리턴할 값입니다.
             float result = 0.0f;
 
@@ -749,7 +746,7 @@ public class UnitPartBase : BaseComponent
             foreach (Penetration one in damages) AddElementArray(ref realDamages, one);
 
 #warning DEBUG_CODE
-            foreach (Penetration one in damages) Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: $"position : x = {one.angle}, y = {one.Quantity}");
+            for(int index = 0; index < damages.Length; index++) Hack.Say(Hack.isDebugUnitPartBase, Hack.check.info, this, message: $"position : x = {damages[index].angle}, y = {damages[index].Quantity}");
 
             for(int index = 0; index < damages.Length; index++)
             {
@@ -1039,6 +1036,8 @@ public class UnitPartBase : BaseComponent
     [System.Serializable]
     public class Spheres : IArray<Sphere>
     {
+        public Sphere[] self;
+
         public int Length
         {
             get => self.Length;
@@ -1048,8 +1047,6 @@ public class UnitPartBase : BaseComponent
             get => self[index];
             set => self[index] = value;
         }
-
-        Sphere[] self;
 
         public Spheres(params Sphere[] spheres)
         {

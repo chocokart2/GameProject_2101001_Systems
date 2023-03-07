@@ -30,6 +30,7 @@ public class Hack : BaseComponent
         private static bool? all = null;
 
         #region System.Common
+        // BaseComponent
         public static class BaseComponent
         {
             private static bool? _all = null;
@@ -50,6 +51,8 @@ public class Hack : BaseComponent
 
         #endregion
         #region Units.Common.Standard
+        // UnitBase
+        // UnitPartBase
         public static class UnitBase
         {
             private static bool? _all = null;
@@ -88,16 +91,75 @@ public class Hack : BaseComponent
             {
                 private static bool? __all = null;
 
-                private static bool getAngleWholeness = true;
+                private static bool getAngleWholeness = false;
+                private static bool add = false;
 
+                public static bool Add
+                {
+                    get => ((all ?? _all) ?? __all) ?? add;
+                    set => add = value;
+                }
                 public static bool GetAngleWholeness
                 {
                     get => ((all ?? _all) ?? __all) ?? getAngleWholeness;
+                    set => getAngleWholeness = value;
                 }
             }
         }
         #endregion
+        #region Units.Common.Standard.Function
+        public static class UnitLife
+        {
+            private static bool? _all = null;
 
+            private static bool kill = true;
+
+            public static bool Kill
+            {
+                get => (all ?? _all) ?? kill;
+                set => kill = value;
+            }
+        }
+
+
+
+        #endregion
+        #region Units.Biological.Human
+        // HumanPartBase
+
+        /// <summary>
+        ///     (구) HumanUnitBase 의 스코프입니다.
+        /// </summary>
+        public static class HumanPartBase
+        {
+            private static bool? _all = null;
+
+            public static class CirculatorySystem
+            {
+                private static bool? __all = null;
+
+                private static bool beingAttacked = true;
+
+                public static bool BeingAttacked
+                {
+                    get => ((all ?? _all) ?? __all) ?? beingAttacked;
+                    set => beingAttacked = value;
+                }
+            }
+            public static class NervousSystem
+            {
+                private static bool? __all = null;
+
+                private static bool beingAttacked = true;
+
+                public static bool BeingAttacked
+                {
+                    get => ((all ?? _all) ?? __all) ?? beingAttacked;
+                    set => beingAttacked = value;
+                }
+            }
+        }
+        #endregion
 
 
     }

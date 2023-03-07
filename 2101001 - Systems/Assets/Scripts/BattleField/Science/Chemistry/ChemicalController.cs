@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class ChemicalController : ChemicalHelper
 {
-    public ChemicalReactionArray reactions;
+    public static ChemicalReactionArray reactions;
 
 
     // Start is called before the first frame update
